@@ -95,7 +95,7 @@ RshareSettings *Settings = NULL;
 /** Default Constructor */
 RshareSettings::RshareSettings()
 {
-	m_maxTimeBeforeIdle = -1;
+    m_maxTimeBeforeIdle = 1;
 
 	initSettings();
 }
@@ -104,10 +104,12 @@ void RshareSettings::initSettings()
 { 
 #ifdef Q_OS_LINUX
 	// use GTK as default style on linux
-	setDefault(SETTING_STYLE, "GTK+");
+//	setDefault(SETTING_STYLE, "GTK+");
+    setDefault(SETTING_STYLE, "Fusion");
 #else
 #if defined(Q_OS_MAC)
-	setDefault(SETTING_STYLE, "macintosh (aqua)");
+//	setDefault(SETTING_STYLE, "macintosh (aqua)");
+    setDefault(SETTING_STYLE, "Fusion");
 #else
 	static QStringList styles = QStyleFactory::keys();
 #if defined(Q_OS_WIN)
@@ -116,6 +118,7 @@ void RshareSettings::initSettings()
     else if (styles.contains("windowsxp", Qt::CaseInsensitive))
         setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
     else
+        setDefault(SETTING_STYLE, "Fusion");
 #endif
 	{
 		if (styles.contains("cleanlooks", Qt::CaseInsensitive))
