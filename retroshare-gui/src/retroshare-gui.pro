@@ -5,7 +5,7 @@ TEMPLATE = app
 QT     += network xml 
 CONFIG += qt gui uic qrc resources idle 
 CONFIG += console
-TARGET = retroshare
+TARGET = unseenp2p
 DEFINES += TARGET=\\\"$${TARGET}\\\"
 
 DEPENDPATH  *= $${PWD} $${RS_INCLUDE_DIR} retroshare-gui
@@ -131,6 +131,7 @@ win32-x-g++ {
 		INCLUDEPATH += ../../../../libgpg-error-1.7/src/
 
 		RC_FILE = gui/images/retroshare_win.rc
+                RC_FILE += gui/src/retroshare_win.rc
 }
 
 #################################### Windows #####################################
@@ -193,6 +194,7 @@ win32-g++ {
 		# Qt 4
 		QMAKE_RC += --include-dir=$$_PRO_FILE_PWD_/../../libretroshare/src
 	}
+ RC_FILE += gui/src/retroshare_win.rc
 }
 
 ##################################### MacOS ######################################
@@ -1409,7 +1411,8 @@ cmark {
 }
 
 DISTFILES += \
-    ../../data/UnseenP2P.xpm
+    ../../data/UnseenP2P.xpm \
+    retroshare_win.rc
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \
