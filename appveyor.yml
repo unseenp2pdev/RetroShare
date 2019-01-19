@@ -142,7 +142,7 @@ build_script:
 # scripts to run after build
 after_build:
   - mkdir %RS_DEPLOY%
-  - copy retroshare-nogui\src\unseenp2p-nogui.exe %RS_DEPLOY%\unseenp2p-nogui.exe
+  - copy retroshare-nogui\src\retroshare-nogui.exe %RS_DEPLOY%\unseenp2p-nogui.exe
   - copy retroshare-gui\src\unseenp2p.exe %RS_DEPLOY%\unseenp2p.exe
 
 ## In Debug build winedeplyqt forget the non debug Qt libs
