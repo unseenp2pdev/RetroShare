@@ -139,7 +139,7 @@ win32-x-g++ {
 win32-g++ {
 	CONFIG(debug, debug|release) {
 		# show console output
-		CONFIG += console
+                #CONFIG += console
 	} else {
 		CONFIG -= console
 	}
