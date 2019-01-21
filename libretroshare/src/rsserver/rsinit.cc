@@ -438,7 +438,7 @@ int RsInit::InitRetroShare(int argc, char **argv, bool /* strictCheck */)
 		rsLoginHelper = new RsLoginHelper;
 
 		int error_code ;
-
+        std::cerr <<" Test directory: opt_base_dir = " << opt_base_dir <<std::endl;
 		if(!RsAccounts::init(opt_base_dir,error_code))
             return error_code ;
 
