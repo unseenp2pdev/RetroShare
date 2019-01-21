@@ -237,7 +237,7 @@ after_build:
   - copy C:\windows\system32\vccorlib140.dll %RS_DEPLOY%\
   - copy C:\windows\system32\vcruntime140.dll %RS_DEPLOY%\
   - copy C:\windows\system32\concrt140.dll  %RS_DEPLOY%\
-  - copy C:\projects\RetroShare\libbitdht\src\bitdht\bdboot.txt
+  - copy C:\projects\RetroShare\libbitdht\src\bitdht\bdboot.txt %RS_DEPLOY%\
 
   - windeployqt %RS_DEPLOY%\unseenp2p.exe
   - find C:\projects\RetroShare >> filelist.txt
