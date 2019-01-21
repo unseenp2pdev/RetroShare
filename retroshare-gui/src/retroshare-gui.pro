@@ -141,7 +141,7 @@ win32-g++ {
 		# show console output
                 #CONFIG += console
 	} else {
-		CONFIG -= console
+                #CONFIG -= console
 	}
 
 	# Switch on extra warnings
