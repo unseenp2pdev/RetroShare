@@ -237,9 +237,9 @@ void RsInit::InitRsConfig()
 	}
 
 	if (rsInitConfig->isWindowsXP) {
-		std::cerr << "Running Windows XP" << std::endl;
+        std::cerr << "Running Windows XP" << std::endl;
 	} else {
-		std::cerr << "Not running Windows XP" << std::endl;
+        std::cerr << "Not running Windows XP" << std::endl;
 	}
 #endif
 
