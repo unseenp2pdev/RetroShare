@@ -136,8 +136,8 @@ before_package:
 # to run your custom scripts instead of automatic MSBuild
 build_script:
   #- qmake -Wall -spec win32-g++ "CONFIG=debug"
-  - qmake -Wall -spec win32-g++ "CONFIG=release"
-  - mingw32-make -j3
+  - qmake -Wall -spec win32-g++ "CONFIG=release" "CONFIG -=console"
+  - mingw32-make -j3 -mwindows
 
 # scripts to run after build
 after_build:
