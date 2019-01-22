@@ -4,7 +4,7 @@
 TEMPLATE = app
 QT     += network xml 
 CONFIG += qt gui uic qrc resources idle 
-#CONFIG += console
+CONFIG -= console
 TARGET = unseenp2p
 DEFINES += TARGET=\\\"$${TARGET}\\\"
 

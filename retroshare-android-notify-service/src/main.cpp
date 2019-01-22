@@ -29,12 +29,6 @@
 
 int main(int argc, char *argv[])
 {
-#ifdef _WIN32
-if (AttachConsole(ATTACH_PARENT_PROCESS)) {
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONOUT$", "w", stderr);
-}
-#endif
 	QCoreApplication app(argc, argv);
 
 	QString sockPath = QDir::homePath() + "/.retroshare";
