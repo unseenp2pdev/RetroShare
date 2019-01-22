@@ -137,7 +137,7 @@ before_package:
 build_script:
   #- qmake -Wall -spec win32-g++ "CONFIG=debug"
   - qmake -Wall -spec win32-g++ "CONFIG=release"
-  - mingw32-make -j3 -mwindows
+  - mingw32-make -j3
 
 # scripts to run after build
 after_build:
