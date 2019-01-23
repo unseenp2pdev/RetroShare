@@ -28,7 +28,7 @@ branches:
     - /^skipthisbranch$/
 
 # Do not build on tags (GitHub only)
-skip_tags: true
+skip_tags: false
 
 # Skipping commits with particular message or from user
 skip_commits:
