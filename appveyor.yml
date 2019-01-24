@@ -20,8 +20,8 @@ version: RetroShare-git-{branch}-{build}
 # branches to build
 branches:
   # whitelist
-  #only:
-  #  - master
+  only:
+    - unseen-gui-app
 
   # blacklist
   except:
