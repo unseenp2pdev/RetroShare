@@ -4,7 +4,7 @@
 TEMPLATE = app
 QT     += network xml 
 CONFIG += qt gui uic qrc resources idle 
-CONFIG -= console
+#CONFIG -= console
 TARGET = unseenp2p
 DEFINES += TARGET=\\\"$${TARGET}\\\"
 
@@ -132,7 +132,6 @@ win32-x-g++ {
 		INCLUDEPATH += ../../../../libgpg-error-1.7/src/
 
 		RC_FILE = gui/images/retroshare_win.rc
-                RC_FILE += gui/src/retroshare_win.rc
 }
 
 #################################### Windows #####################################
@@ -197,7 +196,6 @@ win32-g++ {
 		# Qt 4
 		QMAKE_RC += --include-dir=$$_PRO_FILE_PWD_/../../libretroshare/src
 	}
- RC_FILE += gui/src/retroshare_win.rc
 }
 
 ##################################### MacOS ######################################
