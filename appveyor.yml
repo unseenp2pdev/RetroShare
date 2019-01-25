@@ -15,7 +15,7 @@
 #version: RetroShare-git-{branch}-{build}
 
 # you can use {branch} name in version format too
-#version: v0.6.5.4 {build}-{branch}
+version: v0.6.5.4-{build}-{branch}
 
 # branches to build
 branches:
