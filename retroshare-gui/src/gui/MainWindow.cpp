@@ -230,8 +230,11 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags)
     QDesktopServices::setUrlHandler("https", this, "externalLinkActivated");
 
     // Setting icons
-    this->setWindowIcon(QIcon(QString::fromUtf8(":/app/images/icon.png"))); //D Replace :/icons/logo_128.png
-
+#ifdef __APPLE__
+  setWindowIcon(QIcon(":/../rsMacIcon.icns"));
+#else
+  this->setWindowIcon(QIcon(QString::fromUtf8(":/app/images/icon.png"))); //D Replace :/icons/logo_128.png
+#endif
     /* Create all the dialogs of which we only want one instance */
     _bandwidthGraph = NULL ;
 

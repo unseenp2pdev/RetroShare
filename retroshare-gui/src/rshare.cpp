@@ -254,6 +254,8 @@ Rshare::Rshare(QStringList args, int &argc, char **argv, const QString &dir)
   /* set default window icon */
   setWindowIcon(QIcon(":/app/images/icon.png")); //D replace :/icons/logo_128.png
 
+#else
+  setWindowIcon(QIcon(":/../rsMacIcon.icns"));
 #endif
 
   mBlink = true;
