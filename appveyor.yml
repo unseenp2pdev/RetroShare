@@ -12,23 +12,23 @@
 #---------------------------------#
 
 # version format
-#version: RetroShare-git-{branch}-{build}
+version: Unseenp2p-git-{branch}-{build}
 
 # you can use {branch} name in version format too
-version: v0.6.5.4-{build}-{branch}
+#version: v0.6.5.4-{build}-{branch}
 
 # branches to build
 branches:
   # whitelist
-  only:
-    - unseen-gui-app
+  #only:
+  #  - unseen-gui-app
 
   # blacklist
   except:
     - /^skipthisbranch$/
 
 # Do not build on tags (GitHub only)
-skip_tags: false
+skip_tags: true
 
 # Skipping commits with particular message or from user
 skip_commits:

@@ -162,7 +162,7 @@ RS_MINI_VERSION=5
 
 # Specify RetroShare major version appending the following assignation to qmake
 # command line 'RS_EXTRA_VERSION=""'
-RS_EXTRA_VERSION=0
+RS_EXTRA_VERSION=""
 
 
 ###########################################################################################################################################################
