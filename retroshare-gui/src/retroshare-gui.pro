@@ -1412,7 +1412,8 @@ cmark {
 }
 
 DISTFILES += \
-    ../../data/UnseenP2P.xpm
+    ../../data/UnseenP2P.xpm \
+    retroshare_win.rc
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \
