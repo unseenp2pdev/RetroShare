@@ -143,7 +143,7 @@ build_script:
 after_build:
   - mkdir %RS_DEPLOY%
   - copy retroshare-nogui\src\retroshare-nogui.exe %RS_DEPLOY%\unseenp2p-nogui.exe
-  - copy retroshare-gui\src\retroshare.exe %RS_DEPLOY%\unseenp2p.exe
+  - copy retroshare-gui\src\unseenp2p.exe %RS_DEPLOY%\unseenp2p.exe
 
 ## In Debug build winedeplyqt forget the non debug Qt libs
   - copy C:\msys64\mingw32\bin\Qt5Svg.dll %RS_DEPLOY%\
