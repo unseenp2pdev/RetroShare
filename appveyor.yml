@@ -142,8 +142,8 @@ build_script:
 # scripts to run after build
 after_build:
   - mkdir %RS_DEPLOY%
-  - copy retroshare-nogui\src\retroshare-nogui.exe %RS_DEPLOY%\unseenp2p-nogui.exe
-  - copy retroshare-gui\src\retroshare.exe %RS_DEPLOY%\unseenp2p.exe
+  - copy retroshare-nogui\src\unseenp2p-nogui.exe %RS_DEPLOY%\
+  - copy retroshare-gui\src\unseenp2p.exe %RS_DEPLOY%\
 
 ## In Debug build winedeplyqt forget the non debug Qt libs
   - copy C:\msys64\mingw32\bin\Qt5Svg.dll %RS_DEPLOY%\
@@ -301,12 +301,12 @@ artifacts:
 #         notifications           #
 #---------------------------------#
   
-notifications:
-
-  # Email
-  - provider: Email
-    to:
-      - retrosharephenom@gmail.com
-    subject: 'Build {{status}}'                  # optional
-    message: "{{message}}, {{commitId}}, ..."    # optional
-    on_build_status_changed: true
+#notifications:
+#
+#  # Email
+#  - provider: Email
+#    to:
+#      - retrosharephenom@gmail.com
+#    subject: 'Build {{status}}'                  # optional
+#    message: "{{message}}, {{commitId}}, ..."    # optional
+#    on_build_status_changed: true
