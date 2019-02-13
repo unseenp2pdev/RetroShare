@@ -40,7 +40,7 @@
                         <string>UnseenP2P URL</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-                                <string>UnseenP2P</string>
+                                <string>retroshare</string>
 			</array>
 		</dict>
 	</array>
