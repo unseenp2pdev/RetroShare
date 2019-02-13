@@ -341,7 +341,7 @@ bool RsAccountsDetail::defaultBaseDirectory()
 	}
 
 	basedir = h;
-       basedir += "/.unseen";
+    basedir += "/.unseen";
 
 #else
 	if (RsInit::isPortable())
@@ -360,7 +360,7 @@ bool RsAccountsDetail::defaultBaseDirectory()
 			std::cerr << "defaultBaseDirectory() Error: ";
 			std::cerr << " getEnv Error --Win95/98?";
 			std::cerr << std::endl;
-               basedir="C:\\unseen";
+            basedir="C:\\unseen";
 		}
 		else
 		{
