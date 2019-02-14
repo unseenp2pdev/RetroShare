@@ -5,7 +5,7 @@ TEMPLATE = app
 QT     += network xml 
 CONFIG += qt gui uic qrc resources idle 
 CONFIG += console
-TARGET = retroshare
+TARGET = unseenp2p
 DEFINES += TARGET=\\\"$${TARGET}\\\"
 
 DEPENDPATH  *= $${PWD} $${RS_INCLUDE_DIR} retroshare-gui
@@ -202,7 +202,7 @@ macx {
 	#CONFIG += ppc x86
 	#QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
 	QMAKE_INFO_PLIST = Info.plist
-        mac_icon.files = $$files($$PWD/unseen128.png)
+        mac_icon.files = $$files($$PWD/rsMacIcon.icns)
 	mac_icon.path = Contents/Resources
 	QMAKE_BUNDLE_DATA += mac_icon
 	mac_webui.files = $$files($$PWD/../../libresapi/src/webui)
@@ -211,6 +211,9 @@ macx {
         mac_dht.files= $$files($$PWD/../../libbitdht/src/bitdht/*.txt)
         mac_dht.path = Contents/Resources
         QMAKE_BUNDLE_DATA +=mac_dht
+        mac_sounds.files= $$files($$PWD/sounds/*.wav)
+        mac_sounds.path = Contents/Resources
+        QMAKE_BUNDLE_DATA +=mac_sounds
 
 	CONFIG += version_detail_bash_script
         LIBS += -lssl -lcrypto -lz 
