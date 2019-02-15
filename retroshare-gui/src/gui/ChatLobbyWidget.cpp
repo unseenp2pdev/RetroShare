@@ -5,6 +5,7 @@
 #include "chat/ChatLobbyDialog.h"
 #include "chat/ChatLobbyUserNotify.h"
 #include "chat/ChatTabWidget.h"
+#include "connect/ConnectFriendWizard.h"
 #include "chat/CreateLobbyDialog.h"
 #include "common/RSTreeWidgetItem.h"
 #include "gui/RetroShareLink.h"
@@ -1668,4 +1669,10 @@ void ChatLobbyWidget::UpdateStatusForAllContacts()
                 UpdateStatusForContact(curItem, *peerId);
         }
     }
+}
+void ChatLobbyWidget::on_addContactButton_clicked()
+{
+        ConnectFriendWizard connwiz (this);
+        connwiz.setStartId(ConnectFriendWizard::Page_Text);
+        connwiz.exec ();
 }

@@ -93,6 +93,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="addContactButton">
+        <property name="text">
+         <string>Add contact</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="helpButton">
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
