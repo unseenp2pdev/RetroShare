@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<manifest package="org.retroshare.android.qml_app" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.6.4" android:versionCode="1" android:installLocation="auto">
+<manifest package="org.retroshare.android.qml_app" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.6.5" android:versionCode="1" android:installLocation="auto">
     <application android:name="org.qtproject.qt5.android.bindings.QtApplication" android:hardwareAccelerated="true" android:label="UnseenP2P" android:icon="@drawable/retroshare_128x128">
         <activity android:name=".RetroShareQmlActivity" android:label="ContactDetails.qml" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTask">
             <intent-filter>
