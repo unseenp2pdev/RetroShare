@@ -103,7 +103,7 @@ protected slots:
     void updateRecentTime(const ChatId&, uint);
     //void updateP2PMessageChanged(bool incoming, const ChatId& chatId, QDateTime time, QString senderName, QString msg);
     void updateP2PMessageChanged(ChatMessage);
-
+    void on_addContactButton_clicked();
 private slots:
 	void filterColumnChanged(int);
 	void filterItems(const QString &text);

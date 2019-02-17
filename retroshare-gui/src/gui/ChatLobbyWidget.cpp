@@ -5,6 +5,7 @@
 #include "chat/ChatLobbyDialog.h"
 #include "chat/ChatLobbyUserNotify.h"
 #include "chat/ChatTabWidget.h"
+#include "connect/ConnectFriendWizard.h"
 #include "chat/CreateLobbyDialog.h"
 #include "common/RSTreeWidgetItem.h"
 #include "gui/RetroShareLink.h"
@@ -44,11 +45,11 @@
 #define CHAT_LOBBY_GUI_DEBUG 1
 
 #define COLUMN_NAME       0
-#define COLUMN_USER_COUNT 1
-#define COLUMN_TOPIC      2
-#define COLUMN_SUBSCRIBED 3
-#define COLUMN_COUNT      4
-#define COLUMN_RECENT_TIME      5
+//#define COLUMN_USER_COUNT 1
+//#define COLUMN_TOPIC      2
+//#define COLUMN_SUBSCRIBED 3
+//#define COLUMN_COUNT      4
+//#define COLUMN_RECENT_TIME      5
 #define COLUMN_DATA       0
 
 #define ROLE_SORT          Qt::UserRole
@@ -112,12 +113,12 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
 
 	compareRole = new RSTreeWidgetItemCompareRole;
 	compareRole->setRole(COLUMN_NAME, ROLE_SORT);
-    compareRole->setRole(COLUMN_RECENT_TIME, ROLE_SORT);
+//    compareRole->setRole(COLUMN_RECENT_TIME, ROLE_SORT);
 
-	ui.lobbyTreeWidget->setColumnCount(COLUMN_COUNT);
+//	ui.lobbyTreeWidget->setColumnCount(COLUMN_COUNT);
 	ui.lobbyTreeWidget->sortItems(COLUMN_NAME, Qt::AscendingOrder);
 
-    ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
+//    ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
 
 	ui.lobbyTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu) ;
 
@@ -125,23 +126,23 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
                                       "selection-color: rgb(255,255,255); selection-background-color: rgb(32, 41, 53);");
     QTreeWidgetItem *headerItem = ui.lobbyTreeWidget->headerItem();
     headerItem->setText(COLUMN_NAME, tr("Name"));
-    headerItem->setText(COLUMN_RECENT_TIME, tr("Recent time"));
+//    headerItem->setText(COLUMN_RECENT_TIME, tr("Recent time"));
 
 	QHeaderView *header = ui.lobbyTreeWidget->header();
 	QHeaderView_setSectionResizeModeColumn(header, COLUMN_NAME, QHeaderView::Interactive);
-    QHeaderView_setSectionResizeModeColumn(header, COLUMN_RECENT_TIME, QHeaderView::Interactive);
+//    QHeaderView_setSectionResizeModeColumn(header, COLUMN_RECENT_TIME, QHeaderView::Interactive);
 
     ui.lobbyTreeWidget->setIconSize(QSize(32,32));
 
     commonItem = new RSTreeWidgetItem(compareRole, TYPE_FOLDER);
-    commonItem->setText(COLUMN_NAME, tr("Conversations"));
+//    commonItem->setText(COLUMN_NAME, tr("Conversations"));
     commonItem->setData(COLUMN_NAME, ROLE_SORT, "0");
     commonItem->setData(COLUMN_DATA, ROLE_PRIVACYLEVEL, CHAT_LOBBY_ONE2ONE_LEVEL);
     ui.lobbyTreeWidget->insertTopLevelItem(0, commonItem);
 
 	ui.lobbyTreeWidget->expandAll();
 	ui.lobbyTreeWidget->setColumnHidden(COLUMN_NAME,false) ;
-    ui.lobbyTreeWidget->setColumnHidden(COLUMN_RECENT_TIME,true) ;
+//    ui.lobbyTreeWidget->setColumnHidden(COLUMN_RECENT_TIME,true) ;
 	ui.lobbyTreeWidget->setSortingEnabled(true) ;
 
     float fact = QFontMetricsF(font()).height()/14.0f;
@@ -365,9 +366,9 @@ void ChatLobbyWidget::lobbyTreeWidgetCustomPopupMenu(QPoint)
 
         contextMnu.addSeparator();//-------------------------------------------------------------------
 
-        showUserCountAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_USER_COUNT));
-        showTopicAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_TOPIC));
-        showSubscribeAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_SUBSCRIBED));
+//        showUserCountAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_USER_COUNT));
+//        showTopicAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_TOPIC));
+//        showSubscribeAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_SUBSCRIBED));
 
         QMenu *menu = contextMnu.addMenu(tr("Columns"));
         menu->addAction(showUserCountAct);
@@ -392,9 +393,9 @@ static void updateItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, ChatLobby
 
 	QColor color = treeWidget->palette().color(QPalette::Active, QPalette::Text);
     
-	for (int column = 0; column < COLUMN_COUNT; ++column) {
-		item->setTextColor(column, color);
-	}
+//	for (int column = 0; column < COLUMN_COUNT; ++column) {
+//		item->setTextColor(column, color);
+//	}
     QString tooltipstr = QObject::tr("Group name:")+" "+item->text(COLUMN_NAME)+"\n"
                      +QObject::tr("Group type:")+" "+ (lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC? QObject::tr("Public group (Community group) "): QObject::tr("Private group (members only)"))+"\n"
                      //+QObject::tr("Participants:")+" "+QString::number(count)+"\n"
@@ -404,8 +405,8 @@ static void updateItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, ChatLobby
     {
         tooltipstr += QObject::tr("\nSecurity: no anonymous IDs") ;
         QColor foreground = QColor(0, 128, 0); // green
-        for (int column = 0; column < COLUMN_COUNT; ++column)
-            item->setTextColor(column, foreground);
+//        for (int column = 0; column < COLUMN_COUNT; ++column)
+//            item->setTextColor(column, foreground);
     }
     item->setToolTip(0,tooltipstr) ;
 }
@@ -658,7 +659,7 @@ void ChatLobbyWidget::getHistoryForRecentList()
                 updateContactItem(ui.lobbyTreeWidget, item, nickname, chatId, chatId.toPeerId().toStdString(), current_time, historyIt->unread );
                 //add contact item into common tree
                 commonItem->addChild(item);
-                ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
+//                ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
             }
         }
 
@@ -685,7 +686,7 @@ void ChatLobbyWidget::getHistoryForRecentList()
                 }
                 updateGroupChatItem(ui.lobbyTreeWidget, item, it->second.lobby_name, it->second.lobby_id, current_time, historyIt->unread, it->second.lobby_flags );
                 commonItem->addChild(item);
-                ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
+//                ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
             }
         }
 
@@ -942,10 +943,10 @@ void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, uint current_time)
            item = getTreeWidgetItemForChatId(chatId);
            chatIdStr = chatId.toPeerId().toStdString();
        }
-       if (item)
-            item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
+//       if (item)
+//            item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
 
-       ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
+//       ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
 }
 
 QTreeWidgetItem *ChatLobbyWidget::getTreeWidgetItemForChatId(ChatId id)
@@ -1448,11 +1449,11 @@ void ChatLobbyWidget::setShowSubscribeColumn(bool show)
 int ChatLobbyWidget::getNumColVisible()
 {
 	int iNumColVis=0;
-	for (int iColumn = 0; iColumn < COLUMN_COUNT; ++iColumn) {
-		if (!ui.lobbyTreeWidget->isColumnHidden(iColumn)) {
-			++iNumColVis;
-		}
-	}
+//	for (int iColumn = 0; iColumn < COLUMN_COUNT; ++iColumn) {
+//		if (!ui.lobbyTreeWidget->isColumnHidden(iColumn)) {
+//			++iNumColVis;
+//		}
+//	}
     return iNumColVis;
 }
 
@@ -1553,7 +1554,7 @@ void ChatLobbyWidget::updateContactItem(QTreeWidget *treeWidget, QTreeWidgetItem
 
       item->setData(COLUMN_NAME, ROLE_SORT, QString::fromUtf8(nickname.c_str()));
       item->setData(COLUMN_DATA, ROLE_ID, QString::fromUtf8(rsId.c_str()));
-      item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
+//      item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
 }
 
 void ChatLobbyWidget::updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &name, const ChatLobbyId& id, uint current_time, bool unread, ChatLobbyFlags lobby_flags)
@@ -1576,9 +1577,9 @@ void ChatLobbyWidget::updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetIt
 
     QColor color = treeWidget->palette().color(QPalette::Active, QPalette::Text);
 
-    for (int column = 0; column < COLUMN_COUNT; ++column) {
-        item->setTextColor(column, color);
-    }
+//    for (int column = 0; column < COLUMN_COUNT; ++column) {
+//        item->setTextColor(column, color);
+//    }
     QString tooltipstr = QObject::tr("Group name:")+" "+item->text(COLUMN_NAME)+"\n"
                      +QObject::tr("Group type:")+" "+ (lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC? QObject::tr("Public group (Community group) "): QObject::tr("Private group (members only)"))+"\n"
                      +QObject::tr("Id:")+" "+QString::number(id,16) ;
@@ -1592,7 +1593,7 @@ void ChatLobbyWidget::updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetIt
 //    }
     item->setToolTip(0,tooltipstr) ;
 
-    item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
+//    item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
 }
 
 QIcon ChatLobbyWidget::lastIconForPeerId(RsPeerId peerId, bool unread)
@@ -1668,4 +1669,10 @@ void ChatLobbyWidget::UpdateStatusForAllContacts()
                 UpdateStatusForContact(curItem, *peerId);
         }
     }
+}
+void ChatLobbyWidget::on_addContactButton_clicked()
+{
+        ConnectFriendWizard connwiz (this);
+        connwiz.setStartId(ConnectFriendWizard::Page_Text);
+        connwiz.exec ();
 }
