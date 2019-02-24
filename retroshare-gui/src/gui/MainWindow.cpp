@@ -442,7 +442,7 @@ void MainWindow::initStackedPage()
   addPage(peopleDialog = new PeopleDialog(ui->stackPages), grp, &notify);
   #endif
   //meiyousixin - remove Logs tab for simplicity!!!
-  //addPage(newsFeed = new NewsFeed(ui->stackPages), grp, &notify);
+  addPage(newsFeed = new NewsFeed(ui->stackPages), grp, &notify);
 #ifdef RS_USE_WIKI
   WikiDialog *wikiDialog = NULL;
   addPage(wikiDialog = new WikiDialog(ui->stackPages), grp, &notify);

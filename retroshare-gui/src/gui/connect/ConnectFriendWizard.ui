@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>760</width>
-    <height>714</height>
+    <width>791</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1618,9 +1618,9 @@ resources.</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../Unseengui/unseengui.qrc"/>
   <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
+  <include location="../../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
