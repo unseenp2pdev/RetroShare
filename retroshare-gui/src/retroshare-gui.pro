@@ -112,7 +112,7 @@ version_detail_bash_script {
 #################### Cross compilation for windows under Linux ###################
 
 win32-x-g++ {
-                CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
+                #CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
 		OBJECTS_DIR = temp/win32-x-g++/obj
 
 		LIBS += ../../../../lib/win32-x-g++-v0.5/libssl.a
@@ -138,12 +138,12 @@ win32-x-g++ {
 win32-g++ {
 	CONFIG(debug, debug|release) {
 		# show console output
-                #CONFIG += console
+                CONFIG += console
 	} else {
-                #CONFIG -= console
+                CONFIG -= console
 	}
 
-        CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
+        #CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
 	# Switch on extra warnings
 	QMAKE_CFLAGS += -Wextra
 	QMAKE_CXXFLAGS += -Wextra
@@ -154,7 +154,7 @@ win32-g++ {
                 QMAKE_LFLAGS += -Wl,-dynamicbase
 		# Tell linker to use DEP protection
 		QMAKE_LFLAGS += -Wl,-nxcompat
-                QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
+                #QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
 	}
 
     # Fix linking error (ld.exe: Error: export ordinal too large) due to too
