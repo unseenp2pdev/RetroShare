@@ -364,7 +364,7 @@ void FriendList::peerTreeWidgetCustomPopupMenu()
              contextMenu->addSeparator();
 
              contextMenu->addAction(tr("Profile details"), this, SLOT(configurefriend()));     //hide icon QIcon(IMAGE_FRIENDINFO)
-             contextMenu->addAction(tr("Deny connections"), this, SLOT(removefriend()));       //hide icon QIcon(IMAGE_DENYFRIEND)
+             contextMenu->addAction(tr("Remove friend"), this, SLOT(removefriend()));       //hide icon QIcon(IMAGE_DENYFRIEND)
 
              contextMenu->addAction(tr("Node details"), this, SLOT(configurefriendbySSLid()));     //hide icon QIcon(IMAGE_FRIENDINFO)
 

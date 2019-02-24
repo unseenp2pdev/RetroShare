@@ -308,9 +308,9 @@ void PGPKeyDialog::loadKeyPage()
 
     helptext += "<p>" ;
     if(detail.accept_connection)
-        helptext += tr("You have chosen to accept connections from UnseenP2P nodes signed by this key.") ;
+        helptext += tr("You have chosen to add friend (accept connections) from UnseenP2P nodes signed by this key.") ;
     else
-        helptext += tr("You are currently not allowing connections from UnseenP2P nodes signed by this key.") ;
+        helptext += tr("You are currently not removing friend (allowing connections) from UnseenP2P nodes signed by this key.") ;
 
     helptext += "</p>" ;
 

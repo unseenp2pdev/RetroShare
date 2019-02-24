@@ -27,7 +27,7 @@
    <item>
     <widget class="QTabWidget" name="stabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -243,7 +243,7 @@ p, li { white-space: pre-wrap; }
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click here if you want to refuse connections to nodes authenticated by this key.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>Deny connections</string>
+            <string>Remove friend</string>
            </property>
            <property name="icon">
             <iconset resource="../images.qrc">
@@ -263,10 +263,10 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QToolButton" name="make_friend_button">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click this if you want your node to accept connecting to UnseenP2P nodes authenticated by this PGP key. This is done automatically when exchanging your UnseenP2P certificate with someone. In order to make friends, it is better to exchange certificates than accept connections from a given key, since the certificate also contain useful connection information (IP, DNS, SSL ids, etc).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click this if you want your node to accept connecting to UnseenP2P nodes authenticated by this PGP key. This is done automatically when exchanging your UnseenP2P certificate with someone. In order to make friends, it is better to exchange certificates than add friend (accept connections) from a given key, since the certificate also contain useful connection information (IP, DNS, SSL ids, etc).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>Accept connections</string>
+            <string>Add friend</string>
            </property>
            <property name="icon">
             <iconset resource="../images.qrc">
