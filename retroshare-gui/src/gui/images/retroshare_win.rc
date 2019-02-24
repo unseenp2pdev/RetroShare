@@ -21,11 +21,11 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "CompanyName", ""
-            VALUE "FileDescription", "RetroShare"
+            VALUE "FileDescription", "unseenp2p"
             VALUE "FileVersion", VERSION_STRING(RS_MAJOR_VERSION, RS_MINOR_VERSION, RS_MINI_VERSION, RS_EXTRA_VERSION)
-            VALUE "InternalName", "RetroShare"
-            VALUE "OriginalFilename", "RetroShare.exe"
-            VALUE "ProductName", "RetroShare"
+            VALUE "InternalName", "unseenp2p"
+            VALUE "OriginalFilename", "unseenp2p.exe"
+            VALUE "ProductName", "unseenp2p"
             VALUE "ProductVersion", VERSION_STRING(RS_MAJOR_VERSION, RS_MINOR_VERSION, RS_MINI_VERSION, RS_EXTRA_VERSION)
             VALUE "LegalCopyright", ""
         END

@@ -115,6 +115,9 @@
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose UnseenP2P's interface style&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
        </widget>
       </item>
       <item row="0" column="1">

@@ -22,7 +22,7 @@ QVariant pgpid_item_model::headerData(int section, Qt::Orientation orientation, 
             switch(section)
             {
             case COLUMN_CHECK:
-                return QString(tr(" Do you accept connections signed by this profile?"));
+                return QString(tr(" Do you add friend (accept connections) signed by this profile?"));
                 break;
             case COLUMN_PEERNAME:
                 return QString(tr("Name of the profile"));

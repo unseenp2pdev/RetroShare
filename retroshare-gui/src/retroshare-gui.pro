@@ -1,4 +1,3 @@
-
 !include("../../retroshare.pri"): error("Could not include file ../../retroshare.pri")
 
 TEMPLATE = app
@@ -113,6 +112,7 @@ version_detail_bash_script {
 #################### Cross compilation for windows under Linux ###################
 
 win32-x-g++ {
+                CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
 		OBJECTS_DIR = temp/win32-x-g++/obj
 
 		LIBS += ../../../../lib/win32-x-g++-v0.5/libssl.a
@@ -138,11 +138,12 @@ win32-x-g++ {
 win32-g++ {
 	CONFIG(debug, debug|release) {
 		# show console output
-		CONFIG += console
+                #CONFIG += console
 	} else {
-		CONFIG -= console
+                #CONFIG -= console
 	}
 
+        CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
 	# Switch on extra warnings
 	QMAKE_CFLAGS += -Wextra
 	QMAKE_CXXFLAGS += -Wextra
@@ -150,9 +151,10 @@ win32-g++ {
 	CONFIG(debug, debug|release) {
 	} else {
 		# Tell linker to use ASLR protection
-		QMAKE_LFLAGS += -Wl,-dynamicbase
+                QMAKE_LFLAGS += -Wl,-dynamicbase
 		# Tell linker to use DEP protection
 		QMAKE_LFLAGS += -Wl,-nxcompat
+                QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
 	}
 
     # Fix linking error (ld.exe: Error: export ordinal too large) due to too
@@ -212,7 +214,7 @@ macx {
         mac_dht.path = Contents/Resources
         QMAKE_BUNDLE_DATA +=mac_dht
         mac_sounds.files= $$files($$PWD/sounds/*.wav)
-        mac_sounds.path = Contents/Resources
+        mac_sounds.path = Contents/Resources/sounds
         QMAKE_BUNDLE_DATA +=mac_sounds
 
 	CONFIG += version_detail_bash_script
@@ -1412,7 +1414,8 @@ cmark {
 }
 
 DISTFILES += \
-    ../../data/UnseenP2P.xpm
+    ../../data/UnseenP2P.xpm \
+    retroshare_win.rc
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \

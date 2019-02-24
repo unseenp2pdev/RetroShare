@@ -230,8 +230,11 @@ MainWindow::MainWindow(QWidget* parent, Qt::WindowFlags flags)
     QDesktopServices::setUrlHandler("https", this, "externalLinkActivated");
 
     // Setting icons
-    this->setWindowIcon(QIcon(QString::fromUtf8(":/app/images/icon.png"))); //D Replace :/icons/logo_128.png
-
+#ifdef __APPLE__
+  setWindowIcon(QIcon(":/../rsMacIcon.icns"));
+#else
+  this->setWindowIcon(QIcon(QString::fromUtf8(":/app/images/icon.png"))); //D Replace :/icons/logo_128.png
+#endif
     /* Create all the dialogs of which we only want one instance */
     _bandwidthGraph = NULL ;
 
@@ -439,7 +442,7 @@ void MainWindow::initStackedPage()
   addPage(peopleDialog = new PeopleDialog(ui->stackPages), grp, &notify);
   #endif
   //meiyousixin - remove Logs tab for simplicity!!!
-  //addPage(newsFeed = new NewsFeed(ui->stackPages), grp, &notify);
+  addPage(newsFeed = new NewsFeed(ui->stackPages), grp, &notify);
 #ifdef RS_USE_WIKI
   WikiDialog *wikiDialog = NULL;
   addPage(wikiDialog = new WikiDialog(ui->stackPages), grp, &notify);
