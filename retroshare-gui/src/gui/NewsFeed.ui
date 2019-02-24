@@ -69,7 +69,7 @@
       <item>
        <widget class="StyledLabel" name="titleBarLabel">
         <property name="text">
-         <string>Log entries</string>
+         <string>Activity entries</string>
         </property>
        </widget>
       </item>
@@ -109,7 +109,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="icon">
-         <iconset resource="icons.qrc">
+         <iconset resource="../Unseengui/unseengui.qrc">
           <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
         </property>
         <property name="iconSize">
@@ -156,6 +156,7 @@
  </customwidgets>
  <resources>
   <include location="icons.qrc"/>
+  <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
