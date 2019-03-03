@@ -1415,7 +1415,11 @@ cmark {
 
 DISTFILES += \
     ../../data/UnseenP2P.xpm \
-    retroshare_win.rc
+    retroshare_win.rc \
+    Unseengui/home/img/face_icon/newsfeed_128.png \
+    Unseengui/home/img/face_icon/newsfeed_v_128.png \
+    Unseengui/home/img/face_icon/newsfeed_x_128.PNG \
+    gui/icons/plugins_128.png
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \

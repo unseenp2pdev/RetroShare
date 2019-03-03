@@ -59,7 +59,7 @@
          </size>
         </property>
         <property name="pixmap">
-         <pixmap resource="icons.qrc">:/icons/png/newsfeed.png</pixmap>
+         <pixmap resource="../Unseengui/unseengui.qrc">:/home/img/face_icon/newsfeed_x_128.PNG</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -155,7 +155,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons.qrc"/>
   <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>

@@ -140,8 +140,8 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
     commonItem->setData(COLUMN_DATA, ROLE_PRIVACYLEVEL, CHAT_LOBBY_ONE2ONE_LEVEL);
     ui.lobbyTreeWidget->insertTopLevelItem(0, commonItem);
 
-	ui.lobbyTreeWidget->expandAll();
-	ui.lobbyTreeWidget->setColumnHidden(COLUMN_NAME,false) ;
+    ui.lobbyTreeWidget->expandAll();
+    ui.lobbyTreeWidget->setColumnHidden(COLUMN_NAME,false) ;
 //    ui.lobbyTreeWidget->setColumnHidden(COLUMN_RECENT_TIME,true) ;
 	ui.lobbyTreeWidget->setSortingEnabled(true) ;
 

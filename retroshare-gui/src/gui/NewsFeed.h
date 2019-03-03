@@ -28,7 +28,7 @@
 #include "util/TokenQueue.h"
 #include <retroshare-gui/RsAutoUpdatePage.h>
 
-#define IMAGE_NEWSFEED ":/icons/plugins_128.png"
+#define IMAGE_NEWSFEED ":/home/img/face_icon/newsfeed_128.png"
 
 const uint32_t NEWSFEED_PEERLIST =       0x0001;
 
