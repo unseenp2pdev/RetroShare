@@ -50,7 +50,7 @@ PopupChatDialog::PopupChatDialog(QWidget *parent, Qt::WindowFlags flags)
 
 	manualDelete = false;
 
-    connect(ui.avatarFrameButton, SIGNAL(toggled(bool)), this, SLOT(showAvatarFrame(bool)));
+//    connect(ui.avatarFrameButton, SIGNAL(toggled(bool)), this, SLOT(showAvatarFrame(bool)));
 	connect(ui.actionClearOfflineMessages, SIGNAL(triggered()), this, SLOT(clearOfflineMessages()));
 	connect(NotifyQt::getInstance(), SIGNAL(chatStatusChanged(ChatId,QString)), this, SLOT(chatStatusChanged(ChatId,QString)));
 
@@ -63,13 +63,13 @@ void PopupChatDialog::init(const ChatId &chat_id, const QString &title)
         cId = chat_id;
 
         /* Hide or show the avatar frames */
-        showAvatarFrame(false);         //   showAvatarFrame(PeerSettings->getShowAvatarFrame(chat_id));
+//        showAvatarFrame(false);         //   showAvatarFrame(PeerSettings->getShowAvatarFrame(chat_id));
 
-        ui.avatarWidget->setId(chat_id);
-        ui.avatarWidget->setFrameType(AvatarWidget::STATUS_FRAME);
+//        ui.avatarWidget->setId(chat_id);
+//        ui.avatarWidget->setFrameType(AvatarWidget::STATUS_FRAME);
 
-	ui.ownAvatarWidget->setFrameType(AvatarWidget::STATUS_FRAME);
-	ui.ownAvatarWidget->setOwnId();
+//	ui.ownAvatarWidget->setFrameType(AvatarWidget::STATUS_FRAME);
+//	ui.ownAvatarWidget->setOwnId();
 
 	ui.chatWidget->addToolsAction(ui.actionClearOfflineMessages);
 
@@ -176,21 +176,21 @@ void PopupChatDialog::addChatMsg(const ChatMessage &msg)
 /**
  Toggles the ToolBox on and off, changes toggle button text
  */
-void PopupChatDialog::showAvatarFrame(bool show)
-{
-    ui.avatarframe->setVisible(show);
-    ui.avatarFrameButton->setChecked(show);
+//void PopupChatDialog::showAvatarFrame(bool show)
+//{
+//    ui.avatarframe->setVisible(show);
+//    ui.avatarFrameButton->setChecked(show);
 
-	if (show) {
-		ui.avatarFrameButton->setToolTip(tr("Hide Avatar"));
-		ui.avatarFrameButton->setIcon(QIcon(":images/hide_toolbox_frame.png"));
-	} else {
-		ui.avatarFrameButton->setToolTip(tr("Show Avatar"));
-		ui.avatarFrameButton->setIcon(QIcon(":images/show_toolbox_frame.png"));
-	}
+//	if (show) {
+//		ui.avatarFrameButton->setToolTip(tr("Hide Avatar"));
+//		ui.avatarFrameButton->setIcon(QIcon(":images/hide_toolbox_frame.png"));
+//	} else {
+//		ui.avatarFrameButton->setToolTip(tr("Show Avatar"));
+//		ui.avatarFrameButton->setIcon(QIcon(":images/show_toolbox_frame.png"));
+//	}
 
-    PeerSettings->setShowAvatarFrame(mChatId, show);
-}
+//    PeerSettings->setShowAvatarFrame(mChatId, show);
+//}
 
 void PopupChatDialog::clearOfflineMessages()
 {
