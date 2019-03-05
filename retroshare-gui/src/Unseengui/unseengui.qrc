@@ -159,5 +159,10 @@
         <file>home/img/face_icon/newsfeed_v_128.png</file>
         <file>home/img/face_icon/newsfeed_128.png</file>
         <file>home/img/face_icon/newsfeed_x_128.PNG</file>
+        <file>home/img/file/download.png</file>
+        <file>home/img/file/file.png</file>
+        <file>home/img/file/magnifying-glass.png</file>
+        <file>home/img/file/paste-from-clipboard.png</file>
+        <file>home/img/file/upload.png</file>
     </qresource>
 </RCC>
