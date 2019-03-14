@@ -64,8 +64,8 @@
 
 /* Images for context menu icons */
 #define IMAGE_INFO                 ":/images/fileinfo.png"
-#define IMAGE_CANCEL               ":/images/delete.png"
-#define IMAGE_CLEARCOMPLETED       ":/images/deleteall.png"
+#define IMAGE_CANCEL               ":/home/img/delete.png"
+#define IMAGE_CLEARCOMPLETED       ":/home/img/delete_all.png"
 #define IMAGE_PLAY                 ":/images/player_play.png"
 #define IMAGE_COPYLINK             ":/images/copyrslink.png"
 #define IMAGE_PASTELINK            ":/images/pasterslink.png"

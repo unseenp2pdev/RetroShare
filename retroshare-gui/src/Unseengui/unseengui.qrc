@@ -164,5 +164,8 @@
         <file>home/img/file/magnifying-glass.png</file>
         <file>home/img/file/paste-from-clipboard.png</file>
         <file>home/img/file/upload.png</file>
+        <file>home/img/avatar.jpg</file>
+        <file>home/img/delete.png</file>
+        <file>home/img/delete_all.png</file>
     </qresource>
 </RCC>

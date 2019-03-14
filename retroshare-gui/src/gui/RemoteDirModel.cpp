@@ -105,7 +105,7 @@ void RetroshareDirModel::treeStyle()
 	                     QIcon::Normal, QIcon::Off);
 	categoryIcon.addPixmap(QPixmap(":/images/folder_video.png"),
 	                     QIcon::Normal, QIcon::On);
-	peerIcon = QIcon(":/images/user/identity16.png");
+    peerIcon = QIcon(":/home/img/avatar.jpg");
 }
 void TreeStyle_RDM::update()
 {

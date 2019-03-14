@@ -145,14 +145,13 @@ void PopupChatDialog::addChatMsg(const ChatMessage &msg)
 	ChatWidget *cw = getChatWidget();
 	if (cw)
 	{
-	    QDateTime sendTime = QDateTime::fromTime_t(msg.sendTime);
-	    QDateTime recvTime = QDateTime::fromTime_t(msg.recvTime);
+        QDateTime sendTime = QDateTime::fromTime_t(msg.sendTime);
+        QDateTime recvTime = QDateTime::fromTime_t(msg.recvTime);
 	    QString message = QString::fromUtf8(msg.msg.c_str());
         QString name = msg.incoming? QString::fromStdString(rsPeers->getGPGName(rsPeers->getGPGId(msg.chat_id.toPeerId()))): getOwnName();
         //QString name = msg.incoming? getPeerName(msg.chat_id): getOwnName();
 
-	    cw->addChatMsg(msg.incoming, name, sendTime, recvTime, message, ChatWidget::MSGTYPE_NORMAL);
-
+        cw->addChatMsg(msg.incoming, name, sendTime, recvTime, message, ChatWidget::MSGTYPE_NORMAL);
         //emit messageP2PReceived(msg.incoming, msg.chat_id,  sendTime, name, message) ;
         emit messageP2PReceived(msg) ;
 
