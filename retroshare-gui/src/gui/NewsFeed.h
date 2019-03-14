@@ -68,7 +68,7 @@ public:
 	virtual ~NewsFeed();
 
 	virtual QIcon iconPixmap() const { return QIcon(IMAGE_NEWSFEED) ; } //MainPage
-    virtual QString pageName() const { return tr("Requests") ; } //MainPage
+    virtual QString pageName() const { return tr("Activities") ; } //MainPage
 	virtual QString helpText() const { return ""; } //MainPage
 
 	virtual UserNotify *getUserNotify(QObject *parent);
