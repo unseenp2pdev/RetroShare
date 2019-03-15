@@ -98,7 +98,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="icon">
-         <iconset resource="../icons.qrc">
+         <iconset resource="../../Unseengui/unseengui.qrc">
           <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
         </property>
         <property name="checkable">
@@ -134,8 +134,8 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="icon">
-       <iconset resource="../icons.qrc">
-        <normaloff>:/icons/svg/download.svg</normaloff>:/icons/svg/download.svg</iconset>
+       <iconset resource="../../Unseengui/unseengui.qrc">
+        <normaloff>:/home/img/file/download.png</normaloff>:/home/img/file/download.png</iconset>
       </attribute>
       <attribute name="title">
        <string>Downloads</string>
@@ -256,8 +256,8 @@
           </property>
           <widget class="QWidget" name="uploadsTab">
            <attribute name="icon">
-            <iconset resource="../icons.qrc">
-             <normaloff>:/icons/svg/upload.svg</normaloff>:/icons/svg/upload.svg</iconset>
+            <iconset resource="../../Unseengui/unseengui.qrc">
+             <normaloff>:/home/img/file/upload.png</normaloff>:/home/img/file/upload.png</iconset>
            </attribute>
            <attribute name="title">
             <string>Uploads</string>
@@ -309,7 +309,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../icons.qrc"/>
   <include location="../../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>

@@ -154,7 +154,7 @@ win32-g++ {
                 QMAKE_LFLAGS += -Wl,-dynamicbase
 		# Tell linker to use DEP protection
 		QMAKE_LFLAGS += -Wl,-nxcompat
-                #QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
+                QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
 	}
 
     # Fix linking error (ld.exe: Error: export ordinal too large) due to too
@@ -1415,7 +1415,16 @@ cmark {
 
 DISTFILES += \
     ../../data/UnseenP2P.xpm \
-    retroshare_win.rc
+    retroshare_win.rc \
+    Unseengui/home/img/face_icon/newsfeed_128.png \
+    Unseengui/home/img/face_icon/newsfeed_v_128.png \
+    Unseengui/home/img/face_icon/newsfeed_x_128.PNG \
+    gui/icons/plugins_128.png \
+    Unseengui/home/img/file/download.png \
+    Unseengui/home/img/file/file.png \
+    Unseengui/home/img/file/magnifying-glass.png \
+    Unseengui/home/img/file/paste-from-clipboard.png \
+    Unseengui/home/img/file/upload.png
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \

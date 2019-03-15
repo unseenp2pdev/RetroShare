@@ -36,8 +36,8 @@ class PopupChatDialog : public ChatDialog
 public:
 	ChatId	chatId() const {return cId;}
     virtual ChatWidget *getChatWidget();
-protected slots:
-	void showAvatarFrame(bool show);
+//protected slots:
+//	void showAvatarFrame(bool show);
 private slots:
 	void clearOfflineMessages();
 	void chatStatusChanged(const ChatId &chat_id, const QString &statusString);

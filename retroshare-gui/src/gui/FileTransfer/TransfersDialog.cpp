@@ -64,8 +64,8 @@
 
 /* Images for context menu icons */
 #define IMAGE_INFO                 ":/images/fileinfo.png"
-#define IMAGE_CANCEL               ":/images/delete.png"
-#define IMAGE_CLEARCOMPLETED       ":/images/deleteall.png"
+#define IMAGE_CANCEL               ":/home/img/delete.png"
+#define IMAGE_CLEARCOMPLETED       ":/home/img/delete_all.png"
 #define IMAGE_PLAY                 ":/images/player_play.png"
 #define IMAGE_COPYLINK             ":/images/copyrslink.png"
 #define IMAGE_PASTELINK            ":/images/pasterslink.png"
@@ -80,7 +80,7 @@
 #define IMAGE_PRIORITYNORMAL		 ":/images/prioritynormal.png"
 #define IMAGE_PRIORITYHIGH		   ":/images/priorityhigh.png"
 #define IMAGE_PRIORITYAUTO		   ":/images/priorityauto.png"
-#define IMAGE_SEARCH               ":/icons/svg/magnifying-glass.svg"
+#define IMAGE_SEARCH               ":/home/img/file/magnifying-glass.png"
 #define IMAGE_EXPAND               ":/images/edit_add24.png"
 #define IMAGE_COLLAPSE             ":/images/edit_remove24.png"
 #define IMAGE_LIBRARY              ":/images/library.png"
@@ -88,13 +88,13 @@
 #define IMAGE_COLLMODIF            ":/images/library_edit.png"
 #define IMAGE_COLLVIEW             ":/images/library_view.png"
 #define IMAGE_COLLOPEN             ":/images/library.png"
-#define IMAGE_FRIENDSFILES         ":/icons/svg/folders.svg"
-#define IMAGE_MYFILES              ":icons/svg/folders1.svg"
+#define IMAGE_FRIENDSFILES         ":/home/img/file/paste-from-clipboard.png"
+#define IMAGE_MYFILES              ":/home/img/file/file.png"
 #define IMAGE_RENAMEFILE           ":images/filecomments.png"
 #define IMAGE_STREAMING            ":images/streaming.png"
 #define IMAGE_TUNNEL_ANON_E2E      ":/images/blue_lock.png"
 #define IMAGE_TUNNEL_ANON          ":/images/blue_lock_open.png"
-#define IMAGE_TUNNEL_FRIEND        ":/icons/avatar_128.png"
+#define IMAGE_TUNNEL_FRIEND        ":/home/img/avatar_new.png"
 
 //#define DEBUG_DOWNLOADLIST 1
 
