@@ -72,16 +72,19 @@
         </property>
         <item>
          <widget class="QPushButton" name="avatarFrameButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>14</width>
-            <height>31</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>14</width>
-            <height>31</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="text">
@@ -121,7 +124,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>132</width>
+         <width>1</width>
          <height>16777215</height>
         </size>
        </property>
@@ -140,16 +143,19 @@
         </property>
         <item>
          <widget class="AvatarWidget" name="avatarWidget">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>116</width>
-            <height>116</height>
+            <width>1</width>
+            <height>1</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>116</width>
-            <height>116</height>
+            <width>1</width>
+            <height>1</height>
            </size>
           </property>
          </widget>
@@ -169,16 +175,19 @@
         </item>
         <item>
          <widget class="AvatarWidget" name="ownAvatarWidget">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>116</width>
-            <height>116</height>
+            <width>1</width>
+            <height>1</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>116</width>
-            <height>116</height>
+            <width>1</width>
+            <height>1</height>
            </size>
           </property>
          </widget>
@@ -214,15 +223,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ChatWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">gui/chat/ChatWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>AvatarWidget</class>
    <extends>QLabel</extends>
    <header>gui/common/AvatarWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChatWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">gui/chat/ChatWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
