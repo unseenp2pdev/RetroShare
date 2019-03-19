@@ -53,7 +53,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../icons.qrc">:/icons/svg/folders.svg</pixmap>
+         <pixmap resource="../../Unseengui/unseengui.qrc">:/home/img/file/folders.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -389,8 +389,8 @@ border-image: url(:/images/closepressed.png)
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../Unseengui/unseengui.qrc"/>
   <include location="../images.qrc"/>
-  <include location="../icons.qrc"/>
  </resources>
  <connections/>
 </ui>

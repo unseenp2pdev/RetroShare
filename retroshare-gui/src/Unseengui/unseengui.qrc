@@ -167,5 +167,7 @@
         <file>home/img/avatar.jpg</file>
         <file>home/img/delete.png</file>
         <file>home/img/delete_all.png</file>
+        <file>home/img/file/folders.png</file>
+        <file>home/img/file/folders1.png</file>
     </qresource>
 </RCC>
