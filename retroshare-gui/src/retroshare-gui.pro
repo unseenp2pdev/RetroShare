@@ -154,7 +154,7 @@ win32-g++ {
                 QMAKE_LFLAGS += -Wl,-dynamicbase
 		# Tell linker to use DEP protection
 		QMAKE_LFLAGS += -Wl,-nxcompat
-                #QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
+                QMAKE_LFLAGS += -Wl,--subsystem,windows -mwindows
 	}
 
     # Fix linking error (ld.exe: Error: export ordinal too large) due to too
