@@ -188,5 +188,6 @@
         <file>home/img/file/open-book-top-view.png</file>
         <file>home/img/file/locked-padlock.png</file>
         <file>home/img/file/unlocked-padlock.png</file>
+        <file>home/img/face_icon/confbtn.png</file>
     </qresource>
 </RCC>

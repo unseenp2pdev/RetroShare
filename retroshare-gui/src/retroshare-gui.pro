@@ -1424,7 +1424,64 @@ DISTFILES += \
     Unseengui/home/img/file/file.png \
     Unseengui/home/img/file/magnifying-glass.png \
     Unseengui/home/img/file/paste-from-clipboard.png \
-    Unseengui/home/img/file/upload.png
+    Unseengui/home/img/file/upload.png \
+    gui/images/user/add_group16.png \
+    gui/images/user/add_group22.png \
+    gui/images/user/add_group32.png \
+    gui/images/user/add_group48.png \
+    gui/images/user/add_group256.png \
+    gui/images/user/add_user16.png \
+    gui/images/user/add_user22.png \
+    gui/images/user/add_user24.png \
+    gui/images/user/add_user32.png \
+    gui/images/user/add_user48.png \
+    gui/images/user/add_user256.png \
+    gui/images/user/agt_forum16.png \
+    gui/images/user/agt_forum24.png \
+    gui/images/user/agt_forum32.png \
+    gui/images/user/agt_forum48.png \
+    gui/images/user/agt_forum64.png \
+    gui/images/user/agt_forum128.png \
+    gui/images/user/delete_group16.png \
+    gui/images/user/delete_user16.png \
+    gui/images/user/deny_user48.png \
+    gui/images/user/edit_group64.png \
+    gui/images/user/friend_suggestion16.png \
+    gui/images/user/friends24.png \
+    gui/images/user/friends24_notify.png \
+    gui/images/user/friends32.png \
+    gui/images/user/friends48.png \
+    gui/images/user/friends64.png \
+    gui/images/user/friends128.png \
+    gui/images/user/group16.png \
+    gui/images/user/group24.png \
+    gui/images/user/identity16.png \
+    gui/images/user/identity24.png \
+    gui/images/user/identity24_low.png \
+    gui/images/user/identity24away.png \
+    gui/images/user/identity24busy.png \
+    gui/images/user/identity24idle.png \
+    gui/images/user/identity32.png \
+    gui/images/user/identity48.png \
+    gui/images/user/identityavaible24.png \
+    gui/images/user/identityavaiblecyan24.png \
+    gui/images/user/identitygray16.png \
+    gui/images/user/identityinfo48.png \
+    gui/images/user/identityinfo64.png \
+    gui/images/user/identityoffline24.png \
+    gui/images/user/invite24.png \
+    gui/images/user/kuser24.png \
+    gui/images/user/kuser32.png \
+    gui/images/user/kuser48.png \
+    gui/images/user/personal24.png \
+    gui/images/user/personal32.png \
+    gui/images/user/personal64.png \
+    gui/images/user/personal128.png \
+    gui/images/user/remove_user24.png \
+    gui/images/user/servicepermissions64.png \
+    gui/images/user/user_request_unknown48.png \
+    gui/images/user/user_request16.png \
+    gui/images/user/user_request48.png
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \

@@ -269,8 +269,8 @@ p, li { white-space: pre-wrap; }
             <string>Add friend</string>
            </property>
            <property name="icon">
-            <iconset resource="../images.qrc">
-             <normaloff>:/images/user/add_user48.png</normaloff>:/images/user/add_user48.png</iconset>
+            <iconset resource="../../Unseengui/unseengui.qrc">
+             <normaloff>:/chat/img/personal_add_64.png</normaloff>:/chat/img/personal_add_64.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -481,6 +481,7 @@ p, li { white-space: pre-wrap; }
  </customwidgets>
  <resources>
   <include location="../images.qrc"/>
+  <include location="../../Unseengui/unseengui.qrc"/>
  </resources>
  <connections>
   <connection>
