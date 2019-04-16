@@ -96,6 +96,8 @@ private slots:
 
   void on_actionCreate_New_Profile_activated();
     
+
+  void click_Add_Or_Deny_Friend();
   //void updateNetworkStatus();
   
 //  void loadtabsettings();

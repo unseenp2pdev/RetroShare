@@ -13,6 +13,7 @@ class pgpid_item_proxy :
 public:
     pgpid_item_proxy(QObject *parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+    std::map<int, bool> indexAcceptConnection;
 public slots:
     void use_only_trusted_keys(bool val);
 

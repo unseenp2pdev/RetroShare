@@ -667,5 +667,7 @@
         <file>images/SimpleText.png</file>
         <file>images/ColoredText.png</file>
         <file>images/logo/background_lessblue.png</file>
+        <file>images/denyFriend.png</file>
+        <file>images/addFriend.png</file>
     </qresource>
 </RCC>

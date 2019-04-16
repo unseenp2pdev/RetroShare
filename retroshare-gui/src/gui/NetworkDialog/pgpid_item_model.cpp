@@ -206,18 +206,18 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
             return lst_used_str;
         }
             break;
-        case COLUMN_CHECK:
-        {
-            if (detail.accept_connection)
-            {
-                return tr("Accepted");
-            }
-            else
-            {
-                return tr(" - ");
-            }
-        }
-            break;
+//        case COLUMN_CHECK:
+//        {
+//            if (detail.accept_connection)
+//            {
+//                return tr("Deny friend");
+//            }
+//            else
+//            {
+//                return tr("Add friend");
+//            }
+//        }
+//            break;
 
 
         }
@@ -250,9 +250,21 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
         case COLUMN_CHECK:
         {
             if (detail.accept_connection)
-                return QIcon(IMAGE_AUTHED);
+            {
+                    QImage image(IMAGE_DENY_FRIEND);
+                    QPixmap imageButton = QPixmap::fromImage(image);
+
+                    //imageButton = imageButton.scaled(100,25);
+                    return imageButton;
+            }
             else
-                return QIcon(IMAGE_DENIED);
+            {
+                QImage image(IMAGE_ADD_FRIEND);
+                QPixmap imageButton = QPixmap::fromImage(image);
+
+                //imageButton = imageButton.scaled(100,25);
+                return imageButton;
+            }
 
         }
             break;
@@ -344,5 +356,6 @@ void pgpid_item_model::data_updated(std::list<RsPgpId> &new_neighs)
     }
 
     //shit code end
+
 }
 

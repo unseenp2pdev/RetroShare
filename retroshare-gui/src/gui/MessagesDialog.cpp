@@ -1332,6 +1332,11 @@ void MessagesDialog::clicked(QTreeWidgetItem *item, int column)
             QList<QTreeWidgetItem*> items;
             items.append(item);
             setMsgStar(items, !hasMessageStar(item));
+
+            //ui.messageTreeWidget->setItemWidget(items.value(0),0, new QPushButton("Click Me"));
+
+            //ui.messageTreeWidget->setItemWidget(items.value(1),0, new QPushButton("Click Me 2"));
+
             return;
         }
     }
