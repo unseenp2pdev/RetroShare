@@ -72,6 +72,13 @@ FriendsDialog::FriendsDialog(QWidget *parent)
     if (instance == NULL) {
         instance = this;
     }
+
+
+    ui.tabWidget->setTabPosition(QTabWidget::North);
+    ui.tabWidget->addTab(networkDialog = new NetworkDialog(),QIcon(IMAGE_PEERS), tr("Network contacts"));
+    ui.tabWidget->addTab(networkView = new NetworkView(),QIcon(IMAGE_NETWORK2), tr("Network graph"));
+
+
     QString msg = tr("UnseenP2P broadcast chat: messages are sent to all connected friends.");
     // "<font color='grey'>" + DateTime::formatTime(QTime::currentTime()) + "</font> -
     msg = QString("<font color='blue'><i>" + msg + "</i></font>");
@@ -90,11 +97,8 @@ FriendsDialog::FriendsDialog(QWidget *parent)
     ui.avatar->setOwnId();
     ui.avatar->setFrameType(AvatarWidget::STATUS_FRAME);
 
-    ui.tabWidget->setTabPosition(QTabWidget::North);
-    ui.tabWidget->addTab(networkView = new NetworkView(),QIcon(IMAGE_NETWORK2), tr("Network graph"));
-    ui.tabWidget->addTab(networkDialog = new NetworkDialog(),QIcon(IMAGE_PEERS), tr("Network contacts"));
-
     ui.tabWidget->setCurrentWidget(networkDialog);
+    ui.tabWidget->tabBar()->moveTab(0,1);
 
     ui.tabWidget->hideCloseButton(0);
     ui.tabWidget->hideCloseButton(1);

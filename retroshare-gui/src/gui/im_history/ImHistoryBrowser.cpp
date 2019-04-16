@@ -97,7 +97,7 @@ ImHistoryBrowser::ImHistoryBrowser(const ChatId &chatId, QTextEdit *edit, QWidge
     /* Invoke Qt Designer generated QObject setup routine */
     ui.setupUi(this);
 
-    ui.headerFrame->setHeaderImage(QPixmap(":/images/user/agt_forum64.png"));
+    ui.headerFrame->setHeaderImage(QPixmap(":/home/img/face_icon/confbtn.png"));
     ui.headerFrame->setHeaderText(tr("Message History"));
 
     m_chatId = chatId;

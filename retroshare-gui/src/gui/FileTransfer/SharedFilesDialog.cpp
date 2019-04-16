@@ -75,7 +75,7 @@
 #define IMAGE_COLLVIEW       ":/images/library_view.png"
 #define IMAGE_COLLOPEN       ":/images/library.png"
 #define IMAGE_EDITSHARE      ":/images/edit_16.png"
-#define IMAGE_MYFILES        ":/icons/svg/folders1.svg"
+#define IMAGE_MYFILES        ":/home/img/file/folders1.png"
 #define IMAGE_REMOVE         ":/images/deletemail24.png"
 
 /*define viewType_CB value */

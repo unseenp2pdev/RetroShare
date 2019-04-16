@@ -167,5 +167,27 @@
         <file>home/img/avatar.jpg</file>
         <file>home/img/delete.png</file>
         <file>home/img/delete_all.png</file>
+        <file>home/img/file/folders.png</file>
+        <file>home/img/file/folders1.png</file>
+        <file>home/img/file/play-button.png</file>
+        <file>home/img/file/copy-document.png</file>
+        <file>home/img/file/pause-symbol.png</file>
+        <file>home/img/file/play-resume.png</file>
+        <file>home/img/file/open-folder.png</file>
+        <file>home/img/file/openfile.png</file>
+        <file>home/img/file/stop.png</file>
+        <file>home/img/file/previewfile.png</file>
+        <file>home/img/file/prioritychart.png</file>
+        <file>home/img/file/prioritylow.png</file>
+        <file>home/img/file/priorityhight.png</file>
+        <file>home/img/file/priorityauto.png</file>
+        <file>home/img/file/library.png</file>
+        <file>home/img/file/libraryadd.png</file>
+        <file>home/img/file/libraryedit.png</file>
+        <file>home/img/file/findfile.png</file>
+        <file>home/img/file/open-book-top-view.png</file>
+        <file>home/img/file/locked-padlock.png</file>
+        <file>home/img/file/unlocked-padlock.png</file>
+        <file>home/img/face_icon/confbtn.png</file>
     </qresource>
 </RCC>
