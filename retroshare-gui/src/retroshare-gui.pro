@@ -950,8 +950,14 @@ SOURCES +=  main.cpp \
 #            gui/feeds/ChanNewItem.cpp \
 #            gui/feeds/ChanMsgItem.cpp \
 
+<<<<<<< HEAD
 RESOURCES += gui/images.qrc gui/icons.qrc lang/lang.qrc gui/help/content/content.qrc gui/emojione.qrc \
     Unseengui/unseengui.qrc
+=======
+RESOURCES += gui/icons.qrc lang/lang.qrc gui/help/content/content.qrc gui/emojione.qrc \
+    Unseengui/unseengui.qrc \
+    gui/images.qrc
+>>>>>>> Add/deny friend on network contacts
 
 TRANSLATIONS +=  \
             lang/retroshare_ca_ES.ts \
