@@ -105,7 +105,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="icon">
-         <iconset resource="images.qrc">
+         <iconset resource="../Unseengui/unseengui.qrc">
           <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
         </property>
         <property name="checkable">
