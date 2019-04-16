@@ -1425,9 +1425,6 @@ DISTFILES += \
     Unseengui/home/img/file/file.png \
     Unseengui/home/img/file/magnifying-glass.png \
     Unseengui/home/img/file/paste-from-clipboard.png \
-<<<<<<< HEAD
-    Unseengui/home/img/file/upload.png
-=======
     Unseengui/home/img/file/upload.png \
     gui/images/user/add_group16.png \
     gui/images/user/add_group22.png \
@@ -1486,7 +1483,6 @@ DISTFILES += \
     gui/images/user/user_request_unknown48.png \
     gui/images/user/user_request16.png \
     gui/images/user/user_request48.png
->>>>>>> unseen-gui-app
 DISTFILES += \
     rsMacIcon.icns \
     ../../data/retroshare.xpm \
