@@ -92,7 +92,9 @@ FriendsDialog::FriendsDialog(QWidget *parent)
 
     ui.tabWidget->setTabPosition(QTabWidget::North);
     ui.tabWidget->addTab(networkView = new NetworkView(),QIcon(IMAGE_NETWORK2), tr("Network graph"));
-    ui.tabWidget->addTab(networkDialog = new NetworkDialog(),QIcon(IMAGE_PEERS), tr("Keyring"));
+    ui.tabWidget->addTab(networkDialog = new NetworkDialog(),QIcon(IMAGE_PEERS), tr("Network contacts"));
+
+    ui.tabWidget->setCurrentWidget(networkDialog);
 
     ui.tabWidget->hideCloseButton(0);
     ui.tabWidget->hideCloseButton(1);

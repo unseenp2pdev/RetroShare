@@ -9,6 +9,9 @@
 #define IMAGE_DENIED         ":/images/denied16.png"
 #define IMAGE_TRUSTED        ":/images/rs-2.png"
 
+#define IMAGE_ADD_FRIEND       ":/images/addFriend.png"
+#define IMAGE_DENY_FRIEND         ":/images/denyFriend.png"
+
 
 #define COLUMN_CHECK 0
 #define COLUMN_PEERNAME    1
@@ -40,19 +43,25 @@ public:
     void setBackgroundColorAcceptConnection(QColor color) { mBackgroundColorAcceptConnection = color; }
     void setBackgroundColorHasSignedMe(QColor color) { mBackgroundColorHasSignedMe = color; }
     void setBackgroundColorDenied(QColor color) { mBackgroundColorDenied = color; }
+    static std::map<int, bool> mapIndexToAccept;
 
+    //static std::set<int> setOfIndex;
 
 public slots:
     void data_updated(std::list<RsPgpId> &new_neighs);
 
 private:
     std::list<RsPgpId> &neighs;
+
     float font_height;
     QColor mBackgroundColorSelf;
     QColor mBackgroundColorOwnSign;
     QColor mBackgroundColorAcceptConnection;
     QColor mBackgroundColorHasSignedMe;
     QColor mBackgroundColorDenied;
+
+
+
 };
 
 #endif // KEY_ITEM_MODEL_H

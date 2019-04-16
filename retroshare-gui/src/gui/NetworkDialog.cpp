@@ -99,6 +99,7 @@ NetworkDialog::NetworkDialog(QWidget */*parent*/)
     PGPIdItemModel = new pgpid_item_model(neighs, f, this);
     PGPIdItemProxy = new pgpid_item_proxy(this);
     connect(ui.onlyTrustedKeys, SIGNAL(toggled(bool)), PGPIdItemProxy, SLOT(use_only_trusted_keys(bool)));
+
     PGPIdItemProxy->setSourceModel(PGPIdItemModel);
     PGPIdItemProxy->setFilterKeyColumn(COLUMN_PEERNAME);
     PGPIdItemProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -111,8 +112,13 @@ NetworkDialog::NetworkDialog(QWidget */*parent*/)
     ui.connectTreeWidget->setSortingEnabled(true);
     ui.connectTreeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.connectTreeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui.connectTreeWidget->setColumnWidth(0,120);
+
     connect(ui.connectTreeWidget, SIGNAL( customContextMenuRequested( QPoint ) ), this, SLOT( connectTreeWidgetCostumPopupMenu( QPoint ) ) );
     connect(ui.connectTreeWidget, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(peerdetails()));
+
+    connect(ui.connectTreeWidget, SIGNAL(clicked(QModelIndex)), this, SLOT(click_Add_Or_Deny_Friend()));
 
     /* Set header resize modes and initial section sizes */
 /*    QHeaderView * _header = ui.connectTreeWidget->header () ;
@@ -499,5 +505,32 @@ void NetworkDialog::updateDisplay()
     rsPeers->getGPGAllList(new_neighs);
     //refresh model
     PGPIdItemModel->data_updated(new_neighs);
+
 }
 
+void NetworkDialog::click_Add_Or_Deny_Friend()
+{
+    QModelIndex index1 = ui.connectTreeWidget->currentIndex();
+    if (index1.column() != 0)
+        return;
+    QModelIndex pgpIndex = PGPIdItemProxy->index(index1.row(), COLUMN_PEERID);
+    QString pgpId = ui.connectTreeWidget->model()->data(pgpIndex,Qt::EditRole ).toString();
+
+    //QMessageBox::warning(NULL,tr("UnseenP2P"), tr("You click on PGPId = ") + pgpId );
+
+    RsPgpId rspgpId(pgpId.toStdString());
+    RsPeerDetails details;
+    if (rsPeers->getGPGDetails(rspgpId, details))
+    {
+        PGPKeyDialog::showIt(rspgpId, PGPKeyDialog::PageDetails);
+//        if (details.accept_connection)
+//        {
+
+//        }
+//        else
+//        {
+
+//        }
+    }
+
+}
