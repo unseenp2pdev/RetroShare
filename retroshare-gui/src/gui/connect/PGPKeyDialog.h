@@ -84,5 +84,7 @@ private:
 
     /** Qt Designer generated object */
     Ui::PGPKeyDialog ui;
+
+
 };
 

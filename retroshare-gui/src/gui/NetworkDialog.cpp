@@ -494,7 +494,29 @@ void NetworkDialog::filterColumnChanged(int col)
     //filterItems(ui.filterLineEdit->text());
 }
 
+void NetworkDialog::filterGPGIdWithAvailableCert(std::list<RsPgpId> &ids)
+{
+    std::map<RsPgpId, std::string> certlist = rsPeers->certListOfContact();
+    std::map<RsPgpId, std::string>::iterator cert_it;
+    std::cerr << std::endl;
+    std::cerr << " getGPGAllList size, before: " << ids.size();
+    std::cerr << std::endl;
 
+    for(std::list<RsPgpId>::iterator lit = ids.begin(); lit != ids.end(); ++lit)
+    {
+        cert_it = certlist.find(*lit);
+        if (cert_it != certlist.end())
+        {
+
+            std::cerr << "we are filtering all PGPIds in the getGPGAllList: " << *lit << " is a Friend of contact list that have CERT  ";
+            std::cerr << std::endl;
+        }
+        else ids.erase(lit);
+    }
+
+    std::cerr << " getGPGAllList size, after: " << ids.size();
+    std::cerr << std::endl;
+}
 
 void NetworkDialog::updateDisplay()
 {
@@ -503,6 +525,9 @@ void NetworkDialog::updateDisplay()
     //update ids list
     std::list<RsPgpId> new_neighs;
     rsPeers->getGPGAllList(new_neighs);
+    //unseenp2p - need to check all PGPId that we can get the cert or sslId
+
+    filterGPGIdWithAvailableCert(new_neighs);
     //refresh model
     PGPIdItemModel->data_updated(new_neighs);
 
@@ -516,21 +541,11 @@ void NetworkDialog::click_Add_Or_Deny_Friend()
     QModelIndex pgpIndex = PGPIdItemProxy->index(index1.row(), COLUMN_PEERID);
     QString pgpId = ui.connectTreeWidget->model()->data(pgpIndex,Qt::EditRole ).toString();
 
-    //QMessageBox::warning(NULL,tr("UnseenP2P"), tr("You click on PGPId = ") + pgpId );
-
     RsPgpId rspgpId(pgpId.toStdString());
     RsPeerDetails details;
     if (rsPeers->getGPGDetails(rspgpId, details))
     {
         PGPKeyDialog::showIt(rspgpId, PGPKeyDialog::PageDetails);
-//        if (details.accept_connection)
-//        {
-
-//        }
-//        else
-//        {
-
-//        }
     }
 
 }

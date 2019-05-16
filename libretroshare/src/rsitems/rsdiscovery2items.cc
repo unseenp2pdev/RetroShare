@@ -149,6 +149,10 @@ void RsDiscContactItem::serial_process(RsGenericSerializer::SerializeJob j,RsGen
 	   RsTypeSerializer::serial_process           (j,ctx,localAddrList,"localAddrList");
 	   RsTypeSerializer::serial_process           (j,ctx,  extAddrList,"extAddrList");
    }
+
+   //unseenp2p - add more certificate info when exchange between 2 peers
+   RsTypeSerializer::serial_process           (j,ctx,  full_cert,"full_cert");
+   RsTypeSerializer::serial_process           (j,ctx,  requestAboutCert,"requestAboutCert");
 }
 
 void RsDiscIdentityListItem::serial_process(RsGenericSerializer::SerializeJob j,RsGenericSerializer::SerializeContext& ctx)
