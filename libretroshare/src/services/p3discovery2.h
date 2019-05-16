@@ -118,6 +118,9 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 
 	void processContactInfo(const SSLID &fromId, const RsDiscContactItem *info);
 
+    //unseenp2p
+    void processFriendsOfContactInfo(const SSLID &fromId, const RsDiscContactItem *info);
+
 	void requestPGPCertificate(const PGPID &aboutId, const SSLID &toId);
 	void recvPGPCertificateRequest(const SSLID &fromId, const RsDiscPgpListItem *item);
 	void sendPGPCertificate(const PGPID &aboutId, const SSLID &toId);
@@ -126,6 +129,9 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 
 	bool setPeerVersion(const SSLID &peerId, const std::string &version);
 
+    void fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,peerState &stateDetail);
+    void sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack );
+    void convertFromItemInfoToPeerState(const RsDiscContactItem *item, peerState &pState);
 	private:
 
 	p3PeerMgr *mPeerMgr;
@@ -147,6 +153,7 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 
 	std::list<RsDiscPgpCertItem *> mPendingDiscPgpCertInList;
 	std::list<RsDiscPgpCertItem *> mPendingDiscPgpCertOutList;
+
 };
 
 

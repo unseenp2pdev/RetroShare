@@ -98,6 +98,7 @@ private slots:
     
 
   void click_Add_Or_Deny_Friend();
+  void filterGPGIdWithAvailableCert(std::list<RsPgpId> &ids);
   //void updateNetworkStatus();
   
 //  void loadtabsettings();

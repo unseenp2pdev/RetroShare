@@ -613,7 +613,7 @@ void MainWindow::displayDiskSpaceWarning(int loc,int size_limit_mb)
  * notification area. */
 void MainWindow::createTrayIcon()
 {
- //#ifdef WINDOWS_SYS
+//ifdef WINDOWS_SYS
     /** Tray icon Menu **/
     QMenu *trayMenu = new QMenu(this);
     if (sysTrayStatus) sysTrayStatus->trayMenu = trayMenu;
@@ -624,7 +624,6 @@ void MainWindow::createTrayIcon()
     /* Create status menu */
     QMenu *statusMenu = trayMenu->addMenu(tr("Status"));
     initializeStatusObject(statusMenu, true);
-
     /* Create notify menu */ //meiyousixin - no need more!
     //notifyMenu = trayMenu->addMenu(tr("Notify"));
     //notifyMenu->menuAction()->setVisible(false);
@@ -650,7 +649,7 @@ void MainWindow::createTrayIcon()
     trayMenu->addSeparator();
     trayMenu->addAction(QIcon(IMAGE_CLOSE), tr("&Quit"), this, SLOT(doQuit()));
     /** End of Icon Menu **/
-//#endif
+//endif
 
     // Create the tray icon
     trayIcon = new QSystemTrayIcon(this);

@@ -2453,7 +2453,7 @@ bool  p3PeerMgrIMPL::loadList(std::list<RsItem *>& load)
 
 #ifdef PEER_DEBUG
             std::cerr << "p3PeerMgrIMPL::loadList() Peer group item:" << std::endl;
-            gitem->print(std::cerr, 10);
+            //gitem->print(std::cerr, 10);
             std::cerr << std::endl;
 #endif
             RsGroupInfo info ;
@@ -2875,7 +2875,7 @@ bool	p3PeerMgrIMPL::getAssociatedPeers(const RsPgpId &gpg_id, std::list<RsPeerId
 	RsStackMutex stack(mPeerMtx); /****** STACK LOCK MUTEX *******/
 
 #ifdef PEER_DEBUG
-	std::cerr << "p3PeerMgr::getAssociatedPeers() for id : " << gpg_id << std::endl;
+    //std::cerr << "p3PeerMgr::getAssociatedPeers() for id : " << gpg_id << std::endl;
 #endif
 
 	int count = 0;
@@ -2888,7 +2888,7 @@ bool	p3PeerMgrIMPL::getAssociatedPeers(const RsPgpId &gpg_id, std::list<RsPeerId
 			ids.push_back(it->first);
 
 #ifdef PEER_DEBUG
-			std::cerr << "p3PeerMgr::getAssociatedPeers() found ssl id :  " << it->first << std::endl;
+            //std::cerr << "p3PeerMgr::getAssociatedPeers() found ssl id :  " << it->first << std::endl;
 #endif
 
 		}
@@ -3010,4 +3010,43 @@ bool p3PeerMgrIMPL::removeUnusedLocations()
 	return true;
 }
 
+std::map<RsPgpId, RsPeerId> p3PeerMgrIMPL::friendListOfContact()
+{
+    return mFriendOfContactList;
+}
 
+std::map<RsPgpId, std::string> p3PeerMgrIMPL::certListOfContact()
+{
+    return mCertList;
+}
+
+void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert)
+{
+    std::map<RsPgpId, RsPeerId>::iterator it;
+    std::map<RsPgpId, std::string>::iterator itCert;
+
+    it =  mFriendOfContactList.find(rsPgpId);
+    itCert = mCertList.find(rsPgpId);
+    if (it == mFriendOfContactList.end() && itCert == mCertList.end() )
+    {
+#ifdef PEER_DEBUG
+            std::cerr << "we will add this Peer into Friend Of Contact PGP id: " << rsPgpId << " with sslId: " << sslId << std::endl;
+#endif
+        mFriendOfContactList[rsPgpId] = sslId;
+        mCertList[rsPgpId] = cert;
+        return;
+    }
+#ifdef PEER_DEBUG
+            std::cerr << " This Peer already existed in Friend Of Contact PGP id: " << rsPgpId << " with sslId: " << sslId << std::endl;
+#endif
+
+    return;
+}
+
+bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
+{
+    std::map<RsPgpId, RsPeerId>::iterator it;
+    it =     mFriendOfContactList.find(rsPgpId);
+    if ((it != mFriendOfContactList.end())) return true;
+    else return false;
+}

@@ -146,12 +146,11 @@ virtual bool    getGroupInfoList(std::list<RsGroupInfo> &groupInfoList) = 0;
 virtual bool    assignPeersToGroup(const RsNodeGroupId &groupId, const std::list<RsPgpId> &peerIds, bool assign) = 0;
 
 	virtual bool resetOwnExternalAddressList() = 0 ;
-
 	virtual ServicePermissionFlags servicePermissionFlags(const RsPgpId& gpg_id) =0;
 	virtual ServicePermissionFlags servicePermissionFlags(const RsPeerId& ssl_id) =0;
 	virtual void setServicePermissionFlags(const RsPgpId& gpg_id,const ServicePermissionFlags& flags) =0;
 
-	/**************** Set Net Info ****************/
+   /**************** Set Net Info ****************/
 	/*
 	 * These functions are used by:
 	 * 1) p3linkmgr 
@@ -222,6 +221,12 @@ virtual bool 	haveOnceConnected() = 0;
 
 virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage &addr, uint32_t &count)=0;
 
+    //unseenp2p
+    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
+    virtual std::map<RsPgpId, std::string> certListOfContact() = 0;
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) = 0;
+    virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
+
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -265,7 +270,6 @@ public:
     virtual ServicePermissionFlags servicePermissionFlags(const RsPgpId& gpg_id) ;
     virtual ServicePermissionFlags servicePermissionFlags(const RsPeerId& ssl_id) ;
     virtual void setServicePermissionFlags(const RsPgpId& gpg_id,const ServicePermissionFlags& flags) ;
-
     /**************** Set Net Info ****************/
     /*
      * These functions are used by:
@@ -335,6 +339,11 @@ public:
     virtual bool 	getMaxRates(const RsPgpId&  pid,uint32_t& maxUp,uint32_t& maxDn);
     virtual bool 	getMaxRates(const RsPeerId& pid,uint32_t& maxUp,uint32_t& maxDn);
 
+    //unseenp2p
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert);
+    virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
+    virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
+    virtual std::map<RsPgpId, std::string> certListOfContact();
     /************************************************************************************************/
     /* Extra IMPL Functions (used by p3LinkMgr, p3NetMgr + Setup) */
     /************************************************************************************************/
@@ -358,7 +367,6 @@ public:
 	int getConnectAddresses( const RsPeerId &id, sockaddr_storage &lAddr,
 	                         sockaddr_storage &eAddr, pqiIpAddrSet &histAddrs,
 	                         std::string &dyndns );
-
 
 protected:
     /* Internal Functions */
@@ -401,6 +409,10 @@ private:
 
     std::map<RsNodeGroupId,RsGroupInfo> groupList;
     //uint32_t lastGroupId;
+
+    //unseenp2p
+    std::map<RsPgpId, RsPeerId> mFriendOfContactList;
+    std::map<RsPgpId, std::string> mCertList;
 
     std::list<RsItem *> saveCleanupList; /* TEMPORARY LIST WHEN SAVING */
 

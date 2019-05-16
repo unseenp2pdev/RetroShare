@@ -294,12 +294,16 @@ void PGPKeyDialog::loadKeyPage()
 
     //if (!rsPeers->getGPGDetails(pgpId, detail))
     std::list<RsPeerId> sslIds;
-    rsPeers->getAssociatedSSLIds(detail.gpg_id, sslIds);
+    RsPeerId sslId;
+    //try to replace getAssociatedSSLIds by another function to get sslId
+
+    //rsPeers->getAssociatedSSLIds(detail.gpg_id, sslIds);
     if (sslIds.size() >= 1) {
 
-             RsPeerId sslId  = sslIds.front();
+             sslId  = sslIds.front();
              std::cerr << "DEBUG: sslId of peer id: " << sslId << std::endl ;
     }
+    peerId = sslId;
      std::string pgp_key = rsPeers->getPGPKey(detail.gpg_id,ui._shouldAddSignatures_CB_2->isChecked()) ; // this needs to be a SSL id
 
     ui.userCertificateText_2->setReadOnly(true);
@@ -368,8 +372,73 @@ void PGPKeyDialog::makeFriend()
     if (ui.signGPGKeyCheckBox->isChecked()) {
         rsPeers->signGPGCertificate(pgpId);
     } 
-	
+
+    //Add friend first, then set location, ip go after
+    //we can get peerId here for add friend!!!
+    std::map<RsPgpId, RsPeerId> list = rsPeers->friendListOfContact();
+    std::map<RsPgpId, RsPeerId>::iterator it;
+    it = list.find(pgpId);
+    if (it != list.end())
+    {
+        peerId = it->second;
+        std::cerr << "we can find you sslId: " << peerId << ") is Friend of contact  ";
+        std::cerr << std::endl;
+
+    }
+    else
+    {
+        std::cerr << "we CAN NOT find you is Friend of contact  ";
+        std::cerr << std::endl;
+    }
+
     rsPeers->addFriend(peerId, pgpId);
+
+    //at first we parse the cert str of this peer
+    std::map<RsPgpId, std::string> certlist = rsPeers->certListOfContact();
+    std::map<RsPgpId, std::string>::iterator cert_it;
+    std::string certstr;
+     cert_it = certlist.find(pgpId);
+     if (cert_it != certlist.end())
+     {
+        certstr = cert_it->second;
+        uint32_t cert_error_code;
+        RsPeerDetails peerDetails;
+        if (rsPeers->loadDetailsFromStringCert(certstr, peerDetails, cert_error_code))
+        {
+           if (peerDetails.isHiddenNode)
+           {
+               std::cerr << "PGPKeyDialog::makeFriend() : setting hidden node." << std::endl;
+               rsPeers->setHiddenNode(peerDetails.id, peerDetails.hiddenNodeAddress, peerDetails.hiddenNodePort);
+           }
+           else
+           {
+               if (!peerDetails.location.empty()) {
+                    std::cerr << "PGPKeyDialog::makeFriend() : setting location." << std::endl;
+                   rsPeers->setLocation(peerDetails.id, peerDetails.location);
+               }
+               //let's check if there is ip adresses in the wizard.
+               if (!peerDetails.extAddr.empty() && peerDetails.extPort) {
+                   std::cerr << "PGPKeyDialog::makeFriend() : setting ip ext address." << std::endl;
+                   rsPeers->setExtAddress(peerDetails.id, peerDetails.extAddr, peerDetails.extPort);
+               }
+               if (!peerDetails.localAddr.empty() && peerDetails.localPort) {
+                   std::cerr << "PGPKeyDialog::makeFriend() : setting ip local address." << std::endl;
+                   rsPeers->setLocalAddress(peerDetails.id, peerDetails.localAddr, peerDetails.localPort);
+               }
+               if (!peerDetails.dyndns.empty()) {
+                   std::cerr << "PGPKeyDialog::makeFriend() : setting DynDNS." << std::endl;
+                   rsPeers->setDynDNS(peerDetails.id, peerDetails.dyndns);
+               }
+               for(auto&& ipr : peerDetails.ipAddressList)
+                   rsPeers->addPeerLocator(
+                               peerDetails.id,
+                               RsUrl(ipr.substr(0, ipr.find(' '))) );
+           }
+        }
+     }
+
+
+
 //	 setServiceFlags() ;
     loadAll();
 
