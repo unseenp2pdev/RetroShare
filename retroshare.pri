@@ -593,20 +593,14 @@ macx-* {
 	message(***retroshare.pri:MacOSX)
 
         ## 11 Sep 2018 - meiyousixin - use config in one MacOS comp
-
-        #BIN_DIR += "/usr/bin"
-        #INC_DIR += "/usr/include"
-        #INC_DIR += "/usr/local/include"
-        #LIB_DIR += "/usr/local/lib"
-	##local real Mac OSX Device Setting.
-        BIN_DIR += "/Applications/Xcode.app/Contents/Developer/usr/bin"
+	BIN_DIR += "/Applications/Xcode.app/Contents/Developer/usr/bin"
 	INC_DIR += "/usr/local/Cellar/miniupnpc/2.1/include"
-        INC_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.59/include"
-        INC_DIR += "/usr/local/Cellar/sqlcipher/4.0.1/include"
-        LIB_DIR += "/usr/local/opt/openssl/lib/"
-        LIB_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.59/lib"
-        LIB_DIR += "/usr/local/Cellar/sqlcipher/4.0.1/lib"
-        LIB_DIR += "/usr/local/Cellar/miniupnpc/2.1/lib"
+	INC_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.62_1/include"
+	INC_DIR += "/usr/local/Cellar/sqlcipher/4.1.0/include"
+	LIB_DIR += "/usr/local/opt/openssl/lib/"
+	LIB_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.62_1/lib"
+	LIB_DIR += "/usr/local/Cellar/sqlcipher/4.1.0/lib"
+	LIB_DIR += "/usr/local/Cellar/miniupnpc/2.1/lib"
         CONFIG += c++11
         INCLUDEPATH += "/usr/local/include"
         RS_UPNP_LIB = miniupnpc
