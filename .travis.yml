@@ -72,7 +72,7 @@ after_success:
   - if [ $TRAVIS_OS_NAME == osx ] ; then  mv retroshare.app unseenp2p.app; macdeployqt unseenp2p.app -qmldir=../src/  -dmg; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then  mv unseenp2p.dmg UnseenP2P-0.6.5.dmg; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then  appdmg json-path UnseenP2P-0.6.5.dmg; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then  7z a UnseenP2P-0.6.5_macos.zip UnseenP2P-0.6.5.dmg; cd ../..; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then  7z a UnseenP2P-0.6.6_macos.zip UnseenP2P-0.6.6.dmg; cd ../..; fi
 
 #  - if [ $TRAVIS_BRANCH == $TRAVIS_TAG ]; then rake deploy; fi
 
@@ -85,7 +85,7 @@ deploy:
   - provider: releases
     api_key: $TOKEN
     file:
-      - retroshare-gui/src/UnseenP2P-0.6.5_macos.zip
+      - retroshare-gui/src/UnseenP2P-0.6.6_macos.zip
     overwrite: true
     skip_cleanup: true
     on:
