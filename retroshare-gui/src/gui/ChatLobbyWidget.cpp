@@ -430,16 +430,17 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
 		_lobby_infos[id].default_icon = QIcon() ;
 		_lobby_infos[id].last_typing_event = time(NULL) ;
 
-                ChatLobbyInfo linfo ;
-                if(rsMsgs->getChatLobbyInfo(id,linfo))
-                    _lobby_infos[id].default_icon = (linfo.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC):QIcon(IMAGE_PRIVATE) ;
-                else
-                     std::cerr << "(EE) cannot find info for room " << std::hex << id << std::dec << std::endl;
+        ChatLobbyInfo linfo ;
+        if(rsMsgs->getChatLobbyInfo(id,linfo))
+            _lobby_infos[id].default_icon = (linfo.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC):QIcon(IMAGE_PRIVATE) ;
+        else
+            std::cerr << "(EE) cannot find info for room " << std::hex << id << std::dec << std::endl;
 	}
 }
 
 void ChatLobbyWidget::addOne2OneChatPage(PopupChatDialog *d)
 {
+
     // check that the page does not already exist.
     if (_chatOne2One_infos.count(d->chatId().toPeerId().toStdString()) < 1)
     {
