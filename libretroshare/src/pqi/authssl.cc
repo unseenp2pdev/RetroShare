@@ -1671,7 +1671,9 @@ bool    AuthSSLimpl::FailedCertificate(X509 *x509, const RsPgpId& gpgid,
             // We can addFriend here if we can getPGPDetail
             if (rsPeers->getGPGDetails(gpgid, tmp_det))
             {
+                #ifdef AUTHSSL_DEBUG
                 std::cerr << "Only for Supernode: Auto accepting friend request for connection." << std::endl;
+                #endif
                 rsPeers->addFriend(sslid, gpgid) ;
             }
 
