@@ -61,7 +61,7 @@ const uint32_t RS_SSL_HANDSHAKE_DIAGNOSTIC_WRONG_SIGNATURE_VERSION     = 0x0a ;
 /****
  * #define AUTHSSL_DEBUG 1
  ***/
-
+#define AUTHSSL_DEBUG 1
 // initialisation du pointeur de singleton
 AuthSSL *AuthSSL::instance_ssl = NULL;
 static pthread_mutex_t *mutex_buf = NULL;
@@ -1081,8 +1081,8 @@ bool AuthSSLimpl::AuthX509WithGPG(X509 *x509,uint32_t& diagnostic)
 		//get the fingerprint of the key that is supposed to sign
 #ifdef AUTHSSL_DEBUG
 		std::cerr << "AuthSSLimpl::AuthX509() verifying the gpg sig with keyprint : " << pd.fpr << std::endl;
-		std::cerr << "Sigoutl = " << sigoutl << std::endl ;
-		std::cerr << "pd.fpr = " << pd.fpr << std::endl ;
+//		std::cerr << "Sigoutl = " << sigoutl << std::endl ;
+//		std::cerr << "pd.fpr = " << pd.fpr << std::endl ;
 #endif
 
 		// Take a early look at signature parameters. In particular we dont accept signatures with unsecure hash algorithms.
@@ -1352,9 +1352,9 @@ int AuthSSLimpl::VerifyX509Callback(int preverify_ok, X509_STORE_CTX *ctx)
 #ifdef AUTHSSL_DEBUG
             fprintf(stderr, "AuthSSLimpl::VerifyX509Callback() pgp key not accepted : \n");
             fprintf(stderr, "issuer pgpid : ");
-            fprintf(stderr, "%s\n",pgpid.c_str());
+ //           fprintf(stderr, "%s\n",pgpid.c_str());
             fprintf(stderr, "\n AuthGPG::getAuthGPG()->getGPGOwnId() : ");
-            fprintf(stderr, "%s\n",AuthGPG::getAuthGPG()->getGPGOwnId().c_str());
+  //          fprintf(stderr, "%s\n",AuthGPG::getAuthGPG()->getGPGOwnId().c_str());
             fprintf(stderr, "\n");
 #endif
             return false;
