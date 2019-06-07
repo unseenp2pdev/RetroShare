@@ -351,7 +351,7 @@ void p3discovery2::sendOwnContactInfo(const SSLID &sslid)
 
 		pkt->version = RS_HUMAN_READABLE_VERSION;
         //unseenp2p - add full certificate to share with friend
-        pkt->full_cert = rsPeers->GetRetroshareInvite(sslid);
+        pkt->full_cert = rsPeers->GetRetroshareInvite(rsPeers->getOwnId());
 		pkt->PeerId(sslid);
 
 #ifdef P3DISC_DEBUG

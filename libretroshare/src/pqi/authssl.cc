@@ -1662,20 +1662,26 @@ bool    AuthSSLimpl::FailedCertificate(X509 *x509, const RsPgpId& gpgid,
 	{
         RsServer::notify()->AddPopupMessage(RS_POPUP_CONNECT_ATTEMPT, gpgid.toStdString(), sslcn, sslid.toStdString());
         RsPeerDetails tmp_det ;
+        // Only for Supernode: Here we get certificate and auto accept friend request
+        // We can addFriend here if we can getPGPDetail
+        if (rsPeers->getGPGDetails(gpgid, tmp_det))
+        {
+            #ifdef AUTHSSL_DEBUG
+            std::cerr << "Only for Supernode: Auto accepting friend request for connection." << std::endl;
+            #endif
+            rsPeers->addFriend(sslid, gpgid) ;
+        }
+
+        std::cerr << "Even getGPGDetails false, we can still add friend for auto accept" << std::endl;
+
+        rsPeers->addFriend(sslid, gpgid) ;
+
 		switch(auth_diagnostic)
 		{
 		case RS_SSL_HANDSHAKE_DIAGNOSTIC_CERTIFICATE_MISSING:
 			RsServer::notify()->notifyConnectionWithoutCert();
 			RsServer::notify()->AddFeedItem(RS_FEED_ITEM_SEC_MISSING_CERTIFICATE, gpgid.toStdString(), sslid.toStdString(), sslcn, ip_address);
-            // Only for Supernode: Here we get certificate and auto accept friend request
-            // We can addFriend here if we can getPGPDetail
-            if (rsPeers->getGPGDetails(gpgid, tmp_det))
-            {
-                #ifdef AUTHSSL_DEBUG
-                std::cerr << "Only for Supernode: Auto accepting friend request for connection." << std::endl;
-                #endif
-                rsPeers->addFriend(sslid, gpgid) ;
-            }
+
 
 			break ;
 		case RS_SSL_HANDSHAKE_DIAGNOSTIC_CERTIFICATE_NOT_VALID:
