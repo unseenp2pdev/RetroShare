@@ -26,7 +26,7 @@
 #include "serialiser/rstlvbinary.h"
 #include "serialiser/rstypeserializer.h"
 
-#define GXS_PHOTO_SERIAL_DEBUG
+//#define GXS_PHOTO_SERIAL_DEBUG
 
 
 RsItem *RsGxsPhotoSerialiser::create_item(uint16_t service, uint8_t item_sub_id) const

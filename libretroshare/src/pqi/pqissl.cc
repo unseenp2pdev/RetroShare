@@ -1074,7 +1074,7 @@ int pqissl::SSL_Connection_Complete()
 
 	/* if we are passive - then accept! */
 	int err;
-
+    //unseenp2p - check if ACTIVE
 	if (sslmode)
 	{
 #ifdef PQISSL_LOG_DEBUG 
@@ -1082,7 +1082,7 @@ int pqissl::SSL_Connection_Complete()
 #endif
         err = SSL_connect(ssl_connection);
 	}
-	else
+    else    //unseenp2p - check if PASSIVE
 	{
 #ifdef PQISSL_LOG_DEBUG 
         rslog(RSL_DEBUG_BASIC, pqisslzone, "--------> Passive Accept! Server side.");

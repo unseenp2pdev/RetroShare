@@ -69,7 +69,7 @@
 #define FMM_THRESHOLD 25
 
 /*****/
-  #define CHAT_DEBUG 1
+//  #define CHAT_DEBUG 1
 /******/
 
 ChatWidget::ChatWidget(QWidget *parent)

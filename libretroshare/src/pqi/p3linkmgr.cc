@@ -2071,7 +2071,7 @@ int p3LinkMgrIMPL::addFriend(const RsPeerId &id, bool isVisible)
 		std::cerr << "p3LinkMgrIMPL::addFriend(" << id << "," << isVisible << ")";
 		std::cerr << std::endl;
 #endif
-
+        std::cerr << "calling p3LinkMgrIMPL::addFriend(" << id << "," << isVisible << ")"<< std::endl;
 	        std::map<RsPeerId, peerConnectState>::iterator it;
 		it = mFriendList.find(id);
 	

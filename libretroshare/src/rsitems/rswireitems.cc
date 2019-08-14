@@ -24,7 +24,7 @@
 #include "rswireitems.h"
 #include "serialiser/rstypeserializer.h"
 
-#define WIRE_DEBUG	1
+//#define WIRE_DEBUG	1
 
 
 RsItem *RsGxsWireSerialiser::create_item(uint16_t service,uint8_t item_subtype) const
