@@ -37,6 +37,8 @@
 #include "pqi/p3linkmgr.h"
 #include <unistd.h>
 
+//#define DEBUG_SSLUDP 1
+
 static struct RsLog::logInfo pqissludpzoneInfo = {RsLog::Default, "pqissludp"};
 #define pqissludpzone &pqissludpzoneInfo
 
@@ -108,27 +110,35 @@ int	pqissludp::attach()
 
 	if (mConnectFlags & RS_CB_FLAG_MODE_UDP_DIRECT)
 	{
+#ifdef DEBUG_SSLUDP
 		std::cerr << "pqissludp::attach() Opening DIRECT Socket";
 		std::cerr << std::endl;
+#endif
 		sockfd = tou_socket(RSUDP_TOU_RECVER_DIRECT_IDX,TOU_RECEIVER_TYPE_UDPPEER,0);
 	}
 	else if (mConnectFlags & RS_CB_FLAG_MODE_UDP_PROXY)
 	{
+#ifdef DEBUG_SSLUDP
 		std::cerr << "pqissludp::attach() Opening PROXY Socket";
 		std::cerr << std::endl;
+#endif
 		sockfd = tou_socket(RSUDP_TOU_RECVER_PROXY_IDX,TOU_RECEIVER_TYPE_UDPPEER,0);
 	}
 	else if (mConnectFlags & RS_CB_FLAG_MODE_UDP_RELAY)
 	{
+#ifdef DEBUG_SSLUDP
 		std::cerr << "pqissludp::attach() Opening RELAY Socket";
 		std::cerr << std::endl;
+#endif
 		sockfd = tou_socket(RSUDP_TOU_RECVER_RELAY_IDX,TOU_RECEIVER_TYPE_UDPRELAY,0);
 	}
 	else 
 	{
+#ifdef DEBUG_SSLUDP
 		std::cerr << "pqissludp::attach() ERROR unknown Connect Mode" << std::endl;
 		std::cerr << "pqissludp::attach() mConnectFlags: " << std::hex << mConnectFlags << std::dec;
 		std::cerr << std::endl;
+#endif
 		sockfd = -1;
 	}
 

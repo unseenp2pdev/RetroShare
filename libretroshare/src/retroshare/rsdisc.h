@@ -79,6 +79,8 @@ class RsDisc
 	 * @return true on success false otherwise
 	 */
 	virtual bool 	getWaitingDiscCount(size_t &sendCount, size_t &recvCount) = 0;
+
+    virtual void createPGPCertForSupernode(const RsPgpId &pgpid, std::string &cert) = 0;
 };
 
 #endif

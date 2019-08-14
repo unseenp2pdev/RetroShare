@@ -42,7 +42,7 @@
 #include <algorithm>
 #include <time.h>
 
-#define CHAT_LOBBY_GUI_DEBUG 1
+//#define CHAT_LOBBY_GUI_DEBUG 1
 
 #define COLUMN_NAME       0
 //#define COLUMN_USER_COUNT 1

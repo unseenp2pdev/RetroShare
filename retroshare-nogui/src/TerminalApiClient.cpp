@@ -23,7 +23,7 @@
     #include <stdio.h>
     #include <sys/ioctl.h>
 #endif
-#define TERMINALINPUT_DEBUG
+//#define TERMINALINPUT_DEBUG
 class TerminalInput
 {
 public:

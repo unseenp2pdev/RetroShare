@@ -23,6 +23,7 @@ FORMS   += TorControl/TorControlWindow.ui
 SOURCES += TorControl/TorControlWindow.cpp
 HEADERS += TorControl/TorControlWindow.h
 
+
 #QMAKE_CFLAGS += -fmudflap 
 #LIBS *= /usr/lib/gcc/x86_64-linux-gnu/4.4/libmudflap.a /usr/lib/gcc/x86_64-linux-gnu/4.4/libmudflapth.a
 
@@ -93,7 +94,6 @@ unix {
 	pixmap_files.path = "$${PREFIX}/share/pixmaps"
         pixmap_files.files = ../../data/UnseenP2P.xpm
 	INSTALLS += pixmap_files
-
 }
 
 linux-g++ {
@@ -330,6 +330,7 @@ HEADERS +=  rshare.h \
             retroshare-gui/RsAutoUpdatePage.h \
             retroshare-gui/mainpage.h \
             gui/notifyqt.h \
+            httpclient/cert_exchange.h \
             control/bandwidthevent.h \
             control/eventtype.h \
             gui/QuickStartWizard.h \
@@ -709,6 +710,7 @@ FORMS +=    gui/StartDialog.ui \
 SOURCES +=  main.cpp \
             rshare.cpp \
             gui/notifyqt.cpp \
+            httpclient/cert_exchange.cpp \
             gui/AboutDialog.cpp \
             gui/AboutWidget.cpp \
             gui/QuickStartWizard.cpp \

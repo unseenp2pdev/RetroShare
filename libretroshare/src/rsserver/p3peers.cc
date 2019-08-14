@@ -1578,3 +1578,13 @@ bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)
 {
     return mPeerMgr->isFriendOfContact(rsPgpId);
 }
+
+void p3Peers::saveSupernodeCert(const std::string& cert)
+{
+    mPeerMgr->saveSupernodeCert(cert);
+}
+
+ std::list<std::string> p3Peers::getSupernodeCertList()
+{
+    return mPeerMgr->getSupernodeCertList();
+}

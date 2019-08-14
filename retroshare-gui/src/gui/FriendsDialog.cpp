@@ -57,7 +57,7 @@
 //#define IMAGE_CIRCLES           ":/icons/png/circles.png"
 
 /******/
-  #define FRIENDS_DEBUG 1
+ // #define FRIENDS_DEBUG 1
  /*****/
 
 static FriendsDialog *instance = NULL;
