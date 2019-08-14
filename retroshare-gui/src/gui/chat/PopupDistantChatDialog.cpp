@@ -33,7 +33,7 @@
 #include "PopupDistantChatDialog.h"
 
 #define IMAGE_RED_LED ":/app/images/statusicons/dnd.png"            //d: uptdate icon
-#define IMAGE_YEL_LED ":/app/images/statusicons/offline.png"        //d: uptdate icon
+#define IMAGE_YEL_LED ":/app/images/statusicons/away.png"        //d: uptdate icon
 #define IMAGE_GRN_LED ":/app/images/statusicons/online.png"         //d: uptdate icon
 #define IMAGE_GRY_LED ":/app/images/statusicons/bad.png"            //d: uptdate icon
 

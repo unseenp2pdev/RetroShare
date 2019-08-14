@@ -1748,23 +1748,23 @@ void ChatWidget::updateStatus(const QString &peer_id, int status)
 		    ui->infoLabel->setText(peerName + " " + tr("appears to be Offline.") +"\n" + tr("Messages you send will be delivered after Friend is again Online."));
 		    break;
 
+        case RS_STATUS_AWAY:
+            ui->infoLabel->setText(peerName + " " + tr("is Away and may not reply"));
+            ui->infoFrame->setVisible(true);
+            break;
+
+        case RS_STATUS_BUSY:
+            ui->infoLabel->setText(peerName + " " + tr("is Busy and may not reply"));
+            ui->infoFrame->setVisible(true);
+            break;
+
+        case RS_STATUS_ONLINE:
+            ui->infoFrame->setVisible(false);
+            break;
+
 	    case RS_STATUS_INACTIVE:
 		    ui->infoFrame->setVisible(true);
 		    ui->infoLabel->setText(peerName + " " + tr("is Idle and may not reply"));
-		    break;
-
-	    case RS_STATUS_ONLINE:
-		    ui->infoFrame->setVisible(false);
-		    break;
-
-	    case RS_STATUS_AWAY:
-		    ui->infoLabel->setText(peerName + " " + tr("is Away and may not reply"));
-		    ui->infoFrame->setVisible(true);
-		    break;
-
-	    case RS_STATUS_BUSY:
-		    ui->infoLabel->setText(peerName + " " + tr("is Busy and may not reply"));
-		    ui->infoFrame->setVisible(true);
 		    break;
 	    }
 
@@ -1829,7 +1829,7 @@ void ChatWidget::updatePeersCustomStateString(const QString& /*peer_id*/, const 
 void ChatWidget::updateStatusString(const QString &statusMask, const QString &statusString, bool permanent)
 {
 	ui->typingLabel->setText(QString(statusMask).arg(trUtf8(statusString.toUtf8()))); // displays info for 5 secs.
-	ui->typingPixmapLabel->setPixmap(QPixmap(":images/typing.png") );
+    ui->typingPixmapLabel->setPixmap(QPixmap(":/images/typing.png") );
 
 	if (statusString == "is typing...") {
 		typing = true;
