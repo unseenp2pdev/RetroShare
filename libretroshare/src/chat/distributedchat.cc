@@ -37,7 +37,7 @@
 #include "gxs/rsgixs.h"
 #include "services/p3idservice.h"
 
-#define DEBUG_CHAT_LOBBIES 1
+//#define DEBUG_CHAT_LOBBIES 1
 
 static const int 		CONNECTION_CHALLENGE_MAX_COUNT 	  =   20 ; // sends a connection challenge every 20 messages
 static const rstime_t	CONNECTION_CHALLENGE_MAX_MSG_AGE	  =   30 ; // maximum age of a message to be used in a connection challenge

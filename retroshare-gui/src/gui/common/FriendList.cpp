@@ -31,6 +31,7 @@
 
 #include "rsserver/rsaccounts.h"
 #include "retroshare/rspeers.h"
+#include "retroshare/rsdisc.h"
 
 #include "GroupDefs.h"
 #include "gui/chat/ChatDialog.h"
@@ -59,6 +60,7 @@
 
 #include "FriendList.h"
 #include "ui_FriendList.h"
+#include "gui/MainWindow.h"
 
 /* Images for context menu icons */
 #define IMAGE_DENYFRIEND         ":/images/denied16.png"
@@ -103,9 +105,9 @@
 #define PEER_STATE_INACTIVE     5
 #define PEER_STATE_OFFLINE      6
 
-/*****
-  #define FRIENDS_DEBUG 1
-****/
+/*****/
+//  #define FRIENDS_DEBUG 1
+/****/
 
 Q_DECLARE_METATYPE(ElidedLabel*)
 
@@ -182,12 +184,70 @@ FriendList::FriendList(QWidget *parent) :
     /* Initialize display menu */
 
     createDisplayMenu();
+
+    addSupernodeAsFriend();
 }
 
 FriendList::~FriendList()
 {
     delete ui;
     delete(mCompareRole);
+}
+
+void FriendList::addSupernodeAsFriend()
+{
+    std::list<std::string> supernodeCerts = rsPeers->getSupernodeCertList();
+    std::list<std::string>::iterator certIt;
+    for (certIt = supernodeCerts.begin(); certIt != supernodeCerts.end(); certIt++)
+     {
+          std::string certstr = *certIt;
+          uint32_t cert_error_code;
+          RsPeerDetails peerDetails;
+          RsPgpId pgp_id ;
+          RsPeerId ssl_id ;
+          std::string error_string ;
+          if(rsPeers->loadCertificateFromString(certstr,ssl_id,pgp_id,error_string))
+          {
+             if (!rsPeers->isFriend(ssl_id))
+             {
+                if (rsPeers->loadDetailsFromStringCert(certstr, peerDetails, cert_error_code))
+                {
+
+                      // save this supernode CERT in public_keyrings_map
+                      rsDisc->createPGPCertForSupernode(pgp_id,certstr );
+
+                      //if it is not a friend so need to add!!!
+                      rsPeers->addFriend(ssl_id, pgp_id);
+
+                      if (!peerDetails.location.empty()) {
+                          std::cerr << "PGPKeyDialog::makeFriend() : setting location." << std::endl;
+                          rsPeers->setLocation(peerDetails.id, peerDetails.location);
+                      }
+                       //let's check if there is ip adresses in the wizard.
+                      if (!peerDetails.extAddr.empty() && peerDetails.extPort) {
+                         std::cerr << "PGPKeyDialog::makeFriend() : setting ip ext address." << std::endl;
+                         rsPeers->setExtAddress(peerDetails.id, peerDetails.extAddr, peerDetails.extPort);
+                      }
+                      if (!peerDetails.localAddr.empty() && peerDetails.localPort) {
+                            std::cerr << "PGPKeyDialog::makeFriend() : setting ip local address." << std::endl;
+                                                               rsPeers->setLocalAddress(peerDetails.id, peerDetails.localAddr, peerDetails.localPort);
+                      }
+                      if (!peerDetails.dyndns.empty()) {
+                            std::cerr << "PGPKeyDialog::makeFriend() : setting DynDNS." << std::endl;
+                            rsPeers->setDynDNS(peerDetails.id, peerDetails.dyndns);
+                      }
+                      for(auto&& ipr : peerDetails.ipAddressList)
+                                rsPeers->addPeerLocator(
+                                                           peerDetails.id,
+                                                           RsUrl(ipr.substr(0, ipr.find(' '))) );
+                                                           rsPeers->signGPGCertificate(pgp_id);
+                 }
+                 emit configChanged();
+              }
+
+          }
+     }
+
 }
 
 void FriendList::addToolButton(QToolButton *toolButton)

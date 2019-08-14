@@ -699,6 +699,8 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
+    virtual void saveSupernodeCert(const std::string& cert) =0;
+    virtual std::list<std::string> getSupernodeCertList() =0;
 
 };
 

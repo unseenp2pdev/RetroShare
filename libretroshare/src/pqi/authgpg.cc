@@ -42,7 +42,7 @@
 #define LIMIT_CERTIFICATE_SIZE		1
 #define MAX_CERTIFICATE_SIZE		10000
 
-//#define DEBUG_AUTHGPG 1
+#define DEBUG_AUTHGPG 1
 
 //const rstime_t STORE_KEY_TIMEOUT = 1 * 60 * 60; //store key is call around every hour
 
@@ -50,7 +50,7 @@ AuthGPG *AuthGPG::_instance = NULL ;
 
 void cleanupZombies(int numkill); // function to cleanup zombies under OSX.
 
-//#define GPG_DEBUG 1
+#define GPG_DEBUG 1
 
 /* Function to sign X509_REQ via GPGme.  */
 
@@ -692,7 +692,7 @@ bool AuthGPG::saveList(bool& cleanup, std::list<RsItem*>& lst)
 			RsTlvKeyValue kv;
 			kv.key = (*it).toStdString() ;
 #ifdef GPG_DEBUG
-			std::cerr << "AuthGPG::saveList() called (it->second) : " << (it->second) << std::endl ;
+//			std::cerr << "AuthGPG::saveList() called (it->second) : " << (it->second) << std::endl ;
 #endif
 			kv.value = "TRUE";
 			vitem->tlvkvs.pairs.push_back(kv) ;

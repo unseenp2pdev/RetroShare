@@ -30,7 +30,7 @@
  * #define RSSERIAL_ERROR_DEBUG 	1
  ***/
 
-#define RSSERIAL_ERROR_DEBUG 		1
+//#define RSSERIAL_ERROR_DEBUG 		1
 
 #include <iostream>
 

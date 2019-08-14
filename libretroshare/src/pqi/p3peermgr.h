@@ -226,6 +226,8 @@ virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage 
     virtual std::map<RsPgpId, std::string> certListOfContact() = 0;
     virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) = 0;
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
+    virtual void saveSupernodeCert(const std::string& cert) =0;
+    virtual std::list<std::string> getSupernodeCertList() =0;
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -344,6 +346,8 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
     virtual std::map<RsPgpId, std::string> certListOfContact();
+    virtual void saveSupernodeCert(const std::string& cert);
+    virtual std::list<std::string> getSupernodeCertList();
     /************************************************************************************************/
     /* Extra IMPL Functions (used by p3LinkMgr, p3NetMgr + Setup) */
     /************************************************************************************************/
@@ -413,6 +417,7 @@ private:
     //unseenp2p
     std::map<RsPgpId, RsPeerId> mFriendOfContactList;
     std::map<RsPgpId, std::string> mCertList;
+    std::list<std::string> mSupernodeCertList;  //save at least 3 supernode certificates
 
     std::list<RsItem *> saveCleanupList; /* TEMPORARY LIST WHEN SAVING */
 
