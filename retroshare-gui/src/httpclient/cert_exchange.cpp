@@ -76,7 +76,7 @@ int CertExchange::submitCertToSuperNode(std::string ip, std::string port, std::s
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     QJsonObject json;
-    json.insert("invite",cert.c_str());
+    json.insert("invite",QString::fromStdString(cert));
 
     //Now you have to create a Network Access object which will help with sending the request.
     QNetworkAccessManager nam;
