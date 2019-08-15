@@ -1,3 +1,6 @@
+#ifndef CERTEXCHANGE_H
+#define CERTEXCHANGE_H
+
 #include <iostream>
 #include <string>
 #include <list>
@@ -21,3 +24,6 @@ private:
     std::map<std::string,std::string>  ip_port;
     std::map<std::string,std::string>  supernodeCertList;
 };
+
+
+#endif // CERTEXCHANGE_H
