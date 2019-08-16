@@ -461,22 +461,33 @@ QString TorManagerPrivate::torExecutablePath() const
     QString filename(QStringLiteral("/tor"));
 #endif
 
-    path = qApp->applicationDirPath();
-
-    if (QFile::exists(path + filename))
-        return path + filename;
-
 #ifdef BUNDLED_TOR_PATH
     path = QStringLiteral(BUNDLED_TOR_PATH);
     if (QFile::exists(path + filename))
         return path + filename;
 #endif
+    //macosx and ubuntu bundle
+    path = qApp->applicationDirPath()  ;
+    if (QFile::exists(path + filename)){
+        //set executeable in case, permission got removed during the installation.
+        static QFile::Permissions desired = QFileDevice::ReadUser | QFileDevice::WriteUser | QFileDevice::ExeUser;
+        static QFile::Permissions ignored = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner;
+
+        QFile file(path + filename);
+        if ((file.permissions() & ~ignored) != desired) {
+            qDebug() << "Correcting permissions on configuration directory";
+            if (!file.setPermissions(desired)) {
+                qWarning() << "Correcting permissions on configuration directory failed";
+                return filename.mid(1);
+            }
+        }
+        return path + filename;
+    }
+
 
 #ifdef __APPLE__
     // on MacOS, try traditional brew installation path
-
     path = QStringLiteral("/usr/local/opt/tor/bin") ;
-
     if (QFile::exists(path + filename))
         return path + filename;
 #endif

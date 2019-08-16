@@ -594,6 +594,8 @@ macx-* {
         }
 	message(***retroshare.pri:MacOSX)
 
+        ##DEFINES *=BUNDLED_TOR_PATH=\\\"{RS_DATA_DIR}\\\"
+
         ## 11 Sep 2018 - meiyousixin - use config in one MacOS comp
 	BIN_DIR += "/Applications/Xcode.app/Contents/Developer/usr/bin"
 	INC_DIR += "/usr/local/Cellar/miniupnpc/2.1/include"

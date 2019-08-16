@@ -1122,7 +1122,7 @@ int RsServer::StartupRetroShare()
         installfile += "/";
         installfile += SUPERNODE_LIST_FILENAME;
 
-        std::cerr << "Checking for Installation DHT bootstrap file " << installfile << std::endl;
+        std::cerr << "Checking for Installation Supernode  file " << installfile << std::endl;
         if ((installfile != "") && (RsDirUtil::checkFile(installfile,tmp_size_supernode)))
         {
             std::cerr << "Copying supernode file..." << std::endl;
