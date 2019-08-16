@@ -51,7 +51,7 @@ FriendRequestToaster::FriendRequestToaster(const RsPgpId &gpgId, const QString &
 		ui.avatarWidget->setDefaultAvatar(":/images/avatar_request.png");
 	} else {
 		ui.textLabel->setText( sslName + " " + tr("Unknown (Incoming) Connect Attempt"));
-		ui.avatarWidget->setDefaultAvatar(":/images/avatar_request_unknown.png");
+        ui.avatarWidget->setDefaultAvatar(":/images/avatar_request_unknown.png");
 	}
 }
 
