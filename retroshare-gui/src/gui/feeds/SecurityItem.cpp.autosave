@@ -110,7 +110,7 @@ void SecurityItem::updateItemStatic()
 		case RS_FEED_ITEM_SEC_CONNECT_ATTEMPT:
 			title = tr("Connect Attempt");
 			requestLabel->show();
-			avatar->setDefaultAvatar(":images/avatar_request.png");
+			avatar->setDefaultAvatar(":/images/avatar_request.png");
 			break;
 		case RS_FEED_ITEM_SEC_AUTH_DENIED:
 			title = tr("Connection refused by remote peer");
@@ -120,7 +120,7 @@ void SecurityItem::updateItemStatic()
 		case RS_FEED_ITEM_SEC_UNKNOWN_IN:
 			title = tr("Unknown (Incoming) Connect Attempt");
 			requestLabel->hide();
-			avatar->setDefaultAvatar(":images/avatar_request_unknown.png");
+			avatar->setDefaultAvatar(":/images/avatar_request_unknown.png");
 			break;
 		case RS_FEED_ITEM_SEC_UNKNOWN_OUT:
 			title = tr("Unknown (Outgoing) Connect Attempt");
