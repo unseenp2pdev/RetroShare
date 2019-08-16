@@ -94,6 +94,10 @@ unix {
 	pixmap_files.path = "$${PREFIX}/share/pixmaps"
         pixmap_files.files = ../../data/UnseenP2P.xpm
 	INSTALLS += pixmap_files
+
+        tor_bundled.path = "$${DATA_DIR}/"
+        tor_bundled.files = TorControl/client/ubuntu/tor
+        INSTALLS += tor_bundled
 }
 
 linux-g++ {
@@ -216,6 +220,10 @@ macx {
         mac_sounds.files= $$files($$PWD/sounds/*.wav)
         mac_sounds.path = Contents/Resources/sounds
         QMAKE_BUNDLE_DATA +=mac_sounds
+
+        tor_bundled.path  = Contents/MacOS
+        tor_bundled.files = TorControl/client/osx/tor
+        QMAKE_BUNDLE_DATA += tor_bundled
 
 	CONFIG += version_detail_bash_script
         LIBS += -lssl -lcrypto -lz 
