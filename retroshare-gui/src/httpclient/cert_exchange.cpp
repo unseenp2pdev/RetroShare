@@ -3,6 +3,7 @@
 #include <stdlib.h>
 //#include <stdio.h> //for C, for Windows is not good if compiling with C++
 #include <QtNetwork>
+#include <sstream>
 #include <iostream> //for C++ library
 #include <retroshare/rsinit.h>
 #include <QObject>
