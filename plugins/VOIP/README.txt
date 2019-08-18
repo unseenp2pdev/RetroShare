@@ -22,3 +22,6 @@ COMPILATION
 			libopencv-core-dev
 			libhighgui-dev
 
+	- Add Mac osx
+           building ffmpeg from Source:  brew install ffmpeg --build-from-source
+
