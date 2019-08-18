@@ -601,10 +601,22 @@ macx-* {
 	INC_DIR += "/usr/local/Cellar/miniupnpc/2.1/include"
 	INC_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.63/include"
 	INC_DIR += "/usr/local/Cellar/sqlcipher/4.1.0/include"
+
+#	INC_DIR += "/usr/local/Cellar/speex/1.2.0/include"
+#	INC_DIR += "/usr/local/Cellar/speexdsp/1.2rc3/include"
+#	INC_DIR += "/usr/local/Cellar/ffmpeg/4.1.4_1/include"
+#	INC_DIR += "/usr/local/Cellar/opencv/4.1.0_2/include"
+
 	LIB_DIR += "/usr/local/opt/openssl/lib/"
         LIB_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.59/lib"
         LIB_DIR += "/usr/local/Cellar/sqlcipher/4.0.1/lib"
 	LIB_DIR += "/usr/local/Cellar/miniupnpc/2.1/lib"
+
+#	LIB_DIR += "/usr/local/Cellar/speex/1.2.0/lib"
+#	LIB_DIR += "/usr/local/Cellar/speexdsp/1.2rc3/lib"
+#	LIB_DIR += "/usr/local/Cellar/ffmpeg/4.1.4_1/lib"
+#	LIB_DIR += "/usr/local/Cellar/opencv/4.1.0_2/lib"
+
         CONFIG += c++11
         INCLUDEPATH += "/usr/local/include"
         RS_UPNP_LIB = miniupnpc
