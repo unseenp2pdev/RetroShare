@@ -96,7 +96,7 @@ unix {
         pixmap_files.files += ../../data/unseenp2p.xpm.png
 	INSTALLS += pixmap_files
 
-        tor_bundled.path = "$${DATA_DIR}/"
+        tor_bundled.path = "$${BIN_DIR}/"
         tor_bundled.files = TorControl/client/ubuntu/tor
         INSTALLS += tor_bundled
 }
