@@ -81,10 +81,10 @@ unix {
 	INSTALLS += style_files
 
 	icon_files.path = "$${PREFIX}/share/icons/hicolor"
-        icon_files.files =  ../../data/24x24/apps/retroshare.png
-        icon_files.files += ../../data/48x48/apps/retroshare.png
-        icon_files.files += ../../data/64x64/apps/retroshare.png
-        icon_files.files += ../../data/128x128/apps/retroshare.png
+        icon_files.files =  ../../data/24x24/apps/unseenp2p.png
+        icon_files.files += ../../data/48x48/apps/unseenp2p.png
+        icon_files.files += ../../data/64x64/apps/unseenp2p.png
+        icon_files.files += ../../data/128x128/apps/unseenp2p.png
 	INSTALLS += icon_files
 
 	desktop_files.path = "$${PREFIX}/share/applications"

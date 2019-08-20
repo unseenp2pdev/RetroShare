@@ -34,8 +34,8 @@
 
 /*
 #define CONFIG_DEBUG 1
-*/
 #define BACKEDUP_SAVE
+*/
 
 
 p3ConfigMgr::p3ConfigMgr(std::string dir)

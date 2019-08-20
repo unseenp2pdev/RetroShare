@@ -397,11 +397,11 @@ bool pqipersongrp::getCryptoParams(const RsPeerId& id,RsPeerCryptoParams& params
 
 int     pqipersongrp::addPeer(const RsPeerId& id)
 {
-	pqioutput(PQL_DEBUG_BASIC, pqipersongrpzone, "pqipersongrp::addPeer() PeerId: " + id.toStdString());
+#ifdef PGRP_DEBUG
+    pqioutput(PQL_DEBUG_BASIC, pqipersongrpzone, "pqipersongrp::addPeer() PeerId: " + id.toStdString());
 
 	std::cerr << "pqipersongrp::addPeer() id: " << id;
 	std::cerr << std::endl;
-#ifdef PGRP_DEBUG
 #endif
 
 	SearchModule *sm = NULL;
