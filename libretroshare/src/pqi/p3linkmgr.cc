@@ -61,16 +61,10 @@ static struct RsLog::logInfo p3connectzoneInfo = {RsLog::Default, "p3connect"};
 
 /****
  * #define DISABLE_UDP_CONNECTIONS	1		
+ *  #define P3CONNMGR_NO_TCP_CONNECTIONS 1
  ***/
 
-/****
- * #define P3CONNMGR_NO_TCP_CONNECTIONS 1
- ***/
-/****
- * #define P3CONNMGR_NO_AUTO_CONNECTION 1
- ***/
 
-//#define P3CONNMGR_NO_TCP_CONNECTIONS 1
 
 const uint32_t P3CONNMGR_TCP_DEFAULT_DELAY = 3; /* 2 Seconds? is it be enough! */
 //const uint32_t P3CONNMGR_UDP_DEFAULT_DELAY = 3; /* 2 Seconds? is it be enough! */
@@ -2070,8 +2064,8 @@ int p3LinkMgrIMPL::addFriend(const RsPeerId &id, bool isVisible)
 #ifdef LINKMGR_DEBUG
 		std::cerr << "p3LinkMgrIMPL::addFriend(" << id << "," << isVisible << ")";
 		std::cerr << std::endl;
-#endif
         std::cerr << "calling p3LinkMgrIMPL::addFriend(" << id << "," << isVisible << ")"<< std::endl;
+#endif
 	        std::map<RsPeerId, peerConnectState>::iterator it;
 		it = mFriendList.find(id);
 	

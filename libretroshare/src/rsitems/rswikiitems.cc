@@ -25,7 +25,7 @@
 #include "serialiser/rstlvbase.h"
 #include "serialiser/rstypeserializer.h"
 
-#define GXSID_DEBUG	1
+//#define GXSID_DEBUG	1
 
 RsItem *RsGxsWikiSerialiser::create_item(uint16_t service, uint8_t item_sub_id) const
 {
