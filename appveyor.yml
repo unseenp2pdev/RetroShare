@@ -270,7 +270,7 @@ after_build:
 
 artifacts:
   #- path: $(RS_DEPLOY)
-  - path: '**\*.exe'
+  - path: Unseen_portal\unseenp2p.exe
   - path: filelist.txt
 
 #

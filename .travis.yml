@@ -80,17 +80,17 @@ after_success:
 #    - master
 #    - travis
 
-deploy:
-  - provider: releases
-    api_key: $TOKEN
-    file:
-      - retroshare-gui/src/UnseenP2P-0.6.6_macos.zip
-    overwrite: true
-    skip_cleanup: true
-    on:
-      all_branches: true
-      tags: false
-      condition: $TRAVIS_OS_NAME = osx
+#deploy:
+#  - provider: releases
+#    api_key: $TOKEN
+#    file:
+#      - retroshare-gui/src/UnseenP2P-0.6.6_macos.zip
+#    overwrite: true
+#    skip_cleanup: true
+#    on:
+#      all_branches: true
+#      tags: true
+#      condition: $TRAVIS_OS_NAME = osx
   #- provider: releases
   #  api_key: $TOKEN
   #  file:
