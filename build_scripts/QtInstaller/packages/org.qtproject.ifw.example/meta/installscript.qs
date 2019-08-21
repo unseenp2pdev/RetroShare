@@ -35,16 +35,16 @@ Component.prototype.createOperations = function()
 {
     // call default implementation to actually install README.txt!
     component.createOperations();
+    var targetDir = installer.value("TargetDir");
+    var homeDir = installer.value("HomeDir"); 
     
     if (systemInfo.productType === "windows") {
         component.addOperation("CreateShortcut", "@TargetDir@/unseenp2p.exe", "@StartMenuDir@/Unseen Communicator");
     }
     else if (systemInfo.productType === "osx") {
-       component.addOperation("CreateShortcut", "@TargetDir@/unseenp2p.exe", "@StartMenuDir@/Unseen Communicator");
+	maintenanceToolPath = installer.value("TargetDir") + "/MaintenanceTool";
     }
     else {
-    	var targetDir = installer.value("TargetDir");
-    	var homeDir = installer.value("HomeDir"); 
 	var desktopFileTarget = installer.value("HomeDir") + "/.local/share/applications";
 
         component.addOperation("CreateDesktopEntry", 
