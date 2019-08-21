@@ -103,11 +103,6 @@
             <string>Retroshare Network (Normal RS)</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>Hidden node (Tor/I2P - Manually configured)</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item>
