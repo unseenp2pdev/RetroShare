@@ -95,12 +95,12 @@
           </property>
           <item>
            <property name="text">
-            <string>Standard node</string>
+            <string>Unseen Network (RS + TOR)</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Hidden node (over Tor)</string>
+            <string>Retroshare Network (Normal RS)</string>
            </property>
           </item>
           <item>
