@@ -24,3 +24,9 @@ Setup Mac OSX with QT
 4. Go to ""build-RetroShare-Desktop_Qt_5_9_0_clang_64bit-Release"" folder
 5. sudo macdeployqt unseenp2p.app -dmg (without -qml option)
 or sudo macdeployqt unseenp2p.app -dmg -qmldir=/Users/ductai/RetroShare/retroshare-qml-app/src"
+6. Creating Portal package with symlink to /Applications Folder
+   1. mkdir ui-release
+   2. cd ui-release
+   3. ln -s /Applications
+   4. cd ..
+   5. hdiutil create -volname UnseenPortal -srcfolder ui-release/ -ov -format UDZO unseenp2p.dmg
