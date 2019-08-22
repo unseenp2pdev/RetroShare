@@ -98,11 +98,6 @@
             <string>Unseen Network (RS + TOR)</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>Retroshare Network (Normal RS)</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item>
