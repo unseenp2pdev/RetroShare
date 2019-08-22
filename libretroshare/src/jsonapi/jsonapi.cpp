@@ -115,11 +115,11 @@ JsonApiServer::corsOptionsHeaders =
 	return false;
 }
 
-
-JsonApiServer::JsonApiServer(
-        uint16_t port, const std::string& bindAddress,
-        const std::function<void(int)> shutdownCallback ) :
-    mPort(port), mBindAddress(bindAddress), mShutdownCallback(shutdownCallback)
+JsonApiServer::JsonApiServer(uint16_t port, const std::string& bindAddress,
+        const std::function<bool(const std::string&)> newAccessRequestCallback ) :
+    mPort(port), mBindAddress(bindAddress),
+    mNewAccessRequestCallback(newAccessRequestCallback),
+    configMutex("JsonApiServer config")
 {
 	registerHandler("/rsLoginHelper/createLocation",
 	                [this](const std::shared_ptr<rb::Session> session)
@@ -232,9 +232,6 @@ JsonApiServer::JsonApiServer(
 		                const rb::Bytes& body )
 		{
 			INITIALIZE_API_CALL_JSON_CONTEXT;
-
-			if(!checkRsServicePtrReady(rsFiles, "rsFiles", cAns, session))
-				return;
 
 			if(!checkRsServicePtrReady(rsFiles, "rsFiles", cAns, session))
 				return;

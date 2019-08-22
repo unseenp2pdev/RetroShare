@@ -157,7 +157,7 @@ rs_macos10.13:CONFIG -= rs_macos10.11
 
 # To enable JSON API append the following assignation to qmake command line
 # "CONFIG+=rs_jsonapi"
-CONFIG *= no_rs_jsonapi
+CONFIG *=rs_jsonapi
 rs_jsonapi:CONFIG -= no_rs_jsonapi
 
 # To disable deep search append the following assignation to qmake command line

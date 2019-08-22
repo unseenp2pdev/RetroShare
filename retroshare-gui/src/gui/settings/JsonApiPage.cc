@@ -28,6 +28,9 @@
 #include <QStringListModel>
 #include <QProgressDialog>
 
+//#ifdef RS_JSONAPI
+#include "jsonapi/jsonapi.h"
+//#endif
 
 JsonApiPage::JsonApiPage(QWidget */*parent*/, Qt::WindowFlags /*flags*/)
 {
