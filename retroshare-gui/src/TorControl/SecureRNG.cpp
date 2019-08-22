@@ -38,8 +38,8 @@
 
 #ifdef Q_OS_WIN
 #include <wtypes.h>
-#include <wtypes.h>
-#include <wincrypt.h>
+//0.6.5
+//#include <wincrypt.h>
 #endif
 
 #if QT_VERSION >= 0x040700

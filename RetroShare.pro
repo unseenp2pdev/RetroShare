@@ -22,7 +22,7 @@ VERSION = 0.6.5.0
 SUBDIRS += openpgpsdk
 openpgpsdk.file = openpgpsdk/src/openpgpsdk.pro
 
-rs_jsonapi {
+rs_jsonapi:isEmpty(JSONAPI_GENERATOR_EXE) {
     SUBDIRS += jsonapi-generator
     jsonapi-generator.file = jsonapi-generator/src/jsonapi-generator.pro
     libretroshare.depends += jsonapi-generator
@@ -35,22 +35,34 @@ libretroshare.depends = openpgpsdk libbitdht
 SUBDIRS += libretroshare
 libretroshare.file = libretroshare/src/libretroshare.pro
 
-SUBDIRS += libresapi
-libresapi.file = libresapi/src/libresapi.pro
-libresapi.depends = libretroshare
+libresapi {
+    SUBDIRS += libresapi
+    libresapi.file = libresapi/src/libresapi.pro
+    libresapi.depends = libretroshare
+}
 
 retroshare_gui {
     SUBDIRS += retroshare_gui
     retroshare_gui.file = retroshare-gui/src/retroshare-gui.pro
-    retroshare_gui.depends = libretroshare libresapi
     retroshare_gui.target = retroshare_gui
+
+    libresapi {
+        retroshare_gui.depends = libresapi
+    } else {
+        retroshare_gui.depends = libretroshare
+    }
 }
 
 retroshare_nogui {
     SUBDIRS += retroshare_nogui
     retroshare_nogui.file = retroshare-nogui/src/retroshare-nogui.pro
-    retroshare_nogui.depends = libretroshare libresapi
     retroshare_nogui.target = retroshare_nogui
+
+    libresapi {
+        retroshare_nogui.depends = libresapi
+    } else {
+        retroshare_nogui.depends = libretroshare
+    }
 }
 
 retroshare_android_service {
@@ -76,6 +88,13 @@ retroshare_qml_app {
     android-g++ {
         retroshare_qml_app.depends += retroshare_android_notify_service
     }
+}
+
+retroshare_service {
+    SUBDIRS += retroshare_service
+    retroshare_service.file = retroshare-service/src/retroshare-service.pro
+    retroshare_service.depends = libretroshare
+    retroshare_service.target = retroshare_service
 }
 
 retroshare_plugins {

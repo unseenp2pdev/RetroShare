@@ -1032,6 +1032,7 @@
    </attribute>
    <layout class="QVBoxLayout" name="ConclusionPageVLayout">
     <item>
+<<<<<<< HEAD
      <widget class="StyledLabel" name="makefriend_infolabel">
       <property name="palette">
        <palette>
@@ -1618,7 +1619,6 @@ resources.</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
   <include location="../../Unseengui/unseengui.qrc"/>
  </resources>

@@ -1,3 +1,21 @@
+################################################################################
+# uselibresapi.pri                                                             #
+# Copyright (C) 2018, Retroshare team <retroshare.team@gmailcom>               #
+#                                                                              #
+# This program is free software: you can redistribute it and/or modify         #
+# it under the terms of the GNU Affero General Public License as               #
+# published by the Free Software Foundation, either version 3 of the           #
+# License, or (at your option) any later version.                              #
+#                                                                              #
+# This program is distributed in the hope that it will be useful,              #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of               #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                #
+# GNU Affero General Public License for more details.                          #
+#                                                                              #
+# You should have received a copy of the GNU Affero General Public License     #
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.       #
+################################################################################
+
 !include("../../retroshare.pri"): error("Could not include file ../../retroshare.pri")
 
 TEMPLATE = app
@@ -15,9 +33,16 @@ libresapihttpserver {
     HEADERS *= gui/settings/WebuiPage.h
     SOURCES *= gui/settings/WebuiPage.cpp
     FORMS *= gui/settings/WebuiPage.ui
+} else {
+    !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 }
 
-!include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
+rs_jsonapi {
+    HEADERS *= gui/settings/JsonApiPage.h
+    SOURCES *= gui/settings/JsonApiPage.cc
+    FORMS *= gui/settings/JsonApiPage.ui
+}
+
 
 FORMS   += TorControl/TorControlWindow.ui
 SOURCES += TorControl/TorControlWindow.cpp
@@ -286,25 +311,24 @@ wikipoos {
 # Tor controller
 
 HEADERS += 	TorControl/AddOnionCommand.h \
-				TorControl/AuthenticateCommand.h \
-				TorControl/GetConfCommand.h \
-				TorControl/HiddenService.h \
-				TorControl/ProtocolInfoCommand.h \
-				TorControl/SetConfCommand.h \
-				TorControl/TorControlCommand.h \
-				TorControl/TorControl.h \
-				TorControl/TorControlSocket.h \
-				TorControl/TorManager.h \
-				TorControl/TorProcess.h \
-				TorControl/TorProcess_p.h \
-				TorControl/TorSocket.h \
-				TorControl/Useful.h            \
-				TorControl/CryptoKey.h         \
-				TorControl/PendingOperation.h  \
-				TorControl/SecureRNG.h         \
-				TorControl/Settings.h          \
-				TorControl/StrUtil.h        \
-				TorControl/TorProcess_p.h        
+           	TorControl/AuthenticateCommand.h \
+           	TorControl/CryptoKey.h \
+           	TorControl/GetConfCommand.h \
+           	TorControl/HiddenService.h \
+           	TorControl/PendingOperation.h  \
+           	TorControl/ProtocolInfoCommand.h \
+           	TorControl/SecureRNG.h \
+           	TorControl/SetConfCommand.h \
+           	TorControl/Settings.h \
+           	TorControl/StrUtil.h \
+           	TorControl/TorControl.h \
+           	TorControl/TorControlCommand.h \
+           	TorControl/TorControlSocket.h \
+           	TorControl/TorManager.h \
+           	TorControl/TorProcess.h \
+           	TorControl/TorProcess_p.h \
+           	TorControl/TorSocket.h \
+           	TorControl/Useful.h
 
 SOURCES += 	TorControl/AddOnionCommand.cpp \
 				TorControl/AuthenticateCommand.cpp \
@@ -395,7 +419,7 @@ HEADERS +=  rshare.h \
             util/dllexport.h \
             util/global.h \
             util/rsqtutildll.h \
-            util/Interface.h \
+#            util/Interface.h \
             util/PixmapMerging.h \
             util/MouseEventFilter.h \
             util/EventFilter.h \
@@ -409,6 +433,7 @@ HEADERS +=  rshare.h \
             util/ObjectPainter.h \
             util/QtVersion.h \
             util/RsFile.h \
+            util/qtthreadsutils.h \
             gui/profile/ProfileWidget.h \
             gui/profile/ProfileManager.h \
             gui/profile/StatusMessage.h \
@@ -444,7 +469,6 @@ HEADERS +=  rshare.h \
             gui/settings/PeoplePage.h \
             gui/settings/AboutPage.h \
             gui/settings/ServerPage.h \
-            gui/settings/NetworkPage.h \
             gui/settings/NotifyPage.h \
             gui/settings/CryptoPage.h \
             gui/settings/MessagePage.h \
@@ -630,7 +654,6 @@ FORMS +=    gui/StartDialog.ui \
             gui/settings/settingsw.ui \
             gui/settings/GeneralPage.ui \
             gui/settings/ServerPage.ui \
-            gui/settings/NetworkPage.ui \
             gui/settings/NotifyPage.ui \
             gui/settings/PeoplePage.ui \
             gui/settings/CryptoPage.ui \
@@ -756,7 +779,7 @@ SOURCES +=  main.cpp \
             util/DateTime.cpp \
             util/RetroStyleLabel.cpp \
             util/WidgetBackgroundImage.cpp \
-            util/NonCopyable.cpp \
+#            util/NonCopyable.cpp \
             util/PixmapMerging.cpp \
             util/MouseEventFilter.cpp \
             util/EventFilter.cpp \
@@ -854,7 +877,6 @@ SOURCES +=  main.cpp \
             gui/settings/GeneralPage.cpp \
             gui/settings/AboutPage.cpp \
             gui/settings/ServerPage.cpp \
-            gui/settings/NetworkPage.cpp \
             gui/settings/NotifyPage.cpp \
             gui/settings/CryptoPage.cpp \
             gui/settings/PeoplePage.cpp \
@@ -1216,7 +1238,7 @@ gxsforums {
 		gui/gxsforums/GxsForumGroupDialog.h \
 		gui/gxsforums/CreateGxsForumMsg.h \
 		gui/gxsforums/GxsForumThreadWidget.h \
-		gui/gxsforums/GxsForumsFillThread.h \
+		gui/gxsforums/GxsForumModel.h \
 		gui/gxsforums/GxsForumUserNotify.h \
 		gui/feeds/GxsForumGroupItem.h \
 		gui/feeds/GxsForumMsgItem.h
@@ -1230,7 +1252,7 @@ gxsforums {
 		gui/gxsforums/GxsForumGroupDialog.cpp \
 		gui/gxsforums/CreateGxsForumMsg.cpp \
 		gui/gxsforums/GxsForumThreadWidget.cpp \
-		gui/gxsforums/GxsForumsFillThread.cpp \
+		gui/gxsforums/GxsForumModel.cpp \
 		gui/gxsforums/GxsForumUserNotify.cpp \
 		gui/feeds/GxsForumGroupItem.cpp \
 		gui/feeds/GxsForumMsgItem.cpp

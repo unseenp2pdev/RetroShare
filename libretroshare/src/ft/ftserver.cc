@@ -702,15 +702,15 @@ bool ftServer::ExtraFileMove(std::string fname, const RsFileHash& hash, uint64_t
 /******************** Directory Listing ************************/
 /***************************************************************/
 
-int ftServer::RequestDirDetails(const RsPeerId& uid, const std::string& path, DirDetails &details)
-{
-	return mFileDatabase->RequestDirDetails(uid, path, details);
-}
-
 bool ftServer::findChildPointer(void *ref, int row, void *& result, FileSearchFlags flags)
 {
 	return mFileDatabase->findChildPointer(ref,row,result,flags) ;
 }
+
+bool ftServer::requestDirDetails(
+        DirDetails &details, std::uintptr_t handle, FileSearchFlags flags )
+{ return RequestDirDetails(reinterpret_cast<void*>(handle), details, flags); }
+
 int ftServer::RequestDirDetails(void *ref, DirDetails &details, FileSearchFlags flags)
 {
 	return mFileDatabase->RequestDirDetails(ref,details,flags) ;
@@ -1826,7 +1826,7 @@ int ftServer::handleIncoming()
  **********************************
  *********************************/
 
-void ftServer::receiveSearchResult(RsTurtleFTSearchResultItem *item)
+void ftServer::ftReceiveSearchResult(RsTurtleFTSearchResultItem *item)
 {
 	bool hasCallback = false;
 

@@ -7,6 +7,7 @@ set ParamAutologin=0
 set ParamPlugins=0
 set ParamTor=0
 
+
 :parameter_loop
 if "%~1" NEQ "" (
 	for /f "tokens=1,2 delims==" %%a in ("%~1") do (

@@ -1,3 +1,25 @@
+/*******************************************************************************
+ * libretroshare/src/rsserver: rsloginhandler.cc                                *
+ *                                                                             *
+ * libretroshare: retroshare core library                                      *
+ *                                                                             *
+ * Copyright 2018         retroshare team <retroshare.project@gmail.com>       *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Lesser General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Lesser General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
+
 #include <string>
 #include <iostream>
 #include <pqi/authgpg.h>
@@ -31,7 +53,7 @@ bool RsLoginHandler::checkAndStoreSSLPasswdIntoGPGFile(
 	FILE *sslPassphraseFile = RsDirUtil::rs_fopen(
 	            getSSLPasswdFileName(ssl_id).c_str(), "r");
 
-	if(sslPassphraseFile != NULL)	// already have it.
+	if(sslPassphraseFile)	// already have it.
 	{
 		fclose(sslPassphraseFile);
 		return true ;
@@ -52,7 +74,7 @@ bool RsLoginHandler::getSSLPasswdFromGPGFile(const RsPeerId& ssl_id,std::string&
 	FILE *sslPassphraseFile = RsDirUtil::rs_fopen(
 	            getSSLPasswdFileName(ssl_id).c_str(), "r");
 
-	if (sslPassphraseFile == NULL)
+	if (!sslPassphraseFile)
 	{
 		std::cerr << "No password provided, and no sslPassphraseFile : "
 		          << getSSLPasswdFileName(ssl_id).c_str() << std::endl;
@@ -245,13 +267,13 @@ bool RsLoginHandler::tryAutoLogin(const RsPeerId& ssl_id,std::string& ssl_passwd
                                                    "UnseenP2P SSL Id", ssl_id.toStdString().c_str(),
 	                                               NULL);
 
-	if (error != NULL) {
+	if (error) {
 		g_error_free (error);
 #ifdef DEBUG_RSLOGINHANDLER
 		std::cerr << "Could not get passwd using libsecret: error" << std::endl;
 #endif
 		return false;
-	} else if (password == NULL) {
+	} else if (!password) {
 		/* password will be null, if no matching password found */
 #ifdef DEBUG_RSLOGINHANDLER
 		std::cerr << "Could not get passwd using libsecret: not found" << std::endl;
@@ -267,7 +289,7 @@ bool RsLoginHandler::tryAutoLogin(const RsPeerId& ssl_id,std::string& ssl_passwd
 #ifdef DEBUG_RSLOGINHANDLER
 	std::cerr << "Could not get passwd from gnome keyring: unknown" << std::endl;
 #endif
-	return false;
+	//return false; //Never used returned before
 #else
 	/******************** OSX KeyChain stuff *****************************/
 #ifdef __APPLE__
@@ -440,7 +462,7 @@ bool RsLoginHandler::tryAutoLogin(const RsPeerId& ssl_id,std::string& ssl_passwd
 #endif
 	/******************************** WINDOWS/UNIX SPECIFIC PART ******************/
 
-	return false;
+	//return false; //never used
 }
 
 
@@ -465,7 +487,7 @@ bool RsLoginHandler::enableAutoLogin(const RsPeerId& ssl_id,const std::string& s
 #elif defined(HAS_LIBSECRET)
 	// do synchronous store
 
-	GError *error = NULL;
+	GError *error = nullptr;
 	secret_password_store_sync (libsecret_get_schema(), SECRET_COLLECTION_DEFAULT,
                                 (gchar*)("UnseenP2P password for SSL Id " + ssl_id.toStdString()).c_str(),
 	                            (gchar*)ssl_passwd.c_str(),
@@ -473,7 +495,7 @@ bool RsLoginHandler::enableAutoLogin(const RsPeerId& ssl_id,const std::string& s
                                 "UnseenP2P SSL Id", ssl_id.toStdString().c_str(),
 	                            NULL);
 
-	if (error != NULL) {
+	if (error) {
 		g_error_free (error);
 		std::cerr << "Could not store passwd using libsecret" << std::endl;
 		return false;
@@ -624,10 +646,10 @@ bool RsLoginHandler::enableAutoLogin(const RsPeerId& ssl_id,const std::string& s
 	free(pbDataInput);
 	free(pbDataEnt);
 	LocalFree(DataOut.pbData);
+	return false;
 #endif
 	/******************************** WINDOWS/UNIX SPECIFIC PART ******************/
 
-	return false;
 #endif
 }
 
@@ -652,7 +674,7 @@ bool RsLoginHandler::clearAutoLogin(const RsPeerId& ssl_id)
                                                    "UnseenP2P SSL Id", ssl_id.toStdString().c_str(),
 	                                               NULL);
 
-	if (error != NULL) {
+	if (error) {
 		g_error_free (error);
 		std::cerr << "Could not clearpasswd for SSLID " << ssl_id << " using libsecret: error" << std::endl;
 		return false ;

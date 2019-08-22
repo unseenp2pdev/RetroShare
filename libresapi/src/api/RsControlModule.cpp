@@ -3,7 +3,7 @@
  *                                                                             *
  * LibResAPI: API for local socket server                                      *
  *                                                                             *
- * Copyright 2018 by Retroshare Team <retroshare.team@gmail.com>               *
+ * Copyright 2018 by Retroshare Team <retroshare.project@gmail.com>            *
  *                                                                             *
  * This program is free software: you can redistribute it and/or modify        *
  * it under the terms of the GNU Affero General Public License as              *
@@ -432,9 +432,8 @@ void RsControlModule::handleLogin(Request &req, Response &resp)
 
 void RsControlModule::handleShutdown(Request &, Response &resp)
 {
-	RS_STACK_MUTEX(mExitFlagMtx); // ********** LOCKED **********
-    mProcessShouldExit = true;
-    resp.setOk();
+	requestShutdown();
+	resp.setOk();
 }
 
 void RsControlModule::handleImportPgp(Request &req, Response &resp)
@@ -450,7 +449,7 @@ void RsControlModule::handleImportPgp(Request &req, Response &resp)
 
     RsPgpId pgp_id;
     std::string error_string;
-    if(RsAccounts::ImportIdentityFromString(key_string, pgp_id, error_string))
+    if(RsAccounts::importIdentityFromString(key_string, pgp_id, error_string))
     {
         resp.mDataStream << makeKeyValueReference("pgp_id", pgp_id);
         resp.setOk();
@@ -487,7 +486,7 @@ void RsControlModule::handleCreateLocation(Request &req, Response &resp)
             resp.setFail("hidden_port out of range. It must fit into uint16!");
             return;
         }
-        hidden_port = p;
+        hidden_port = static_cast<uint16_t>(p);
     }
 
     RsPgpId pgp_id;
@@ -528,7 +527,7 @@ void RsControlModule::handleCreateLocation(Request &req, Response &resp)
 		RsInit::SetHiddenLocation(hidden_address, hidden_port, false);
 	}
 
-    std::string ssl_password = RSRandom::random_alphaNumericString(RsInit::getSslPwdLen()) ;
+    std::string ssl_password = RSRandom::random_alphaNumericString(static_cast<uint32_t>(RsInit::getSslPwdLen())) ;
 
     /* GenerateSSLCertificate - selects the PGP Account */
     //RsInit::SelectGPGAccount(PGPId);
@@ -580,6 +579,12 @@ bool RsControlModule::askForDeferredSelfSignature(const void *data, const uint32
 		signature_result = SELF_SIGNATURE_RESULT_FAILED;
 		return false;
 	}
+}
+
+void RsControlModule::requestShutdown()
+{
+	RS_STACK_MUTEX(mExitFlagMtx);
+	mProcessShouldExit = true;
 }
 
 void RsControlModule::setRunState(RunState s, std::string errstr)

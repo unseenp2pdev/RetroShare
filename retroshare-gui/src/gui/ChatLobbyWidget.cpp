@@ -1,3 +1,23 @@
+/*******************************************************************************
+ * gui/ChatLobbyWidget.cpp                                                     *
+ *                                                                             *
+ * Copyright (C) 2012 Retroshare Team <retroshare.project@gmail.com>           *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
+
 
 #include "ChatLobbyWidget.h"
 
@@ -45,11 +65,17 @@
 #define CHAT_LOBBY_GUI_DEBUG 1
 
 #define COLUMN_NAME       0
+
 //#define COLUMN_USER_COUNT 1
 //#define COLUMN_TOPIC      2
 //#define COLUMN_SUBSCRIBED 3
 //#define COLUMN_COUNT      4
 //#define COLUMN_RECENT_TIME      5
+//0.6.5
+//#define COLUMN_USER_COUNT 1
+//#define COLUMN_TOPIC      2
+//#define COLUMN_COUNT      3
+
 #define COLUMN_DATA       0
 
 #define ROLE_SORT          Qt::UserRole
@@ -160,6 +186,7 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
 //    showSubscribeAct= new QAction(headerItem->text(COLUMN_SUBSCRIBED),this);
 //    showSubscribeAct->setCheckable(true); showSubscribeAct->setToolTip(tr("Show")+" "+showSubscribeAct->text()+" "+tr("column"));
 //    connect(showSubscribeAct,SIGNAL(triggered(bool)),this,SLOT(setShowSubscribeColumn(bool))) ;
+
 
 	// Set initial size of the splitter
 	ui.splitter->setStretchFactor(0, 0);
@@ -370,10 +397,10 @@ void ChatLobbyWidget::lobbyTreeWidgetCustomPopupMenu(QPoint)
 //        showTopicAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_TOPIC));
 //        showSubscribeAct->setChecked(!ui.lobbyTreeWidget->isColumnHidden(COLUMN_SUBSCRIBED));
 
+
         QMenu *menu = contextMnu.addMenu(tr("Columns"));
         menu->addAction(showUserCountAct);
         menu->addAction(showTopicAct);
-        menu->addAction(showSubscribeAct);
 
         contextMnu.exec(QCursor::pos());
 }

@@ -1,29 +1,24 @@
-
-/*
- * "$Id: p3face-config.cc,v 1.4 2007-05-05 16:10:05 rmf24 Exp $"
- *
- * RetroShare C++ Interface.
- *
- * Copyright 2004-2006 by Robert Fernie.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License Version 2 as published by the Free Software Foundation.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA.
- *
- * Please report all bugs and problems to "retroshare@lunamutt.com".
- *
- */
-
+/*******************************************************************************
+ * libretroshare/src/rsserver: p3face-config.cc                                *
+ *                                                                             *
+ * libretroshare: retroshare core library                                      *
+ *                                                                             *
+ * Copyright 2004-2006 by Robert Fernie.                                       *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Lesser General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Lesser General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
 
 #include "rsserver/p3face.h"
 
@@ -33,7 +28,10 @@
 #include "retroshare/rsinit.h"
 #include "plugins/pluginmanager.h"
 #include "util/rsdebug.h"
-//const int p3facemsgzone = 11453;
+
+#ifdef RS_JSONAPI
+#	include "jsonapi/jsonapi.h"
+#endif // ifdef RS_JSONAPI
 
 #include <sys/time.h>
 #include "util/rstime.h"
@@ -92,6 +90,10 @@ void RsServer::rsGlobalShutDown()
 
 	mNetMgr->shutdown(); /* Handles UPnP */
 
+#ifdef RS_JSONAPI
+	if(jsonApiServer) jsonApiServer->shutdown();
+#endif
+
 	rsAutoProxyMonitor::instance()->stopAllRSShutdown();
 
     fullstop() ;
@@ -117,4 +119,6 @@ void RsServer::rsGlobalShutDown()
 // #endif
 
 	AuthGPG::exit();
+
+	mShutdownCallback(0);
 }

@@ -426,9 +426,16 @@ public:
 	 * @param[in] sslId id of the peer to check
 	 * @return true if the node is trusted, false otherwise
 	 */
-	virtual bool isFriend(const RsPeerId &sslId) = 0;
+	virtual bool isFriend(const RsPeerId& sslId) = 0;
 
-	virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend) = 0;
+	/**
+	 * @brief Check if given PGP id is trusted
+	 * @jsonapi{development}
+	 * @param[in] pgpId PGP id to check
+	 * @return true if the PGP id is trusted, false otherwise
+	 */
+	virtual bool isPgpFriend(const RsPgpId& pgpId) = 0;
+
 	virtual std::string getPeerName(const RsPeerId &ssl_id) = 0;
 	virtual std::string getGPGName(const RsPgpId& gpg_id) = 0;
 
@@ -510,12 +517,65 @@ public:
 	virtual bool setHiddenNode(const RsPeerId &id, const std::string &address, uint16_t port) = 0;
 	virtual bool isHiddenNode(const RsPeerId &id) = 0;
 
-	virtual bool addPeerLocator(const RsPeerId &ssl_id, const RsUrl& locator) = 0;
-	virtual	bool setLocalAddress(const RsPeerId &ssl_id, const std::string &addr, uint16_t port) = 0;
-	virtual	bool setExtAddress(  const RsPeerId &ssl_id, const std::string &addr, uint16_t port) = 0;
-	virtual	bool setDynDNS(const RsPeerId &id, const std::string &addr) = 0;
-	virtual	bool setNetworkMode(const RsPeerId &ssl_id, uint32_t netMode) = 0;
-	virtual bool setVisState(const RsPeerId &ssl_id, uint16_t vs_disc, uint16_t vs_dht)	= 0;
+	/**
+	 * @brief Add URL locator for given peer
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] locator peer url locator
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool addPeerLocator(const RsPeerId& sslId, const RsUrl& locator) = 0;
+
+	/**
+	 * @brief Set local IPv4 address for the given peer
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] addr string representation of the local IPv4 address
+	 * @param[in] port local listening port
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool setLocalAddress(
+	        const RsPeerId& sslId, const std::string& addr, uint16_t port ) = 0;
+
+	/**
+	 * @brief Set external IPv4 address for given peer
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] addr string representation of the external IPv4 address
+	 * @param[in] port external listening port
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool setExtAddress(
+	        const RsPeerId& sslId, const std::string &addr, uint16_t port ) = 0;
+
+	/**
+	 * @brief Set (dynamical) domain name associated to the given peer
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] addr domain name string representation
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool setDynDNS(const RsPeerId& sslId, const std::string& addr) = 0;
+
+	/**
+	 * @brief Set network mode of the given peer
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] netMode one of RS_NETMODE_*
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool setNetworkMode(const RsPeerId &sslId, uint32_t netMode) = 0;
+
+	/**
+	 * @brief set DHT and discovery modes
+	 * @jsonapi{development}
+	 * @param[in] sslId SSL id of the peer, own id is accepted too
+	 * @param[in] vsDisc one of RS_VS_DISC_*
+	 * @param[in] vsDht one of RS_VS_DHT_*
+	 * @return false if error occurred, true otherwise
+	 */
+	virtual bool setVisState( const RsPeerId& sslId,
+	                          uint16_t vsDisc, uint16_t vsDht ) = 0;
 
 	virtual bool getProxyServer(const uint32_t type, std::string &addr, uint16_t &port,uint32_t& status_flags) = 0;
 	virtual bool setProxyServer(const uint32_t type, const std::string &addr, const uint16_t port) = 0;
@@ -528,13 +588,15 @@ public:
 	/**
 	 * @brief Get RetroShare invite of the given peer
 	 * @jsonapi{development}
-	 * @param[in] sslId Id of the peer of which we want to generate an invite
+	 * @param[in] sslId Id of the peer of which we want to generate an invite,
+	 *	a null id (all 0) is passed, an invite for own node is returned.
 	 * @param[in] includeSignatures true to add key signatures to the invite
 	 * @param[in] includeExtraLocators false to avoid to add extra locators
 	 * @return invite string
 	 */
 	virtual std::string GetRetroshareInvite(
-	        const RsPeerId& sslId, bool includeSignatures = false,
+	        const RsPeerId& sslId = RsPeerId(),
+	        bool includeSignatures = false,
 	        bool includeExtraLocators = true ) = 0;
 
 	/**
@@ -548,15 +610,6 @@ public:
 	        const std::string& invite,
 	        ServicePermissionFlags flags = RS_NODE_PERM_DEFAULT ) = 0;
 
-	/**
-	 * @brief Get RetroShare invite of our own peer
-	 * @param[in] includeSignatures true to add key signatures to the invite
-	 * @param[in] includeExtraLocators false to avoid to add extra locators
-	 * @return invite string
-	 */
-	virtual std::string GetRetroshareInvite(
-	        bool includeSignatures = false,
-	        bool includeExtraLocators = true ) = 0;
 
 	/* Auth Stuff */
 	virtual	std::string getPGPKey(const RsPgpId& pgp_id,bool include_signatures) = 0;

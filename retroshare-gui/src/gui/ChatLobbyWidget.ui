@@ -242,7 +242,11 @@
            <string notr="true"/>
           </property>
           <property name="title">
+<<<<<<< HEAD
            <string>Welcome to UnseenP2P</string>
+=======
+           <string>Selected Chat Room info</string>
+>>>>>>> 0.6.5
           </property>
           <layout class="QVBoxLayout" name="lobbyinfo_groupBoxVLayout">
            <item>
@@ -322,6 +326,7 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="images.qrc"/>
   <include location="icons.qrc"/>
   <include location="../Unseengui/unseengui.qrc"/>
  </resources>

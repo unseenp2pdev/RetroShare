@@ -3,7 +3,7 @@
  *                                                                             *
  * LibResAPI: API for local socket server                                      *
  *                                                                             *
- * Copyright 2018 by Retroshare Team <retroshare.team@gmail.com>               *
+ * Copyright 2018 by Retroshare Team <retroshare.project@gmail.com>            *
  *                                                                             *
  * This program is free software: you can redistribute it and/or modify        *
  * it under the terms of the GNU Affero General Public License as              *
@@ -20,9 +20,6 @@
  *                                                                             *
  *******************************************************************************/
 
-// Sep 11 2018 - meiyousixin - fix bug error: no matching constructor for initialization
-//#define nullptr 0
-
 #include "json.h"
 #include <stdlib.h>
 #include <string>
@@ -35,7 +32,11 @@
 #include <cctype>
 #include <stack>
 #include <cerrno>
+<<<<<<< HEAD
 #include <util/cxx11retrocompat.h>
+=======
+#include "util/cxx11retrocompat.h"
+>>>>>>> 0.6.5
 
 #ifndef WIN32
 #define _stricmp strcasecmp

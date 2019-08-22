@@ -1,23 +1,22 @@
-/****************************************************************
- *  RetroShare is distributed under the following license:
- *
- *  Copyright (C) 2006,2007 crypton
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA  02110-1301, USA.
- ****************************************************************/
+/*******************************************************************************
+ * retroshare-gui/src/gui/FileTransfer/TransfersDialog.cpp                     *
+ *                                                                             *
+ * Copyright (c) 2007 Crypton         <retroshare.project@gmail.com>           *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
 
 #include <QDateTime>
 #include <QDir>
@@ -353,19 +352,19 @@ public:
 		switch(col)
 		{
 		default:
-		case COLUMN_NAME:         return QVariant( factor * 170 );
-		case COLUMN_SIZE:         return QVariant( factor * 70  );
-		case COLUMN_COMPLETED:    return QVariant( factor * 75  );
-		case COLUMN_DLSPEED:      return QVariant( factor * 75  );
-		case COLUMN_PROGRESS:     return QVariant( factor * 170 );
-		case COLUMN_SOURCES:      return QVariant( factor * 90  );
-		case COLUMN_STATUS:       return QVariant( factor * 100 );
-		case COLUMN_PRIORITY:     return QVariant( factor * 100 );
-		case COLUMN_REMAINING:    return QVariant( factor * 100 );
-		case COLUMN_DOWNLOADTIME: return QVariant( factor * 100 );
-		case COLUMN_ID:           return QVariant( factor * 100 );
-		case COLUMN_LASTDL:       return QVariant( factor * 100 );
-		case COLUMN_PATH:         return QVariant( factor * 100 );
+		case COLUMN_NAME:         return QVariant( QSize(factor * 170, factor*14.0f ));
+		case COLUMN_SIZE:         return QVariant( QSize(factor * 70 , factor*14.0f ));
+		case COLUMN_COMPLETED:    return QVariant( QSize(factor * 75 , factor*14.0f ));
+		case COLUMN_DLSPEED:      return QVariant( QSize(factor * 75 , factor*14.0f ));
+		case COLUMN_PROGRESS:     return QVariant( QSize(factor * 170, factor*14.0f ));
+		case COLUMN_SOURCES:      return QVariant( QSize(factor * 90 , factor*14.0f ));
+		case COLUMN_STATUS:       return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_PRIORITY:     return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_REMAINING:    return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_DOWNLOADTIME: return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_ID:           return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_LASTDL:       return QVariant( QSize(factor * 100, factor*14.0f ));
+		case COLUMN_PATH:         return QVariant( QSize(factor * 100, factor*14.0f ));
 		}
 	}
 
@@ -826,6 +825,9 @@ TransfersDialog::TransfersDialog(QWidget *parent)
     QHeaderView *qhvDLList = ui.downloadList->header();
     qhvDLList->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(qhvDLList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(downloadListHeaderCustomPopupMenu(QPoint)));
+	QHeaderView *qhvULList = ui.uploadsList->header();
+	qhvULList->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(qhvULList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(uploadsListHeaderCustomPopupMenu(QPoint)));
 
 // Why disable autoscroll ?
 // With disabled autoscroll, the treeview doesn't scroll with cursor move
@@ -1006,7 +1008,7 @@ TransfersDialog::TransfersDialog(QWidget *parent)
 	collOpenAct = new QAction(QIcon(IMAGE_COLLOPEN), tr( "Download from collection file..." ), this );
 	connect(collOpenAct, SIGNAL(triggered()), this, SLOT(collOpen()));
 
-    /** Setup the actions for the header context menu */
+	/** Setup the actions for the download header context menu */
     showDLSizeAct= new QAction(tr("Size"),this);
     showDLSizeAct->setCheckable(true); showDLSizeAct->setToolTip(tr("Show Size Column"));
     connect(showDLSizeAct,SIGNAL(triggered(bool)),this,SLOT(setShowDLSizeColumn(bool))) ;
@@ -1043,6 +1045,26 @@ TransfersDialog::TransfersDialog(QWidget *parent)
     showDLPath= new QAction(tr("Path"),this);
     showDLPath->setCheckable(true); showDLPath->setToolTip(tr("Show Path Column"));
     connect(showDLPath,SIGNAL(triggered(bool)),this,SLOT(setShowDLPath(bool))) ;
+
+	/** Setup the actions for the upload header context menu */
+	showULPeerAct= new QAction(tr("Peer"),this);
+	showULPeerAct->setCheckable(true); showULPeerAct->setToolTip(tr("Show Peer Column"));
+	connect(showULPeerAct,SIGNAL(triggered(bool)),this,SLOT(setShowULPeerColumn(bool))) ;
+	showULSizeAct= new QAction(tr("Size"),this);
+	showULSizeAct->setCheckable(true); showULSizeAct->setToolTip(tr("Show Peer Column"));
+	connect(showULSizeAct,SIGNAL(triggered(bool)),this,SLOT(setShowULSizeColumn(bool))) ;
+	showULTransferredAct= new QAction(tr("Transferred"),this);
+	showULTransferredAct->setCheckable(true); showULTransferredAct->setToolTip(tr("Show Transferred Column"));
+	connect(showULTransferredAct,SIGNAL(triggered(bool)),this,SLOT(setShowULTransferredColumn(bool))) ;
+	showULSpeedAct= new QAction(tr("Speed"),this);
+	showULSpeedAct->setCheckable(true); showULSpeedAct->setToolTip(tr("Show Speed Column"));
+	connect(showULSpeedAct,SIGNAL(triggered(bool)),this,SLOT(setShowULSpeedColumn(bool))) ;
+	showULProgressAct= new QAction(tr("Progress"),this);
+	showULProgressAct->setCheckable(true); showULProgressAct->setToolTip(tr("Show Progress Column"));
+	connect(showULProgressAct,SIGNAL(triggered(bool)),this,SLOT(setShowULProgressColumn(bool))) ;
+	showULHashAct= new QAction(tr("Hash"),this);
+	showULHashAct->setCheckable(true); showULHashAct->setToolTip(tr("Show Hash Column"));
+	connect(showULHashAct,SIGNAL(triggered(bool)),this,SLOT(setShowULHashColumn(bool))) ;
 
     /** Setup the actions for the upload context menu */
     ulOpenFolderAct = new QAction(QIcon(IMAGE_OPENFOLDER), tr("Open Folder"), this);
@@ -1416,6 +1438,29 @@ void TransfersDialog::uploadsListCustomPopupMenu( QPoint /*point*/ )
 		contextMnu.addAction( expandAllULAct ) ;
 		contextMnu.addAction( collapseAllULAct ) ;
 	}
+
+	contextMnu.exec(QCursor::pos());
+}
+
+void TransfersDialog::uploadsListHeaderCustomPopupMenu( QPoint /*point*/ )
+{
+	std::cerr << "TransfersDialog::uploadsListHeaderCustomPopupMenu()" << std::endl;
+	QMenu contextMnu( this );
+
+	showULPeerAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_UPEER));
+	showULSizeAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_USIZE));
+	showULTransferredAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_UTRANSFERRED));
+	showULSpeedAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_ULSPEED));
+	showULProgressAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_UPROGRESS));
+	showULHashAct->setChecked(!ui.uploadsList->isColumnHidden(COLUMN_UHASH));
+
+	QMenu *menu = contextMnu.addMenu(tr("Columns"));
+	menu->addAction(showULPeerAct);
+	menu->addAction(showULSizeAct);
+	menu->addAction(showULTransferredAct);
+	menu->addAction(showULSpeedAct);
+	menu->addAction(showULProgressAct);
+	menu->addAction(showULHashAct);
 
 	contextMnu.exec(QCursor::pos());
 }
@@ -2790,6 +2835,13 @@ void TransfersDialog::setShowDLDownloadTimeColumn(bool show) { ui.downloadList->
 void TransfersDialog::setShowDLIDColumn          (bool show) { ui.downloadList->setColumnHidden(COLUMN_ID,           !show); }
 void TransfersDialog::setShowDLLastDLColumn      (bool show) { ui.downloadList->setColumnHidden(COLUMN_LASTDL,       !show); }
 void TransfersDialog::setShowDLPath              (bool show) { ui.downloadList->setColumnHidden(COLUMN_PATH,         !show); }
+
+void TransfersDialog::setShowULPeerColumn       (bool show) { ui.uploadsList->setColumnHidden(COLUMN_UPEER,        !show); }
+void TransfersDialog::setShowULSizeColumn       (bool show) { ui.uploadsList->setColumnHidden(COLUMN_USIZE,        !show); }
+void TransfersDialog::setShowULTransferredColumn(bool show) { ui.uploadsList->setColumnHidden(COLUMN_UTRANSFERRED, !show); }
+void TransfersDialog::setShowULSpeedColumn      (bool show) { ui.uploadsList->setColumnHidden(COLUMN_ULSPEED,      !show); }
+void TransfersDialog::setShowULProgressColumn   (bool show) { ui.uploadsList->setColumnHidden(COLUMN_UPROGRESS,    !show); }
+void TransfersDialog::setShowULHashColumn       (bool show) { ui.uploadsList->setColumnHidden(COLUMN_UHASH,        !show); }
 
 void TransfersDialog::expandAllDL()
 {

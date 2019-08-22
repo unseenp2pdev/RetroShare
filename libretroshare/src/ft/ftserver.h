@@ -98,7 +98,7 @@ public:
     uint16_t serviceId() const { return RS_SERVICE_TYPE_FILE_TRANSFER ; }
     virtual bool handleTunnelRequest(const RsFileHash& hash,const RsPeerId& peer_id) ;
     virtual void receiveTurtleData(const RsTurtleGenericTunnelItem *item,const RsFileHash& hash,const RsPeerId& virtual_peer_id,RsTurtleGenericTunnelItem::Direction direction) ;
-	virtual void receiveSearchResult(RsTurtleFTSearchResultItem *item);
+	virtual void ftReceiveSearchResult(RsTurtleFTSearchResultItem *item);	// We dont use TurtleClientService::receiveSearchResult() because of backward compatibility.
     virtual RsItem *create_item(uint16_t service,uint8_t item_type) const ;
 	virtual RsServiceSerializer *serializer() { return this ; }
 
@@ -189,8 +189,13 @@ public:
     /***
          * Directory Listing / Search Interface
          ***/
-    virtual int RequestDirDetails(const RsPeerId& uid, const std::string& path, DirDetails &details);
     virtual int RequestDirDetails(void *ref, DirDetails &details, FileSearchFlags flags);
+
+	/// @see RsFiles::RequestDirDetails
+	virtual bool requestDirDetails(
+	        DirDetails &details, std::uintptr_t handle = 0,
+	        FileSearchFlags flags = RS_FILE_HINTS_LOCAL );
+
     virtual bool findChildPointer(void *ref, int row, void *& result, FileSearchFlags flags) ;
     virtual uint32_t getType(void *ref,FileSearchFlags flags) ;
 

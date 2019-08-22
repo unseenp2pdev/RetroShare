@@ -1,23 +1,28 @@
-/****************************************************************
- *  RetroShare QT Gui is distributed under the following license:
- *
- *  Copyright (C) 2006, crypton
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
- *  Boston, MA  02110-1301, USA.
- ****************************************************************/
+/*******************************************************************************
+ * retroshare-gui/src/: main.cpp                                               *
+ *                                                                             *
+ * libretroshare: retroshare core library                                      *
+ *                                                                             *
+ * Copyright 2006 by Crypton <retroshare@lunamutt.com>                         *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
+
+#include "util/stacktrace.h"
+
+CrashStackTrace gCrashStackTrace;
 
 #include <QObject>
 #include <QMessageBox>
@@ -50,6 +55,10 @@
 #ifdef ENABLE_WEBUI
 #	include "gui/settings/WebuiPage.h"
 #endif
+
+#ifdef RS_JSONAPI
+#	include "gui/settings/JsonApiPage.h"
+#endif // RS_JSONAPI
 
 #include "TorControl/TorManager.h"
 #include "TorControl/TorControlWindow.h"
@@ -542,6 +551,10 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
     WebuiPage::checkStartWebui();
 #endif // ENABLE_WEBUI
 
+#ifdef RS_JSONAPI
+	JsonApiPage::checkStartJsonApi();
+#endif // RS_JSONAPI
+
 	// This is done using a timer, because the passphrase request from notify is asynchrouneous and therefore clearing the
 	// passphrase here makes it request for a passphrase when creating the default chat identity.
 
@@ -550,6 +563,10 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
 	/* dive into the endless loop */
 	int ti = rshare.exec();
 	delete w ;
+
+#ifdef RS_JSONAPI
+	JsonApiPage::checkShutdownJsonApi();
+#endif // RS_JSONAPI
 
 #ifdef ENABLE_WEBUI
 	WebuiPage::checkShutdownWebui();

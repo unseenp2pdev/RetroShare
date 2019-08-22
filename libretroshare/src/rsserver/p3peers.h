@@ -65,7 +65,11 @@ public:
 
 	virtual bool isOnline(const RsPeerId &id);
 	virtual bool isFriend(const RsPeerId &id);
+	virtual bool isPgpFriend(const RsPgpId& pgpId);
+
+	RS_DEPRECATED_FOR(isPgpFriend)
 	virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend);
+
 	virtual std::string getGPGName(const RsPgpId &gpg_id);
 	virtual std::string getPeerName(const RsPeerId& ssl_or_gpg_id);
 	virtual bool getPeerDetails(const RsPeerId& ssl_or_gpg_id, RsPeerDetails &d);
@@ -116,14 +120,10 @@ public:
 	/* Auth Stuff */
 	// Get the invitation (GPG cert + local/ext address + SSL id for the given peer)
 	virtual	std::string GetRetroshareInvite(
-	        const RsPeerId& ssl_id, bool include_signatures = false,
-	        bool includeExtraLocators = true );
+	        const RsPeerId& ssl_id = RsPeerId(),
+	        bool include_signatures = false, bool includeExtraLocators = true );
 	virtual	std::string getPGPKey(const RsPgpId& pgp_id,bool include_signatures);
 
-	// same but for own id
-	virtual	std::string GetRetroshareInvite(
-	        bool include_signatures = false,
-	        bool includeExtraLocators = true );
 	virtual bool GetPGPBase64StringAndCheckSum(const RsPgpId& gpg_id,std::string& gpg_base64_string,std::string& gpg_base64_checksum);
 
 	/// @see RsPeers::acceptInvite

@@ -1,27 +1,24 @@
-/*
- * libretroshare/src/gxs: rsgxsnettunnel.cc
- *
- * General Data service, interface for RetroShare.
- *
- * Copyright 2018-2018 by Cyril Soler
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License Version 2 as published by the Free Software Foundation.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA.
- *
- * Please report all bugs and problems to "retroshare.project@gmail.com"
- *
- */
+/*******************************************************************************
+ * libretroshare/src/gxs: gxsnettunnel.cc                                      *
+ *                                                                             *
+ * libretroshare: retroshare core library                                      *
+ *                                                                             *
+ * Copyright 2018 by Cyril Soler <retroshare.project@gmail.com>                *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Lesser General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Lesser General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
 
 #include "util/rsdir.h"
 #include "util/rstime.h"
@@ -30,7 +27,7 @@
 #include "gxs/rsnxs.h"
 #include "rsgxsnettunnel.h"
 
-// #define DEBUG_RSGXSNETTUNNEL 1
+//#define DEBUG_RSGXSNETTUNNEL 1
 
 #define GXS_NET_TUNNEL_NOT_IMPLEMENTED() { std::cerr << __PRETTY_FUNCTION__ << ": not yet implemented." << std::endl; }
 #define GXS_NET_TUNNEL_DEBUG()             std::cerr << time(NULL) << " : GXS_NET_TUNNEL: " << __FUNCTION__ << " : "
@@ -325,8 +322,6 @@ bool RsGxsNetTunnelService::sendTunnelData(uint16_t /* service_id */,unsigned ch
 		return false ;
 	}
 
-	it->second.last_contact = time(NULL) ;
-
     // 2 - encrypt and send the item.
 
 	RsTurtleGenericDataItem *encrypted_turtle_item = NULL ;
@@ -543,6 +538,7 @@ void RsGxsNetTunnelService::receiveTurtleData(const RsTurtleGenericTunnelItem *i
 		if(!pid_item)		// this handles the case of a KeepAlive packet.
 		{
 			delete decrypted_item ;
+			free(data);
 			return ;
 		}
 
@@ -578,7 +574,13 @@ void RsGxsNetTunnelService::receiveTurtleData(const RsTurtleGenericTunnelItem *i
 
 	if(it == mTurtle2GxsPeer.end())
 	{
-		GXS_NET_TUNNEL_ERROR() << "item received by GxsNetTunnel for vpid " << turtle_virtual_peer_id << " but this vpid is unknown!" << std::endl;
+		GXS_NET_TUNNEL_ERROR() << "item received by GxsNetTunnel for vpid " << turtle_virtual_peer_id << " but this vpid is unknown! Removing this vpid from group " << group_id << std::endl;
+
+		// this situation is inconsistent: the first item that should go through the tunnel is a virtual peer info, so if we don't have one, it means that
+		// this virtual peer is dead. We should therefore remove it from the list of vpids for this group.
+
+		mGroups[group_id].virtual_peers.erase(turtle_virtual_peer_id) ;
+
 		free(data);
 		return;
 	}
@@ -593,8 +595,6 @@ void RsGxsNetTunnelService::receiveTurtleData(const RsTurtleGenericTunnelItem *i
 		free(data);
 		return;
 	}
-	it2->second.vpid_status = RsGxsNetTunnelVirtualPeerInfo::RS_GXS_NET_TUNNEL_VP_STATUS_ACTIVE ;					// status of the peer
-	it2->second.last_contact = time(NULL);					// last time some data was sent/recvd
 
 	if(service_id != it2->second.service_id && service_id != RS_SERVICE_GXS_TYPE_GXSID)
 	{
@@ -602,6 +602,10 @@ void RsGxsNetTunnelService::receiveTurtleData(const RsTurtleGenericTunnelItem *i
 		free(data);
 		return ;
 	}
+	it2->second.vpid_status = RsGxsNetTunnelVirtualPeerInfo::RS_GXS_NET_TUNNEL_VP_STATUS_ACTIVE ;					// status of the peer
+	it2->second.last_contact = time(NULL);					// last time some data was sent/recvd from this peer
+
+	mGroups[group_id].last_contact = time(NULL);			// last time some data as received for this group
 
 #ifdef DEBUG_RSGXSNETTUNNEL
 	GXS_NET_TUNNEL_DEBUG() << "item contains generic data for VPID " << gxs_vpid << ". service_id = " << std::hex << service_id << std::dec << ". Storing in incoming list" <<  std::endl;

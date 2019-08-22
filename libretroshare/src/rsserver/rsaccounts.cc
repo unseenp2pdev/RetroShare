@@ -811,7 +811,7 @@ static bool checkAccount(const std::string &accountdir, AccountDetails &account,
 	/* Use RetroShare's exe dir */
 	dataDirectory = ".";
 #elif defined(ANDROID)
-	dataDirectory = defaultBaseDirectory()+"/usr/share/retroshare";
+	dataDirectory = PathBaseDirectory()+"/usr/share/retroshare";
 #elif defined(DATA_DIR)
 	// cppcheck-suppress ConfigurationNotChecked
 	dataDirectory = DATA_DIR;
@@ -928,6 +928,14 @@ bool RsAccountsDetail::importIdentity(const std::string& fname,RsPgpId& id,std::
 bool RsAccountsDetail::importIdentityFromString(const std::string &data, RsPgpId &imported_pgp_id, std::string &import_error)
 {
     return AuthGPG::getAuthGPG()->importProfileFromString(data, imported_pgp_id, import_error);
+}
+
+bool RsAccountsDetail::exportIdentityToString(
+        std::string& data, const RsPgpId& pgpId, bool includeSignatures,
+        std::string& errorMsg )
+{
+	return AuthGPG::getAuthGPG()->exportIdentityToString(
+	            data, pgpId, includeSignatures, errorMsg );
 }
 
 bool RsAccountsDetail::copyGnuPGKeyrings()
@@ -1339,9 +1347,20 @@ bool    RsAccounts::ImportIdentity(const std::string& fname,RsPgpId& imported_pg
 	return rsAccountsDetails->importIdentity(fname,imported_pgp_id,import_error);
 }
 
-bool    RsAccounts::ImportIdentityFromString(const std::string& data,RsPgpId& imported_pgp_id,std::string& import_error)
+bool RsAccounts::importIdentityFromString(
+        const std::string& data, RsPgpId& imported_pgp_id,
+        std::string& import_error )
 {
-    return rsAccountsDetails->importIdentityFromString(data,imported_pgp_id,import_error);
+	return rsAccountsDetails->
+	        importIdentityFromString(data, imported_pgp_id, import_error);
+}
+
+/*static*/ bool RsAccounts::exportIdentityToString(
+        std::string& data, const RsPgpId& pgpId, std::string& errorMsg,
+        bool includeSignatures )
+{
+	return rsAccountsDetails->exportIdentityToString(
+	            data, pgpId, includeSignatures, errorMsg);
 }
 
 void    RsAccounts::GetUnsupportedKeys(std::map<std::string,std::vector<std::string> > &unsupported_keys)

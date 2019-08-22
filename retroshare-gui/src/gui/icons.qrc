@@ -82,6 +82,7 @@
         <file>icons/png/exit.png</file>
         <file>icons/png/feedreader-notify.png</file>
         <file>icons/png/feedreader.png</file>
+
         <file>icons/png/filesharing-notify.png</file>
         <file>icons/png/filesharing.png</file>
         <file>icons/png/font.png</file>
@@ -89,7 +90,7 @@
         <file>icons/png/forums.png</file>
         <file>icons/png/fullscreen_arrows.png</file>
         <file>icons/png/highlight.png</file>
-        <file>icons/png/info.png</file>
+        <file>icons/png/info.png</file>f
         <file>icons/png/invite.png</file>
         <file>icons/png/keyring.png</file>
         <file>icons/png/leave.png</file>

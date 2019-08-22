@@ -4390,7 +4390,9 @@ void RsGxsNetService::handleRecvSyncMessage(RsNxsSyncMsgReqItem *item,bool item_
 
     rstime_t now = time(NULL) ;
 
+#ifndef RS_GXS_SEND_ALL
     uint32_t max_send_delay = locked_getGrpConfig(item->grpId).msg_req_delay;	// we should use "sync" but there's only one variable used in the GUI: the req one.
+#endif
 
     if(canSendMsgIds(msgMetas, *grpMeta, peer, should_encrypt_to_this_circle_id))
     {
@@ -4421,8 +4423,11 @@ void RsGxsNetService::handleRecvSyncMessage(RsNxsSyncMsgReqItem *item,bool item_
 				}
 			}
 			// Check publish TS
-
+#ifndef RS_GXS_SEND_ALL
 			if(item->createdSinceTS > (*vit)->mPublishTs || ((max_send_delay > 0) && (*vit)->mPublishTs + max_send_delay < now))
+#else
+			if(item->createdSinceTS > (*vit)->mPublishTs)
+#endif
 			{
 #ifdef NXS_NET_DEBUG_0
 				GXSNETDEBUG_PG(item->PeerId(),item->grpId) << "  not sending item ID " << (*vit)->mMsgId << ", because it is too old (publishTS = " << (time(NULL)-(*vit)->mPublishTs)/86400 << " days ago" << std::endl;
@@ -5148,11 +5153,13 @@ TurtleRequestId RsGxsNetService::turtleSearchRequest(const std::string& match_st
     return mGxsNetTunnel->turtleSearchRequest(match_string,this) ;
 }
 
+#ifndef RS_DEEP_SEARCH
 static bool termSearch(const std::string& src, const std::string& substring)
 {
 		/* always ignore case */
 	return src.end() != std::search( src.begin(), src.end(), substring.begin(), substring.end(), RsRegularExpression::CompareCharIC() );
 }
+#endif // ndef RS_DEEP_SEARCH
 
 bool RsGxsNetService::retrieveDistantSearchResults(TurtleRequestId req,std::map<RsGxsGroupId,RsGxsGroupSummary>& group_infos)
 {
@@ -5187,7 +5194,9 @@ bool RsGxsNetService::clearDistantSearchResults(const TurtleRequestId& id)
     mDistantSearchResults.erase(id);
     return true ;
 }
-void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req, const std::list<RsGxsGroupSummary>& group_infos)
+
+void RsGxsNetService::receiveTurtleSearchResults(
+        TurtleRequestId req, const std::list<RsGxsGroupSummary>& group_infos )
 {
 	std::set<RsGxsGroupId> groupsToNotifyResults;
 
@@ -5198,38 +5207,42 @@ void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req, const std:
 		std::map<RsGxsGroupId,RsGxsGroupSummary>&
 		        search_results_map(mDistantSearchResults[req]);
 
-		for(auto it(group_infos.begin());it!=group_infos.end();++it)
-			if(search_results_map.find((*it).mGroupId) == search_results_map.end())
-				grpMeta[(*it).mGroupId] = NULL;
-
+		for(const RsGxsGroupSummary& gps : group_infos)
+			if(search_results_map.find(gps.mGroupId) == search_results_map.end())
+				grpMeta[gps.mGroupId] = nullptr;
 		mDataStore->retrieveGxsGrpMetaData(grpMeta);
 
-		// only keep groups that are not locally known, and groups that are not already in the mDistantSearchResults structure
+		for (const RsGxsGroupSummary& gps : group_infos)
+		{
+#ifndef RS_DEEP_SEARCH
+			/* Only keep groups that are not locally known, and groups that are
+			 * not already in the mDistantSearchResults structure. */
+			if(grpMeta[gps.mGroupId]) continue;
+#else // ndef RS_DEEP_SEARCH
+			/* When deep search is enabled search results may bring more info
+			 * then we already have also about post that are indexed by xapian,
+			 * so we don't apply this filter in this case. */
+#endif
+			const RsGxsGroupId& grpId(gps.mGroupId);
 
-		for(auto it(group_infos.begin());it!=group_infos.end();++it)
-			if(grpMeta[(*it).mGroupId] == NULL)
+			groupsToNotifyResults.insert(grpId);
+			auto it2 = search_results_map.find(grpId);
+			if(it2 != search_results_map.end())
 			{
-				const RsGxsGroupId& grpId((*it).mGroupId);
-
-				groupsToNotifyResults.insert(grpId);
-
-				auto it2 = search_results_map.find(grpId);
-
-				if(it2 != search_results_map.end())
-				{
-					// update existing data
-
-					it2->second.mPopularity++;
-					it2->second.mNumberOfMessages = std::max(
-					            it2->second.mNumberOfMessages,
-					            (*it).mNumberOfMessages );
-				}
-				else
-				{
-					search_results_map[grpId] = *it;
-					search_results_map[grpId].mPopularity = 1; // number of results so far
-				}
+				// update existing data
+				RsGxsGroupSummary& eGpS(it2->second);
+				eGpS.mPopularity++;
+				eGpS.mNumberOfMessages = std::max(
+				            eGpS.mNumberOfMessages,
+				            gps.mNumberOfMessages );
 			}
+			else
+			{
+				search_results_map[grpId] = gps;
+				// number of results so far
+				search_results_map[grpId].mPopularity = 1;
+			}
+		}
 	} // end RS_STACK_MUTEX(mNxsMutex);
 
 	for(const RsGxsGroupId& grpId : groupsToNotifyResults)
@@ -5285,7 +5298,8 @@ void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req,const unsig
 #ifdef NXS_NET_DEBUG_8
 	GXSNETDEBUG___ << " passing the grp data to observer." << std::endl;
 #endif
-    mObserver->receiveNewGroups(new_grps);
+	mObserver->receiveNewGroups(new_grps);
+	mObserver->receiveDistantSearchResults(req, grpId);
 }
 
 bool RsGxsNetService::search( const std::string& substring,

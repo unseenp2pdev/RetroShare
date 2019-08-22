@@ -1,3 +1,23 @@
+/*******************************************************************************
+ * gui/settings/WebuiPage.cpp                                                  *
+ *                                                                             *
+ * Copyright (c) 2014 Retroshare Team <retroshare.project@gmail.com>           *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
+
 #include "WebuiPage.h"
 
 #include <iostream>
@@ -23,11 +43,6 @@ resource_api::ApiServerLocal* WebuiPage::apiServerLocal = 0;
 #endif
 resource_api::RsControlModule* WebuiPage::controlModule = 0;
 
-#ifdef RS_JSONAPI
-#	include <csignal>
-
-JsonApiServer* WebuiPage::jsonApiServer = nullptr;
-#endif // ifdef RS_JSONAPI
 
 WebuiPage::WebuiPage(QWidget */*parent*/, Qt::WindowFlags /*flags*/)
 {
@@ -113,15 +128,6 @@ QString WebuiPage::helpText() const
 	apiServerLocal = new resource_api::ApiServerLocal(apiServer, resource_api::ApiServerLocal::serverPath());
 #endif
 
-#ifdef RS_JSONAPI
-	// Use same port of libresapi + 2
-	jsonApiServer = new JsonApiServer(
-	            Settings->getWebinterfacePort() + 2,
-	            Settings->getWebinterfaceAllowAllIps() ? "::" : "127.0.0.1",
-	            [](int /*ec*/) { std::raise(SIGTERM); } );
-	jsonApiServer->start("WebuiPage::jsonApiServer");
-#endif // ifdef RS_JSONAPI
-
     return ok;
 }
 
@@ -142,10 +148,6 @@ QString WebuiPage::helpText() const
         delete controlModule;
         controlModule = 0;
     }
-#ifdef RS_JSONAPI
-	delete jsonApiServer;
-	jsonApiServer = nullptr;
-#endif
 }
 
 /*static*/ void WebuiPage::showWebui()

@@ -72,13 +72,12 @@ after_success:
   - if [ $TRAVIS_OS_NAME == osx ] ; then  mv unseenp2p.dmg UnseenP2P-0.6.5.dmg; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then  appdmg json-path UnseenP2P-0.6.5.dmg; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then  7z a UnseenP2P-0.6.5_macos.zip UnseenP2P-0.6.5.dmg; cd ../..; fi
-
+  - if [ $TRAVIS_OS_NAME == linux ] && [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then make -j2; fi
 #  - if [ $TRAVIS_BRANCH == $TRAVIS_TAG ]; then rake deploy; fi
 
-#branches:
-#  only:
-#    - master
-#    - travis
+# branches:
+#   only:
+#   - v0.6-MacOS-Travis-Deploy2
 
 deploy:
   - provider: releases
@@ -106,18 +105,20 @@ deploy:
 notifications:
   email: false
   irc:
-    channels:
-      - "chat.freenode.net#retroshare"
-    template:
-      - "%{repository}/%{branch} (%{commit} - %{author}): %{build_url}: %{message}"
-      - "Message: %{commit_message}"
-      - "Commit details: %{compare_url}"
-#  webhooks:
-#    urls:
-#      - https://webhooks.gitter.im/e/9502afd22ca6c8e85fb3
-#    on_success: change
-#    on_failure: always
-#    on_start: always
+  channels:
+   - "chat.freenode.net#retroshare"
+  template:
+   - "%{repository}/%{branch} (%{commit} - %{author}): %{build_url}: %{message}"
+   - "Message: %{commit_message}"
+   - "Commit details: %{compare_url}"
 
-#env:
-#  - RVM=2.0.0 LANG="en_US.UTF-8"
+deploy:
+  provider: releases
+  api_key:
+    secure: auwuhxelaMriNaXzT8I03xrh1s+STicNyNToOWFCAYKxkWWQ4WeaCO6kRDmQrejhizMUILGU+s4FrWTEhDsviftGAF86EgzxxbSBfsHHAP4t2C0pcXX8/WxEoh1IrUs7iGCIpl7O2cvWqGidc20ROeptSEd1uQgkHnn14D9A2YmXf8g52PzqivKkb6HKfkVTPdmNJkMBT5eDtEw6DIk+DvnvRo6b6uanvVAKS9CBwXOdA3rLzaD9bz0LrdL9X1CNoTkGROyez0Lsc4zTr70id2Xfp1MMmJAV6hgQy+iwE37wRyrxJf3dkh5SUAAMUC9Xnvh/iBKNQKdQGhj2WGcV7GZV9k6u9DA1w2H0kcrwt9KHUXdhEQ67yr6Boa9ZFwdDb5VIOtC6iHAoDZXharHhiuxi0K/bCtwNAajrMjBCm9mWhEKvtoxUUYxAJajhJkkO3ERaOU3zHE+06esDzGozd2YOEH8a74HhYy4xvhR05Yj00hAWLS2kIaUITiqmBf6Yuh5XwH7KCDcapxF59ROWqyicdwtbfWpvN8IvFuGKyxYuEfoT8WxZ4lZpo4Q9CrTB7gedJYJxYNfZE/okWoFBb4cpPI94PHo3DZPR7lVyQ60RNyeR0nOeqf8NW8cBT1G4jw3u1LEyAdyvup+54aALw0DCVyoDojSXB8s+AlQG2JE=
+  file: retroshare-gui/src/retroshare.dmg
+  skip_cleanup: true
+  on:
+    repo: retroshare/RetroShare
+    branch: v0.6-OSX-Deploy
+

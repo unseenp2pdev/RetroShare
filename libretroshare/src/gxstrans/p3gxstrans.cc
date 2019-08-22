@@ -33,7 +33,8 @@ const uint32_t p3GxsTrans::MAX_DELAY_BETWEEN_CLEANUPS = 900; // every 15 mins. C
 
 p3GxsTrans::~p3GxsTrans()
 {
-	p3Config::saveConfiguration();
+    // (cyril) this cannot be called here! There's chances the thread that saves configs will be dead already!
+	//p3Config::saveConfiguration();
 
 	{
 		RS_STACK_MUTEX(mIngoingMutex);
@@ -752,8 +753,9 @@ bool p3GxsTrans::handleEncryptedMail(const RsGxsTransMailItem* mail)
 	// Hint match none of our own ids
 	if(decryptIds.empty())
 	{
-		std::cout << "p3GxsTrans::handleEcryptedMail(...) hint doesn't match"
-		          << std::endl;
+#ifdef DEBUG_GXSTRANS
+		std::cout << "p3GxsTrans::handleEcryptedMail(...) hint doesn't match" << std::endl;
+#endif
 		return true;
 	}
 

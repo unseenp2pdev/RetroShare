@@ -1202,6 +1202,7 @@ int p3FileDatabase::RequestDirDetails(const RsPeerId &/*uid*/, const std::string
 //    NOT_IMPLEMENTED();
 //    return 0;
 //}
+
 uint32_t p3FileDatabase::getType(void *ref,FileSearchFlags flags) const
 {
     RS_STACK_MUTEX(mFLSMtx) ;
@@ -2035,11 +2036,11 @@ bool p3FileDatabase::banFile(const RsFileHash& real_file_hash, const std::string
 		RS_STACK_MUTEX(mFLSMtx) ;
 		BannedFileEntry& entry(mPrimaryBanList[real_file_hash]) ;	// primary list (user controlled) of files banned from FT search and forwarding. map<real hash, BannedFileEntry>
 
-        if(entry.ban_time_stamp == 0)
+        if(entry.mBanTimeStamp == 0)
 		{
-			entry.filename = filename ;
-			entry.size = file_size ;
-			entry.ban_time_stamp = time(NULL);
+			entry.mFilename = filename ;
+			entry.mSize = file_size ;
+			entry.mBanTimeStamp = time(NULL);
 
 			RsFileHash hash_of_hash ;
 			ftServer::encryptHash(real_file_hash,hash_of_hash) ;

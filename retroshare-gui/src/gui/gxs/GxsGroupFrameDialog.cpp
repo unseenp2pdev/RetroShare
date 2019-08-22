@@ -1,23 +1,22 @@
-/****************************************************************
- *  RetroShare is distributed under the following license:
- *
- *  Copyright (C) 2008 Robert Fernie
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA  02110-1301, USA.
- ****************************************************************/
+/*******************************************************************************
+ * retroshare-gui/src/gui/gxs/GxsGroupFrameDialog.cpp                          *
+ *                                                                             *
+ * Copyright 2012-2013  by Robert Fernie      <retroshare.project@gmail.com>   *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
 
 #include <QMenu>
 #include <QMessageBox>
@@ -336,6 +335,26 @@ void GxsGroupFrameDialog::removeAllSearches()
     mSearchGroupsItems.clear();
     mKnownGroups.clear();
 }
+
+// Same function than the one in rsgxsnetservice.cc, so that all times are automatically consistent
+
+static uint32_t checkDelay(uint32_t time_in_secs)
+{
+    if(time_in_secs <    1 * 86400)
+        return 0        ;
+    if(time_in_secs <=  10 * 86400)
+        return 5 * 86400;
+    if(time_in_secs <=  20 * 86400)
+        return 15 * 86400;
+    if(time_in_secs <=  60 * 86400)
+        return 30 * 86400;
+    if(time_in_secs <= 120 * 86400)
+        return 90 * 86400;
+    if(time_in_secs <= 250 * 86400)
+        return 180 * 86400;
+
+   return 365 * 86400;
+}
 void GxsGroupFrameDialog::groupTreeCustomPopupMenu(QPoint point)
 {
 	// First separately handle the case of search top level items
@@ -403,8 +422,8 @@ void GxsGroupFrameDialog::groupTreeCustomPopupMenu(QPoint point)
 	action = contextMnu.addAction(QIcon(IMAGE_EDIT), tr("Edit Details"), this, SLOT(editGroupDetails()));
 	action->setEnabled (!mGroupId.isNull() && isAdmin);
 
-	uint32_t current_store_time = mInterface->getStoragePeriod(mGroupId)/86400 ;
-	uint32_t current_sync_time  = mInterface->getSyncPeriod(mGroupId)/86400 ;
+	uint32_t current_store_time = checkDelay(mInterface->getStoragePeriod(mGroupId))/86400 ;
+	uint32_t current_sync_time  = checkDelay(mInterface->getSyncPeriod(mGroupId))/86400 ;
 
 	std::cerr << "Got sync=" << current_sync_time << ". store=" << current_store_time << std::endl;
 	QAction *actnn = NULL;
@@ -415,7 +434,7 @@ void GxsGroupFrameDialog::groupTreeCustomPopupMenu(QPoint point)
 	actnn = ctxMenu2->addAction(tr(" 1 month"    ),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant( 30)) ; if(current_sync_time == 30) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" 3 months"   ),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant( 90)) ; if(current_sync_time == 90) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" 6 months"   ),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant(180)) ; if(current_sync_time ==180) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
-	actnn = ctxMenu2->addAction(tr(" 1 year  "   ),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant(372)) ; if(current_sync_time ==372) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
+	actnn = ctxMenu2->addAction(tr(" 1 year  "   ),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant(365)) ; if(current_sync_time ==365) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" Indefinitly"),this,SLOT(setSyncPostsDelay())) ; actnn->setData(QVariant(  0)) ; if(current_sync_time ==  0) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 
 	ctxMenu2 = contextMnu.addMenu(tr("Store posts for at most...")) ;
@@ -424,7 +443,7 @@ void GxsGroupFrameDialog::groupTreeCustomPopupMenu(QPoint point)
 	actnn = ctxMenu2->addAction(tr(" 1 month"    ),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant( 30)) ; if(current_store_time == 30) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" 3 months"   ),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant( 90)) ; if(current_store_time == 90) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" 6 months"   ),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant(180)) ; if(current_store_time ==180) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
-	actnn = ctxMenu2->addAction(tr(" 1 year  "   ),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant(372)) ; if(current_store_time ==372) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
+	actnn = ctxMenu2->addAction(tr(" 1 year  "   ),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant(365)) ; if(current_store_time ==365) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 	actnn = ctxMenu2->addAction(tr(" Indefinitly"),this,SLOT(setStorePostsDelay())) ; actnn->setData(QVariant(  0)) ; if(current_store_time ==  0) { actnn->setEnabled(false);actnn->setIcon(QIcon(":/images/start.png"));}
 
 	if (shareKeyType()) {
@@ -1055,8 +1074,8 @@ void GxsGroupFrameDialog::loadGroupSummary(const uint32_t &token)
 	loadGroupSummaryToken(token, groupInfo, userdata);
 
 	mCachedGroupMetas.clear();
-    for(auto it(groupInfo.begin());it!=groupInfo.end();++it)
-        mCachedGroupMetas[(*it).mGroupId] = *it;
+	for(auto it(groupInfo.begin());it!=groupInfo.end();++it)
+		mCachedGroupMetas[(*it).mGroupId] = *it;
 
 	insertGroupsData(mCachedGroupMetas, userdata);
     updateSearchResults();

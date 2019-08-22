@@ -3,7 +3,7 @@
 # Copyright (C) 2018, Retroshare team <retroshare.team@gmailcom>               #
 #                                                                              #
 # This program is free software: you can redistribute it and/or modify         #
-# it under the terms of the GNU Lesser General Public License as               #
+# it under the terms of the GNU Affero General Public License as               #
 # published by the Free Software Foundation, either version 3 of the           #
 # License, or (at your option) any later version.                              #
 #                                                                              #
@@ -67,6 +67,16 @@ retroshare_android_notify_service:CONFIG -= no_retroshare_android_notify_service
 CONFIG *= no_retroshare_qml_app
 retroshare_qml_app:CONFIG -= no_retroshare_qml_app
 
+# To enable RetroShare service append the following assignation to
+# qmake command line "CONFIG+=retroshare_service"
+CONFIG *= no_retroshare_service
+retroshare_service:CONFIG -= no_retroshare_service
+
+# To disable libresapi append the following assignation to qmake command line
+#"CONFIG+=no_libresapi"
+CONFIG *= libresapi
+no_libresapi:CONFIG -= libresapi
+
 # To enable libresapi via local socket (unix domain socket or windows named
 # pipes) append the following assignation to qmake command line
 #"CONFIG+=libresapilocalserver"
@@ -105,6 +115,12 @@ rs_onlyhiddennode:CONFIG -= no_rs_onlyhiddennode
 CONFIG *= rs_gxs
 no_rs_gxs:CONFIG -= rs_gxs
 
+# To disable GXS distrubuting all available posts independed of the "sync"
+# settings append the following assignation to qmake command line
+# "CONFIG+=no_rs_gxs_send_all"
+CONFIG *= rs_gxs_send_all
+no_rs_gxs_send_all:CONFIG -= rs_gxs_send_all
+
 # To enable RS Deprecated Warnings append the following assignation to qmake
 # command line "CONFIG+=rs_deprecatedwarning"
 CONFIG *= no_rs_deprecatedwarning
@@ -125,7 +141,6 @@ CONFIG *= rs_gxs_trans
 CONFIG *= rs_async_chat
 rs_async_chat:CONFIG -= no_rs_async_chat
 
-
 # To disable bitdht append the following assignation to qmake command line
 # "CONFIG+=no_bitdht"
 CONFIG *= bitdht
@@ -138,6 +153,7 @@ rs_macos10.8:CONFIG -= rs_macos10.11
 rs_macos10.9:CONFIG -= rs_macos10.11
 rs_macos10.10:CONFIG -= rs_macos10.11
 rs_macos10.12:CONFIG -= rs_macos10.11
+rs_macos10.13:CONFIG -= rs_macos10.11
 
 # To enable JSON API append the following assignation to qmake command line
 # "CONFIG+=rs_jsonapi"
@@ -146,6 +162,7 @@ rs_jsonapi:CONFIG -= no_rs_jsonapi
 
 # To disable deep search append the following assignation to qmake command line
 CONFIG *= no_rs_deep_search
+
 no_rs_deep_search:CONFIG -= rs_deep_search
 
 # Specify RetroShare major version appending the following assignation to qmake
@@ -164,6 +181,16 @@ RS_MINI_VERSION=6
 # command line 'RS_EXTRA_VERSION=""'
 RS_EXTRA_VERSION=""
 
+
+# Specify threading library to use appending the following assignation to qmake
+# commandline 'RS_THREAD_LIB=pthread' the name of the multi threading library to
+# use (pthread, "") usually depends on platform.
+isEmpty(RS_THREAD_LIB):RS_THREAD_LIB = pthread
+
+# Specify UPnP library to use appending the following assignation to qmake
+# command line 'RS_UPNP_LIB=miniupnpc' the name of the UPNP library to use
+# (miniupnpc, "upnp ixml threadutil") usually depends on platform.
+isEmpty(RS_UPNP_LIB):RS_UPNP_LIB = upnp ixml threadutil
 
 ###########################################################################################################################################################
 #
@@ -298,10 +325,18 @@ defineReplace(linkDynamicLibs) {
 ## RS_SQL_LIB String viariable containing the name of the SQL library to use
 ##   ("sqlcipher sqlite3", sqlite3) it is usually precalculated depending on
 ##   CONFIG.
-## RS_UPNP_LIB String viariable containing the name of the UPNP library to use
-##   (miniupnpc, "upnp ixml threadutil") it usually depend on platform.
-## RS_THREAD_LIB String viariable containing the name of the multi threading
-##   library to use (pthread, "") it usually depend on platform.
+
+isEmpty(QMAKE_HOST_SPEC):QMAKE_HOST_SPEC=$$[QMAKE_SPEC]
+isEmpty(QMAKE_TARGET_SPEC):QMAKE_TARGET_SPEC=$$[QMAKE_XSPEC]
+equals(QMAKE_HOST_SPEC, $$QMAKE_TARGET_SPEC) {
+    CONFIG *= no_rs_cross_compiling
+    CONFIG -= rs_cross_compiling
+} else {
+    CONFIG *= rs_cross_compiling
+    CONFIG -= no_rs_cross_compiling
+    message(Cross-compiling detected QMAKE_HOST_SPEC: $$QMAKE_HOST_SPEC \
+QMAKE_TARGET_SPEC: $$QMAKE_TARGET_SPEC)
+}
 
 defined(RS_MAJOR_VERSION,var):\
 defined(RS_MINOR_VERSION,var):\
@@ -349,8 +384,10 @@ trough qmake command line arguments!")
 gxsdistsync:DEFINES *= RS_USE_GXS_DISTANT_SYNC
 wikipoos:DEFINES *= RS_USE_WIKI
 rs_gxs:DEFINES *= RS_ENABLE_GXS
+rs_gxs_send_all:DEFINES *= RS_GXS_SEND_ALL
 libresapilocalserver:DEFINES *= LIBRESAPI_LOCAL_SERVER
 libresapi_settings:DEFINES *= LIBRESAPI_SETTINGS
+
 #libresapihttpserver:DEFINES *= ENABLE_WEBUI
 RS_THREAD_LIB=pthread
 RS_UPNP_LIB = upnp ixml threadutil
@@ -403,6 +440,15 @@ rs_gxs_trans {
     }
 }
 
+bitdht {
+    DEFINES *= RS_USE_BITDHT
+}
+
+direct_chat {
+    warning("You have enabled RetroShare direct chat which is deprecated!")
+    DEFINES *= RS_DIRECT_CHAT
+}
+
 rs_async_chat {
     DEFINES *= RS_ASYNC_CHAT
 }
@@ -412,6 +458,10 @@ rs_chatserver {
 }
 
 rs_jsonapi {
+    rs_cross_compiling:!exists($$JSONAPI_GENERATOR_EXE):error("Inconsistent \
+build configuration, cross-compiling JSON API requires JSONAPI_GENERATOR_EXE \
+to contain the path to an host executable jsonapi-generator")
+
     DEFINES *= RS_JSONAPI
 }
 
@@ -424,6 +474,8 @@ rs_deep_search {
 	 }
 	}
 }
+
+rs_use_native_dialogs:DEFINES *= RS_NATIVEDIALOGS
 
 debug {
     QMAKE_CXXFLAGS -= -O2 -fomit-frame-pointer
@@ -453,7 +505,7 @@ linux-* {
     isEmpty(RS_INCLUDE_DIR): RS_INCLUDE_DIR = "$${PREFIX}/include"
     isEmpty(RS_LIB_DIR)    : RS_LIB_DIR     = "$${PREFIX}/lib"
     isEmpty(RS_DATA_DIR)   : RS_DATA_DIR    = "$${PREFIX}/share/retroshare"
-    isEmpty(RS_PLUGIN_DIR) : RS_PLUGIN_DIR  = "$${RS_LIB_DIR}/retroshare/extensions6"
+    isEmpty(RS_PLUGIN_DIR) : RS_PLUGIN_DIR  = "$${PREFIX}/lib/retroshare/extensions6"
 
     QMAKE_LIBDIR *= "$$RS_LIB_DIR"
 
@@ -535,7 +587,7 @@ win32-g++ {
 
     RS_UPNP_LIB = miniupnpc
 
-    DEFINES *= NOGDI WIN32 WIN32_LEAN_AND_MEAN WINDOWS_SYS _USE_32BIT_TIME_T
+    DEFINES *= NOGDI WIN32 WIN32_LEAN_AND_MEAN WINDOWS_SYS
 
     # This defines the platform to be WinXP or later and is needed for
     #  getaddrinfo (_WIN32_WINNT_WINXP)
@@ -577,6 +629,7 @@ macx-* {
 		QMAKE_CFLAGS += -Wno-nullability-completeness
 	}
 	rs_macos10.13 {
+
                 message(***retroshare.pri: Set Target and SDK to MacOS 10.13 )
                 QMAKE_MACOSX_DEPLOYMENT_TARGET=10.13
                 QMAKE_MAC_SDK = macosx10.13

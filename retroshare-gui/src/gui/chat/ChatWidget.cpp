@@ -1,29 +1,27 @@
-/****************************************************************
- *
- *  RetroShare is distributed under the following license:
- *
- *  Copyright (C) 2011, RetroShare Team
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
- *  Boston, MA  02110-1301, USA.
- ****************************************************************/
-
+/*******************************************************************************
+ * gui/chat/ChatWidget.cpp                                                     *
+ *                                                                             *
+ * LibResAPI: API for local socket server                                      *
+ *                                                                             *
+ * Copyright (C) 2011, Retroshare Team <retroshare.project@gmail.com>          *
+ *                                                                             *
+ * This program is free software: you can redistribute it and/or modify        *
+ * it under the terms of the GNU Affero General Public License as              *
+ * published by the Free Software Foundation, either version 3 of the          *
+ * License, or (at your option) any later version.                             *
+ *                                                                             *
+ * This program is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                *
+ * GNU Affero General Public License for more details.                         *
+ *                                                                             *
+ * You should have received a copy of the GNU Affero General Public License    *
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.       *
+ *                                                                             *
+ *******************************************************************************/
 #include <QApplication>
 #include <QBuffer>
 #include <QColorDialog>
-#include <QFontDialog>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QMessageBox>
@@ -1506,7 +1504,8 @@ void ChatWidget::chooseFont()
 {
 	bool ok;
 	//Use NULL as parent as with this QFontDialog don't take care of title nether options.
-	QFont font = QFontDialog::getFont(&ok, currentFont, NULL, tr("Choose your font."),QFontDialog::DontUseNativeDialog);
+	QFont font = misc::getFont(&ok, currentFont, nullptr, tr("Choose your font."));
+
 	if (ok) {
 		currentFont = font;
 		setFont();
@@ -1601,7 +1600,7 @@ void ChatWidget::addExtraPicture()
 {
 	// select a picture file
 	QString file;
-	if (misc::getOpenFileName(window(), RshareSettings::LASTDIR_IMAGES, tr("Load Picture File"), "Pictures (*.png *.xpm *.jpg *.jpeg)", file)) {
+	if (misc::getOpenFileName(window(), RshareSettings::LASTDIR_IMAGES, tr("Load Picture File"), "Pictures (*.png *.xpm *.jpg *.jpeg *.gif *.webp )", file)) {
 		QString encodedImage;
 		uint32_t maxMessageSize = this->maxMessageSize();
 		if (RsHtml::makeEmbeddedImage(file, encodedImage, 640*480, maxMessageSize - 200)) {		//-200 for the html stuff
@@ -1720,19 +1719,28 @@ void ChatWidget::updateStatus(const QString &peer_id, int status)
     {
 	    // the peers status has changed
 
+		QString tooltip_info ;
 	    QString peerName ;
+
 	    if(chatId.isDistantChatId())
 	    {
 		    DistantChatPeerInfo dcpinfo ;
 		    RsIdentityDetails details  ;
 
 		    if(rsMsgs->getDistantChatStatus(chatId.toDistantChatId(),dcpinfo))
+			{
 			    if(rsIdentity->getIdDetails(dcpinfo.to_id,details))
 				    peerName = QString::fromUtf8( details.mNickname.c_str() ) ;
 			    else
 				    peerName = QString::fromStdString(dcpinfo.to_id.toStdString()) ;
+
+				tooltip_info = QString("Identity Id: ")+QString::fromStdString(dcpinfo.to_id.toStdString());
+			}
 		    else
+			{
 			    peerName = QString::fromStdString(chatId.toDistantChatId().toStdString()) ;
+				tooltip_info = QString("Identity Id: unknown (bug?)");
+			}
 	    }
 	    else
             //peerName = QString::fromUtf8(rsPeers->getPeerName(chatId.toPeerId()).c_str());
@@ -1769,6 +1777,7 @@ void ChatWidget::updateStatus(const QString &peer_id, int status)
 	    }
 
 	    ui->titleLabel->setText(peerName);
+	    ui->titleLabel->setToolTip(tooltip_info);
 	    ui->statusLabel->setText(QString("(%1)").arg(StatusDefs::name(status)));
 
 	    peerStatus = status;
