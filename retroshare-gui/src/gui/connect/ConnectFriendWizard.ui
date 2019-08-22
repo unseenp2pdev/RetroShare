@@ -1032,7 +1032,6 @@
    </attribute>
    <layout class="QVBoxLayout" name="ConclusionPageVLayout">
     <item>
-<<<<<<< HEAD
      <widget class="StyledLabel" name="makefriend_infolabel">
       <property name="palette">
        <palette>

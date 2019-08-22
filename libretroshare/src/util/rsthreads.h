@@ -29,8 +29,8 @@
 #include <semaphore.h>
 
 //0.6.5=======
-//#include <thread>
-//#include <functional>
+#include <thread>
+#include <functional>
 
 
 #include <util/rsmemory.h>
@@ -264,16 +264,16 @@ public:
 
     void ask_for_stop();
 
-	/**
-	 * Execute given function on another thread without blocking the caller
-	 * execution.
-	 * This can be generalized with variadic template, ATM it is enough to wrap
-	 *	any kind of function call or job into a lambda which get no paramethers
-	 *	and return nothing but can capture
-	 * This can be easly optimized later by using a thread pool
-	 */
-	static void async(const std::function<void()>& fn)
-	{ std::thread(fn).detach(); }
+    /**
+     * Execute given function on another thread without blocking the caller
+     * execution.
+     * This can be generalized with variadic template, ATM it is enough to wrap
+     *	any kind of function call or job into a lambda which get no paramethers
+     *	and return nothing but can capture
+     * This can be easly optimized later by using a thread pool
+     */
+    static void async(const std::function<void()>& fn)
+    { std::thread(fn).detach(); }
 
 protected:
     virtual void runloop() =0; /* called once the thread is started. Should be overloaded by subclasses. */

@@ -186,9 +186,20 @@ public:
 struct BannedFileEntry : RsSerializable
 {
 	BannedFileEntry() : mFilename(""), mSize(0), mBanTimeStamp(0) {}
-    uint64_t size ;
-    std::string filename ;
-    rstime_t ban_time_stamp;
+    std::string mFilename;
+    uint64_t mSize;
+    rstime_t mBanTimeStamp;
+
+    /// @see RsSerializable::serial_process
+    virtual void serial_process(RsGenericSerializer::SerializeJob j,
+                                RsGenericSerializer::SerializeContext& ctx)
+    {
+        RS_SERIAL_PROCESS(mFilename);
+        RS_SERIAL_PROCESS(mSize);
+        RS_SERIAL_PROCESS(mBanTimeStamp);
+    }
+
+
 
 };
 

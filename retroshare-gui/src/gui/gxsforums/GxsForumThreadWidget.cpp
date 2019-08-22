@@ -1164,22 +1164,21 @@ void GxsForumThreadWidget::insertMessage()
 #ifdef DEBUG_FORUMS
     std::cerr << "Inserting message, threadId=" << mThreadId <<std::endl;
 #endif
-<<<<<<< HEAD
 
-	mNavigatePendingMsgId.clear();
-	ui->progressBar->reset();
+//	mNavigatePendingMsgId.clear();
+//	ui->progressBar->reset();
 
-	if (mFillThread) {
-#ifdef DEBUG_FORUMS
-		std::cerr << "GxsForumThreadWidget::insertThreads() stop current fill thread" << std::endl;
-#endif
-		// stop current fill thread
-		GxsForumsFillThread *thread = mFillThread;
-		mFillThread = NULL;
-		thread->stop();
+//	if (mFillThread) {
+//#ifdef DEBUG_FORUMS
+//		std::cerr << "GxsForumThreadWidget::insertThreads() stop current fill thread" << std::endl;
+//#endif
+//		// stop current fill thread
+//		GxsForumsFillThread *thread = mFillThread;
+//		mFillThread = NULL;
+//		thread->stop();
 
-		mStateHelper->setLoading(mTokenTypeInsertThreads, false);
-	}
+//		mStateHelper->setLoading(mTokenTypeInsertThreads, false);
+//	}
 
 	if (groupId().isNull())
 	{
@@ -1449,12 +1448,12 @@ void GxsForumThreadWidget::nextUnreadMessage()
 		if(index.data(RsGxsForumModel::UnreadChildrenRole).toBool())
 			ui->threadTreeWidget->expand(index);
 
-void GxsForumThreadWidget::showInPeopleTab()
-{
-	if (groupId().isNull() || mThreadId.isNull()) {
-        QMessageBox::information(this, tr("UnseenP2P"),tr("You cant act on the author to a non-existant Message"));
-		return;
-	}
+//void GxsForumThreadWidget::showInPeopleTab()
+//{
+//	if (groupId().isNull() || mThreadId.isNull()) {
+//        QMessageBox::information(this, tr("UnseenP2P"),tr("You cant act on the author to a non-existant Message"));
+//		return;
+    }
 
 	ui->threadTreeWidget->setCurrentIndex(index);
 	ui->threadTreeWidget->scrollTo(index);
@@ -1647,27 +1646,63 @@ void GxsForumThreadWidget::flagperson()
     mThreadModel->setAuthorOpinion(mThreadProxyModel->mapToSource(getCurrentIndex()),opinion);
 }
 
-void GxsForumThreadWidget::reply_with_private_message()
-{
-	if (groupId().isNull() || mThreadId.isNull()) {
-        QMessageBox::information(this, tr("UnseenP2P"),tr("You cant reply to a non-existant Message"));
-		return;
-	}
+void GxsForumThreadWidget::replytoforummessage()        { async_msg_action( &GxsForumThreadWidget::replyForumMessageData ); }
+void GxsForumThreadWidget::editforummessage()           { async_msg_action( &GxsForumThreadWidget::editForumMessageData  ); }
+void GxsForumThreadWidget::reply_with_private_message() { async_msg_action( &GxsForumThreadWidget::replyMessageData      ); }
+void GxsForumThreadWidget::showInPeopleTab()            { async_msg_action( &GxsForumThreadWidget::showAuthorInPeople    ); }
 
-	// Get Message ... then complete replyMessageData().
-	RsGxsGrpMsgIdPair postId = std::make_pair(groupId(), mThreadId);
-	requestMsgData_EditForumMessage(postId);
-}
-void GxsForumThreadWidget::replytoforummessage()
+void GxsForumThreadWidget::async_msg_action(const MsgMethod &action)
 {
-	if (groupId().isNull() || mThreadId.isNull()) {
-        QMessageBox::information(this, tr("UnseenP2P"),tr("You cant reply to a non-existant Message"));
-		return;
-	}
-    // Get Message ... then complete replyMessageData().
-    RsGxsGrpMsgIdPair postId = std::make_pair(groupId(), mThreadId);
-    requestMsgData_ReplyForumMessage(postId);
+    if (groupId().isNull() || mThreadId.isNull()) {
+        QMessageBox::information(this, tr("RetroShare"),tr("You cant reply to a non-existant Message"));
+        return;
+    }
+
+    RsThread::async([this,action]()
+    {
+        // 1 - get message data from p3GxsForums
+
+#ifdef DEBUG_FORUMS
+        std::cerr << "Retrieving post data for post " << mThreadId << std::endl;
+#endif
+
+        std::set<RsGxsMessageId> msgs_to_request ;
+        std::vector<RsGxsForumMsg> msgs;
+
+        msgs_to_request.insert(mThreadId);
+
+        if(!rsGxsForums->getForumContent(groupId(),msgs_to_request,msgs))
+        {
+            std::cerr << __PRETTY_FUNCTION__ << " failed to retrieve forum group info for forum " << groupId() << std::endl;
+            return;
+        }
+
+        if(msgs.size() != 1)
+        {
+            std::cerr << __PRETTY_FUNCTION__ << " more than 1 or no msgs selected in forum " << groupId() << std::endl;
+            return;
+        }
+
+        // 2 - sort the messages into a proper hierarchy
+
+        RsGxsForumMsg msg = msgs[0];
+
+        // 3 - update the model in the UI thread.
+
+        RsQThreadUtils::postToObject( [msg,action,this]()
+        {
+            /* Here it goes any code you want to be executed on the Qt Gui
+             * thread, for example to update the data model with new information
+             * after a blocking call to RetroShare API complete */
+
+            (this->*action)(msg);
+
+        }, this );
+
+    });
 }
+
+
 
 void GxsForumThreadWidget::replyMessageData(const RsGxsForumMsg &msg)
 {

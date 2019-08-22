@@ -32,11 +32,7 @@
 #include <cctype>
 #include <stack>
 #include <cerrno>
-<<<<<<< HEAD
-#include <util/cxx11retrocompat.h>
-=======
 #include "util/cxx11retrocompat.h"
->>>>>>> 0.6.5
 
 #ifndef WIN32
 #define _stricmp strcasecmp

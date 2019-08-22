@@ -285,8 +285,8 @@ public:
 //0.6.5
 //    virtual bool setAsRegularContact(const RsGxsId& id,bool is_a_contact) override;
 //    virtual bool isARegularContact(const RsGxsId& id) override;
-//    virtual void setAutoAddFriendIdsAsContact(bool b) override;
-//    virtual bool autoAddFriendIdsAsContact() override;
+    virtual void setAutoAddFriendIdsAsContact(bool b) override;
+    virtual bool autoAddFriendIdsAsContact() override;
 
 
 	virtual uint32_t nbRegularContacts() ;

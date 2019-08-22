@@ -138,8 +138,8 @@ void PopupChatDialog::chatStatusChanged(const ChatId &chat_id, const QString& st
 	QString additional_info ;
 
     if (mChatId.isSameEndpoint(chat_id)) {
-        ui.chatWidget->updateStatusString(getPeerName(chat_id,additional_info) + " %1", statusString);
-	}
+        ui.chatWidget->updateStatusString(getPeerName(chat_id) + " %1", statusString);
+    }
 }
 
 void PopupChatDialog::addChatMsg(const ChatMessage &msg)

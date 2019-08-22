@@ -401,36 +401,36 @@ public:
 	RS_DEPRECATED_FOR(editChannel)
 	virtual bool updateGroup(uint32_t& token, RsGxsChannelGroup& group) = 0;
 
-	/**
-	 * @brief Share extra file
-	 * Can be used to share extra file attached to a channel post
-	 * @jsonapi{development}
-	 * @param[in] path file path
-	 * @return false on error, true otherwise
-	 */
-	virtual bool ExtraFileHash(const std::string& path) = 0;
+//	/**
+//	 * @brief Share extra file
+//	 * Can be used to share extra file attached to a channel post
+//	 * @jsonapi{development}
+//	 * @param[in] path file path
+//	 * @return false on error, true otherwise
+//	 */
+//	virtual bool ExtraFileHash(const std::string& path) = 0;
 
-	/**
-	 * @brief Remove extra file from shared files
-	 * @jsonapi{development}
-	 * @param[in] hash hash of the file to remove
-	 * @return false on error, true otherwise
-	 */
-	virtual bool ExtraFileRemove(const RsFileHash& hash) = 0;
+//	/**
+//	 * @brief Remove extra file from shared files
+//	 * @jsonapi{development}
+//	 * @param[in] hash hash of the file to remove
+//	 * @return false on error, true otherwise
+//	 */
+//	virtual bool ExtraFileRemove(const RsFileHash& hash) = 0;
 
-	/**
-	 * @brief Request remote channels search
-	 * @jsonapi{development}
-	 * @param[in] matchString string to look for in the search
-	 * @param multiCallback function that will be called each time a search
-	 * result is received
-	 * @param[in] maxWait maximum wait time in seconds for search results
-	 * @return false on error, true otherwise
-	 */
-	virtual bool turtleSearchRequest(
-	        const std::string& matchString,
-	        const std::function<void (const RsGxsGroupSummary& result)>& multiCallback,
-	        rstime_t maxWait = 300 ) = 0;
+//	/**
+//	 * @brief Request remote channels search
+//	 * @jsonapi{development}
+//	 * @param[in] matchString string to look for in the search
+//	 * @param multiCallback function that will be called each time a search
+//	 * result is received
+//	 * @param[in] maxWait maximum wait time in seconds for search results
+//	 * @return false on error, true otherwise
+//	 */
+//	virtual bool turtleSearchRequest(
+//	        const std::string& matchString,
+//	        const std::function<void (const RsGxsGroupSummary& result)>& multiCallback,
+//	        rstime_t maxWait = 300 ) = 0;
 
 	//////////////////////////////////////////////////////////////////////////////
     ///                     Distant synchronisation methods                    ///

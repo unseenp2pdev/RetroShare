@@ -114,15 +114,15 @@ virtual bool getChannelDownloadDirectory(const RsGxsGroupId &groupId, std::strin
 
     //0.6.5
 //    /// @see RsGxsChannels::turtleChannelRequest
-//    virtual bool turtleChannelRequest(
-//            const RsGxsGroupId& channelId,
-//            const std::function<void (const RsGxsChannelGroup& result)>& multiCallback,
-//            rstime_t maxWait = 300 );
-//
-//    /// @see RsGxsChannels::localSearchRequest
-//    virtual bool localSearchRequest(const std::string& matchString,
-//            const std::function<void (const RsGxsGroupSummary& result)>& multiCallback,
-//            rstime_t maxWait = 30 ) override;
+    virtual bool turtleChannelRequest(
+            const RsGxsGroupId& channelId,
+            const std::function<void (const RsGxsChannelGroup& result)>& multiCallback,
+            rstime_t maxWait = 300 );
+
+    /// @see RsGxsChannels::localSearchRequest
+    virtual bool localSearchRequest(const std::string& matchString,
+            const std::function<void (const RsGxsGroupSummary& result)>& multiCallback,
+            rstime_t maxWait = 30 ) override;
 
 
 	/**
@@ -286,15 +286,15 @@ bool generateGroup(uint32_t &token, std::string groupName);
 	RsGxsMessageId mGenThreadId;
 	/** G10h4ck: Is this stuff really used? And for what? END */
 
-<<<<<<< HEAD
-	p3GxsCommentService *mCommentService;
-    std::map<RsGxsGroupId,rstime_t> mKnownChannels;
-=======
+//<<<<<<< HEAD
+//	p3GxsCommentService *mCommentService;
+//    std::map<RsGxsGroupId,rstime_t> mKnownChannels;
+//=======
 	p3GxsCommentService* mCommentService;
 
 	std::map<RsGxsGroupId,rstime_t> mKnownChannels;
 	RsMutex mKnownChannelsMutex;
->>>>>>> 0.6.5
+
 
 	/** Store search callbacks with timeout*/
 	std::map<

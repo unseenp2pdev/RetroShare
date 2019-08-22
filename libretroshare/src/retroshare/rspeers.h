@@ -752,7 +752,8 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
-
+    RS_DEPRECATED_FOR(isPgpFriend)
+    virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend) = 0;
 };
 
 
