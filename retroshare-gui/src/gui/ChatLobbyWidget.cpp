@@ -532,7 +532,9 @@ void ChatLobbyWidget::updateDisplay()
             item = new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
 
             icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
+#ifdef CHAT_LOBBY_GUI_DEBUG
             std::cerr << " Add group chat item to the common item if there is no item, group name: " << it->second.lobby_name << std::endl;
+#endif
             if (!icon.isNull())
             {
                 item->setIcon(COLUMN_NAME, true ? icon : icon.pixmap(ui.lobbyTreeWidget->iconSize(), QIcon::Disabled));
@@ -676,8 +678,9 @@ void ChatLobbyWidget::getHistoryForRecentList()
             {
                 QTreeWidgetItem *item =  new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
                 uint current_time = (historyIt->incoming ? historyIt->recvTime :  historyIt->sendTime) ;
-
-                std::cerr << "History for group chat " <<  (*it).second.lobby_name <<"last msg is unread: " << historyIt->unread << std::endl;
+#ifdef CHAT_LOBBY_GUI_DEBUG
+               // std::cerr << "History for group chat " <<  (*it).second.lobby_name <<"last msg is unread: " << historyIt->unread << std::endl;
+#endif
                 QIcon icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
                 if (!icon.isNull())
                 {

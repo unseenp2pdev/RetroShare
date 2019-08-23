@@ -362,14 +362,14 @@ bool RsPluginManager::loadPlugin(const std::string& plugin_name,bool first_time)
 		dlclose(handle);
 		return false ;
 	} 
-	if(pinfo.svn_revision == 0)
-	{
-		std::cerr  << "    -> No svn revision number." << std::endl;
-		pinfo.status = PLUGIN_STATUS_MISSING_SVN ;
-		pinfo.info_string = "" ;
-		dlclose(handle);
-		return false ;
-	} 
+//	if(pinfo.svn_revision == 0)
+//	{
+//		std::cerr  << "    -> No svn revision number." << std::endl;
+//		pinfo.status = PLUGIN_STATUS_MISSING_SVN ;
+//		pinfo.info_string = "" ;
+//		dlclose(handle);
+//		return false ;
+//	}
 
 	// Now look for the plugin class symbol.
 	//

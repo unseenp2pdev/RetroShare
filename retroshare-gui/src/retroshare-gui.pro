@@ -81,21 +81,22 @@ unix {
 	INSTALLS += style_files
 
 	icon_files.path = "$${PREFIX}/share/icons/hicolor"
-        icon_files.files =  ../../data/24x24/apps/retroshare.png
-        icon_files.files += ../../data/48x48/apps/retroshare.png
-        icon_files.files += ../../data/64x64/apps/retroshare.png
-        icon_files.files += ../../data/128x128/apps/retroshare.png
+        icon_files.files =  ../../data/24x24/apps/unseenp2p.png
+        icon_files.files += ../../data/48x48/apps/unseenp2p.png
+        icon_files.files += ../../data/64x64/apps/unseenp2p.png
+        icon_files.files += ../../data/128x128/apps/unseenp2p.png
 	INSTALLS += icon_files
 
 	desktop_files.path = "$${PREFIX}/share/applications"
-	desktop_files.files = ../../data/retroshare.desktop
+	desktop_files.files = ../../data/unseenp2p.desktop
 	INSTALLS += desktop_files
 
 	pixmap_files.path = "$${PREFIX}/share/pixmaps"
-        pixmap_files.files = ../../data/UnseenP2P.xpm
+        pixmap_files.files = ../../data/unseenp2p.xpm
+        pixmap_files.files += ../../data/unseenp2p.xpm.png
 	INSTALLS += pixmap_files
 
-        tor_bundled.path = "$${DATA_DIR}/"
+        tor_bundled.path = "$${BIN_DIR}/"
         tor_bundled.files = TorControl/client/ubuntu/tor
         INSTALLS += tor_bundled
 }

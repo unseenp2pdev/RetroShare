@@ -505,8 +505,10 @@ void NetworkDialog::filterGPGIdWithAvailableCert(std::list<RsPgpId> &ids)
         if (cert_it != certlist.end())
         {
             i++;
+#ifdef NET_DEBUG
             std::cerr << "we are filtering all PGPIds in the getGPGAllList: " << *i << " is a Friend of contact list that have CERT  ";
             std::cerr << std::endl;
+#endif
         }
         else
         {

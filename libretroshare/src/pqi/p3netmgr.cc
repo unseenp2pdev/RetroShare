@@ -74,10 +74,7 @@ const uint32_t MAX_UPNP_COMPLETE = 	600; /* 10 min... seems to take a while */
  * #define NETMGR_DEBUG_TICK 1
  * #define NETMGR_DEBUG_STATEBOX 1
  ***/
-// #define NETMGR_DEBUG 1
-// #define NETMGR_DEBUG_RESET 1
-// #define NETMGR_DEBUG_TICK 1
-// #define NETMGR_DEBUG_STATEBOX 1
+
 
 pqiNetStatus::pqiNetStatus()
 	:mLocalAddrOk(false), mExtAddrOk(false), mExtAddrStableOk(false), 

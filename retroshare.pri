@@ -38,7 +38,7 @@ CONFIG += warn_off
 
 # To disable RetroShare-nogui append the following
 # assignation to qmake command line "CONFIG+=no_retroshare_nogui"
-CONFIG *= retroshare_nogui
+CONFIG *= no_retroshare_nogui
 no_retroshare_nogui:CONFIG -= retroshare_nogui
 
 # To disable cmark append the following 
@@ -454,8 +454,8 @@ linux-* {
     isEmpty(RS_BIN_DIR)    : RS_BIN_DIR     = "$${PREFIX}/bin"
     isEmpty(RS_INCLUDE_DIR): RS_INCLUDE_DIR = "$${PREFIX}/include"
     isEmpty(RS_LIB_DIR)    : RS_LIB_DIR     = "$${PREFIX}/lib"
-    isEmpty(RS_DATA_DIR)   : RS_DATA_DIR    = "$${PREFIX}/share/retroshare"
-    isEmpty(RS_PLUGIN_DIR) : RS_PLUGIN_DIR  = "$${RS_LIB_DIR}/retroshare/extensions6"
+    isEmpty(RS_DATA_DIR)   : RS_DATA_DIR    = "$${PREFIX}/share/unseenp2p"
+    isEmpty(RS_PLUGIN_DIR) : RS_PLUGIN_DIR  = "$${RS_LIB_DIR}/unseenp2p/extensions6"
 
     QMAKE_LIBDIR *= "$$RS_LIB_DIR"
 
@@ -601,10 +601,22 @@ macx-* {
 	INC_DIR += "/usr/local/Cellar/miniupnpc/2.1/include"
 	INC_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.63/include"
 	INC_DIR += "/usr/local/Cellar/sqlcipher/4.1.0/include"
+
+#	INC_DIR += "/usr/local/Cellar/speex/1.2.0/include"
+#	INC_DIR += "/usr/local/Cellar/speexdsp/1.2rc3/include"
+#	INC_DIR += "/usr/local/Cellar/ffmpeg/4.1.4_1/include"
+#	INC_DIR += "/usr/local/Cellar/opencv/4.1.0_2/include"
+
 	LIB_DIR += "/usr/local/opt/openssl/lib/"
         LIB_DIR += "/usr/local/Cellar/libmicrohttpd/0.9.59/lib"
         LIB_DIR += "/usr/local/Cellar/sqlcipher/4.0.1/lib"
 	LIB_DIR += "/usr/local/Cellar/miniupnpc/2.1/lib"
+
+#	LIB_DIR += "/usr/local/Cellar/speex/1.2.0/lib"
+#	LIB_DIR += "/usr/local/Cellar/speexdsp/1.2rc3/lib"
+#	LIB_DIR += "/usr/local/Cellar/ffmpeg/4.1.4_1/lib"
+#	LIB_DIR += "/usr/local/Cellar/opencv/4.1.0_2/lib"
+
         CONFIG += c++11
         INCLUDEPATH += "/usr/local/include"
         RS_UPNP_LIB = miniupnpc

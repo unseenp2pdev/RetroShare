@@ -23,13 +23,16 @@
 #include "util/rsdebug.h"
 #include "util/rsstring.h"
 
-#ifdef  SERVICE_DEBUG
-const int pqiservicezone = 60478;
-#endif
+
 
 /****
  * #define SERVICE_DEBUG 1
  ****/
+
+#ifdef  SERVICE_DEBUG
+const int pqiservicezone = 60478;
+#endif
+
 
 void pqiService::setServiceServer(p3ServiceServerIface *server)
 {
