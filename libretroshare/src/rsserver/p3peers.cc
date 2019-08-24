@@ -1054,6 +1054,12 @@ bool p3Peers::setProxyServer(const uint32_t type, const std::string &addr_str, c
 
 //===========================================================================
 	/* Auth Stuff */
+std::string p3Peers::GetRetroshareInvite(
+        bool include_signatures, bool includeExtraLocators )
+{
+    return GetRetroshareInvite(
+                getOwnId(), include_signatures, includeExtraLocators );
+}
 
 std::string p3Peers::getPGPKey(const RsPgpId& pgp_id,bool include_signatures)
 {
@@ -1213,28 +1219,20 @@ std::string p3Peers::GetRetroshareInvite(
 
 //===========================================================================
 
-bool p3Peers::loadCertificateFromString(
-        const std::string& cert, RsPeerId& ssl_id,
-        RsPgpId& gpg_id, std::string& error_string )
+bool 	p3Peers::loadCertificateFromString(const std::string& cert, RsPeerId& ssl_id, RsPgpId& gpg_id, std::string& error_string)
 {
-	RsCertificate crt;
-	uint32_t errNum = 0;
-	if(!crt.initializeFromString(cert,errNum))
-	{
-		error_string = "RsCertificate failed with errno: "
-		        + std::to_string(errNum) + " parsing: " + cert;
-		return false;
-	}
+    RsCertificate crt(cert) ;
+    RsPgpId gpgid ;
 
-	RsPgpId gpgid;
-	bool res = AuthGPG::getAuthGPG()->
-	        LoadCertificateFromString(crt.armouredPGPKey(), gpgid,error_string);
+    bool res = AuthGPG::getAuthGPG()->LoadCertificateFromString(crt.armouredPGPKey(),gpgid,error_string) ;
 
-	gpg_id = gpgid;
-	ssl_id = crt.sslid();
+    gpg_id = gpgid;
+    ssl_id = crt.sslid() ;
 
-	return res;
+    return res ;
 }
+
+
 
 bool p3Peers::loadDetailsFromStringCert( const std::string &certstr,
                                          RsPeerDetails &pd,
@@ -1583,4 +1581,14 @@ void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, 
 bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)
 {
     return mPeerMgr->isFriendOfContact(rsPgpId);
+}
+
+void p3Peers::saveSupernodeCert(const std::string& cert)
+{
+    mPeerMgr->saveSupernodeCert(cert);
+}
+
+ std::list<std::string> p3Peers::getSupernodeCertList()
+{
+    return mPeerMgr->getSupernodeCertList();
 }

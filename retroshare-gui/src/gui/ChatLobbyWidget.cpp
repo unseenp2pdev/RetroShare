@@ -62,7 +62,7 @@
 #include <algorithm>
 #include <time.h>
 
-#define CHAT_LOBBY_GUI_DEBUG 1
+//#define CHAT_LOBBY_GUI_DEBUG 1
 
 #define COLUMN_NAME       0
 
@@ -457,11 +457,11 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
 		_lobby_infos[id].default_icon = QIcon() ;
 		_lobby_infos[id].last_typing_event = time(NULL) ;
 
-                ChatLobbyInfo linfo ;
-                if(rsMsgs->getChatLobbyInfo(id,linfo))
-                    _lobby_infos[id].default_icon = (linfo.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC):QIcon(IMAGE_PRIVATE) ;
-                else
-                     std::cerr << "(EE) cannot find info for room " << std::hex << id << std::dec << std::endl;
+        ChatLobbyInfo linfo ;
+        if(rsMsgs->getChatLobbyInfo(id,linfo))
+            _lobby_infos[id].default_icon = (linfo.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC):QIcon(IMAGE_PRIVATE) ;
+        else
+            std::cerr << "(EE) cannot find info for room " << std::hex << id << std::dec << std::endl;
 	}
 }
 
@@ -470,6 +470,11 @@ void ChatLobbyWidget::addOne2OneChatPage(PopupChatDialog *d)
 	// check that the page does not already exist.
 	if (_chatOne2One_infos.count(d->chatId().toPeerId().toStdString()) < 1)
 	{
+        ui.stackedWidget->addWidget(d) ;
+        connect(d,SIGNAL(messageP2PReceived(ChatMessage)),this,SLOT(updateP2PMessageChanged(ChatMessage))) ;
+
+        _chatOne2One_infos[d->chatId().toPeerId().toStdString()].dialog = d ;
+
         //Check if the item already exist in the contact chat folder, if yes, just add to widget and save to _chatOne2One_infos
         QTreeWidgetItem *checkItem = getTreeWidgetItemForChatId(d->chatId());
         uint current_time = QDateTime::currentDateTime().toTime_t();
@@ -480,6 +485,7 @@ void ChatLobbyWidget::addOne2OneChatPage(PopupChatDialog *d)
             std::string nickname = rsPeers->getGPGName(pgpId);
             updateContactItem(ui.lobbyTreeWidget, item, nickname, d->chatId(), d->chatId().toPeerId().toStdString(), current_time, false );
 
+            _chatOne2One_infos[d->chatId().toPeerId().toStdString()].last_typing_event = current_time; //QDateTime::currentDateTime().toTime_t();
             //add to common
             commonItem->addChild(item);
             commonItem->treeWidget()->setItemSelected(item, true);
@@ -490,13 +496,6 @@ void ChatLobbyWidget::addOne2OneChatPage(PopupChatDialog *d)
                 ++it2;
               }
         }
-
-        connect(d,SIGNAL(messageP2PReceived(ChatMessage)),this,SLOT(updateP2PMessageChanged(ChatMessage))) ;
-
-		ui.stackedWidget->addWidget(d) ;
-		_chatOne2One_infos[d->chatId().toPeerId().toStdString()].dialog = d ;
-        if (checkItem == NULL) _chatOne2One_infos[d->chatId().toPeerId().toStdString()].last_typing_event = current_time; //QDateTime::currentDateTime().toTime_t();
-
    }
 
 
@@ -1643,7 +1642,7 @@ void ChatLobbyWidget::UpdateStatusForContact(QTreeWidgetItem* gpgItem , const Rs
     switch (statusContactInfo.status)
     {
         case RS_STATUS_INACTIVE:
-            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_OFFLINE));
+            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_AWAY));
             gpgFont.setBold(false);
             break;
 

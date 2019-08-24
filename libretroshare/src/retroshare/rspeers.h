@@ -594,10 +594,23 @@ public:
 	 * @param[in] includeExtraLocators false to avoid to add extra locators
 	 * @return invite string
 	 */
-	virtual std::string GetRetroshareInvite(
-	        const RsPeerId& sslId = RsPeerId(),
-	        bool includeSignatures = false,
-	        bool includeExtraLocators = true ) = 0;
+//	virtual std::string GetRetroshareInvite(
+//	        const RsPeerId& sslId = RsPeerId(),
+//	        bool includeSignatures = false,
+//	        bool includeExtraLocators = true ) = 0;
+    /**
+     * @brief Get RetroShare invite of our own peer
+     * @param[in] includeSignatures true to add key signatures to the invite
+     * @param[in] includeExtraLocators false to avoid to add extra locators
+     * @return invite string
+     */
+    virtual std::string GetRetroshareInvite(
+            bool includeSignatures = false,
+            bool includeExtraLocators = true ) = 0;
+    virtual std::string GetRetroshareInvite(
+            const RsPeerId& sslId,
+            bool includeSignatures = false,
+            bool includeExtraLocators = true ) = 0;
 
 	/**
 	 * @brief Add trusted node from invite
@@ -752,8 +765,13 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
+
     RS_DEPRECATED_FOR(isPgpFriend)
     virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend) = 0;
+
+    virtual void saveSupernodeCert(const std::string& cert) =0;
+    virtual std::list<std::string> getSupernodeCertList() =0;
+
 };
 
 

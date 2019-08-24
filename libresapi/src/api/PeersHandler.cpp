@@ -424,7 +424,7 @@ void PeersHandler::handleWildcard(Request &req, Response &resp)
 			{
 				resp.mDataStream << makeKeyValue(
 				                        "cert_string",
-				                        mRsPeers->GetRetroshareInvite());
+                                        mRsPeers->GetRetroshareInvite(false));
 				resp.setOk();
 				return;
 			}

@@ -24,7 +24,7 @@
 #include "serialiser/rstlvbase.h"
 #include "serialiser/rsbaseserial.h"
 
-#define TEST_DEBUG	1
+//#define TEST_DEBUG	1
 
 
 uint32_t RsGxsTestSerialiser::size(RsItem *item)

@@ -119,3 +119,4 @@ tests {
     unittests.depends = libretroshare librssimulator
     unittests.target = unittests
 }
+

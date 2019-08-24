@@ -1004,12 +1004,18 @@ int RsServer::StartupRetroShare()
 
 #define BITDHT_BOOTSTRAP_FILENAME  	"bdboot.txt"
 #define BITDHT_FILTERED_IP_FILENAME  	"bdfilter.txt"
+#define SUPERNODE_LIST_FILENAME  	"supernode.txt"
 
 
 	std::string bootstrapfile = RsAccounts::AccountDirectory();
 	if (bootstrapfile != "")
 		bootstrapfile += "/";
 	bootstrapfile += BITDHT_BOOTSTRAP_FILENAME;
+
+    std::string supernodefile = RsAccounts::AccountDirectory();
+    if (supernodefile != "")
+        supernodefile += "/";
+    supernodefile += SUPERNODE_LIST_FILENAME;
 
     std::string filteredipfile = RsAccounts::AccountDirectory();
     if (filteredipfile != "")
@@ -1074,6 +1080,37 @@ int RsServer::StartupRetroShare()
 		}
 #endif // def __ANDROID__
 	}
+
+    ////////////////////////unseenp2p - make for supernode.txt /////////////////////////////
+    //make similar for supernode.txt from bdboot.txt, not choosing ANDROID
+    uint64_t tmp_size_supernode ;
+    if (!RsDirUtil::checkFile(supernodefile,tmp_size_supernode,true))
+    {
+        std::cerr << "Supernode file not in ConfigDir: " << supernodefile
+                  << std::endl;
+
+        std::string installfile = RsAccounts::systemDataDirectory();
+        installfile += "/";
+        installfile += SUPERNODE_LIST_FILENAME;
+
+        std::cerr << "Checking for Installation Supernode  file " << installfile << std::endl;
+        if ((installfile != "") && (RsDirUtil::checkFile(installfile,tmp_size_supernode)))
+        {
+            std::cerr << "Copying supernode file..." << std::endl;
+            if (RsDirUtil::copyFile(installfile, supernodefile))
+            {
+                std::cerr << "Installed supernode file in configDir" << std::endl;
+            }
+            else
+            {
+                std::cerr << "Failed Installation supernode file..." << std::endl;
+            }
+        }
+        else
+        {
+            std::cerr << "No Installation supernode file to copy" << std::endl;
+        }
+    }
 
 	/* construct the rest of the stack, important to build them in the correct order! */
 	/* MOST OF THIS IS COMMENTED OUT UNTIL THE REST OF libretroshare IS READY FOR IT! */

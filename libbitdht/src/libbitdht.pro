@@ -49,6 +49,11 @@ unix {
 	data_files.path = "$${DATA_DIR}"
 	data_files.files = bitdht/bdboot.txt
 	INSTALLS += data_files
+
+        supernode_files.path = "$${DATA_DIR}"
+        supernode_files.files = bitdht/supernode.txt
+        INSTALLS += supernode_files
+
 }
 
 android-* {

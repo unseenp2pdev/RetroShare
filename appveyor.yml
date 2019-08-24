@@ -105,6 +105,15 @@ install:
   - copy C:\msys64\mingw64\bin\windres.exe C:\msys64\mingw64\bin\x86_64-w64-mingw32-windres.exe
 
 
+ # Work-around linker looking for Qt dll in wrong place
+  - copy C:\msys64\mingw32\bin\Qt5PrintSupport.dll C:\msys64\mingw32\lib\Qt5PrintSupport.dll
+  - copy C:\msys64\mingw32\bin\Qt5Widgets.dll C:\msys64\mingw32\lib\Qt5Widgets.dll
+  - copy C:\msys64\mingw32\bin\Qt5Multimedia.dll C:\msys64\mingw32\lib\Qt5Multimedia.dll
+  - copy C:\msys64\mingw32\bin\Qt5Gui.dll C:\msys64\mingw32\lib\Qt5Gui.dll
+  - copy C:\msys64\mingw32\bin\Qt5Network.dll C:\msys64\mingw32\lib\Qt5Network.dll
+  - copy C:\msys64\mingw32\bin\Qt5Xml.dll C:\msys64\mingw32\lib\Qt5Xml.dll
+  - copy C:\msys64\mingw32\bin\Qt5Core.dll C:\msys64\mingw32\lib\Qt5Core.dll
+
 #---------------------------------#
 #       build configuration       #
 #---------------------------------#
@@ -237,8 +246,9 @@ after_build:
   - copy C:\windows\system32\vccorlib140.dll %RS_DEPLOY%\
   - copy C:\windows\system32\vcruntime140.dll %RS_DEPLOY%\
   - copy C:\windows\system32\concrt140.dll  %RS_DEPLOY%\
-  - copy C:\projects\RetroShare\libbitdht\src\bitdht\bdboot.txt
-
+  - copy C:\msys64\mingw32\bin\libdouble-conversion.dll  %RS_DEPLOY%\ 
+  - copy C:\projects\RetroShare\libbitdht\src\bitdht\*.txt  %RS_DEPLOY%\
+  - copy C:\projects\RetroShare\retroshare-gui\src\TorControl\client\win32\tor*.exe  %RS_DEPLOY%\
   - windeployqt %RS_DEPLOY%\unseenp2p.exe
   - find C:\projects\RetroShare >> filelist.txt
   #- rd /s /q C:\projects\RetroShare\retroshare-gui\src\temp\moc\
@@ -259,8 +269,8 @@ after_build:
 #---------------------------------#
 
 artifacts:
-  - path: $(RS_DEPLOY)
-  - path: 'unseenp2p.exe'
+  #- path: $(RS_DEPLOY)
+  - path: '**\*.exe'
   - path: filelist.txt
 
 #

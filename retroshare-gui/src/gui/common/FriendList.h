@@ -97,6 +97,8 @@ public slots:
     void setShowGroups(bool show);
     void setHideUnconnected(bool hidden);
     void setShowState(bool show);
+signals:
+    void configChanged();
 
 private slots:
     void peerTreeColumnVisibleChanged(int column, bool visible);
@@ -137,6 +139,9 @@ private:
     bool importExportFriendlistFileDialog(QString &fileName, bool import);
     bool exportFriendlist(QString &fileName);
     bool importFriendlist(QString &fileName, bool &errorPeers, bool &errorGroups);
+
+    //unseenp2p: add supernode as friend
+    void addSupernodeAsFriend();
 
 private slots:
     void groupsChanged();

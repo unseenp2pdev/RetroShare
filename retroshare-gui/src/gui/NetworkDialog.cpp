@@ -290,24 +290,21 @@ void NetworkDialog::filterGPGIdWithAvailableCert(std::list<RsPgpId> &ids)
 {
     std::map<RsPgpId, std::string> certlist = rsPeers->certListOfContact();
     std::map<RsPgpId, std::string>::iterator cert_it;
-    std::cerr << std::endl;
-    std::cerr << " getGPGAllList size, before: " << ids.size();
-    std::cerr << std::endl;
-
-    for(std::list<RsPgpId>::iterator lit = ids.begin(); lit != ids.end(); ++lit)
+    std::list<RsPgpId>::iterator i = ids.begin();
+    while (i != ids.end())
     {
-        cert_it = certlist.find(*lit);
+        cert_it = certlist.find(*i);
         if (cert_it != certlist.end())
         {
-
-            std::cerr << "we are filtering all PGPIds in the getGPGAllList: " << *lit << " is a Friend of contact list that have CERT  ";
+            i++;
+            std::cerr << "we are filtering all PGPIds in the getGPGAllList: " << *i << " is a Friend of contact list that have CERT  ";
             std::cerr << std::endl;
         }
-        else ids.erase(lit);
+        else
+        {
+             ids.erase(i++);
+        }
     }
-
-    std::cerr << " getGPGAllList size, after: " << ids.size();
-    std::cerr << std::endl;
 }
 
 void NetworkDialog::updateDisplay()

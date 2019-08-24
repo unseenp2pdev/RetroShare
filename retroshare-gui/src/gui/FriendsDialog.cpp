@@ -56,7 +56,7 @@
 //#define IMAGE_CIRCLES           ":/icons/png/circles.png"
 
 /******/
-  #define FRIENDS_DEBUG 1
+ // #define FRIENDS_DEBUG 1
  /*****/
 
 static FriendsDialog *instance = NULL;
@@ -77,7 +77,6 @@ FriendsDialog::FriendsDialog(QWidget *parent)
     ui.tabWidget->addTab(networkDialog = new NetworkDialog(),QIcon(IMAGE_PEERS), tr("Network contacts"));
     ui.tabWidget->addTab(networkView = new NetworkView(),QIcon(IMAGE_NETWORK2), tr("Network graph"));
 
-#ifdef RS_DIRECT_CHAT
     QString msg = tr("UnseenP2P broadcast chat: messages are sent to all connected friends.");
     // "<font color='grey'>" + DateTime::formatTime(QTime::currentTime()) + "</font> -
     msg = QString("<font color='blue'><i>" + msg + "</i></font>");
@@ -88,10 +87,6 @@ FriendsDialog::FriendsDialog(QWidget *parent)
             this, SLOT(chatMessageReceived(ChatMessage)));
     connect(NotifyQt::getInstance(), SIGNAL(chatStatusChanged(ChatId,QString)),
             this, SLOT(chatStatusReceived(ChatId,QString)));
-#else // def RS_DIRECT_CHAT
-	ui.tabWidget->removeTab(ui.tabWidget->indexOf(ui.groupChatTab));
-#endif // def RS_DIRECT_CHAT
-
 
     connect( ui.mypersonalstatusLabel, SIGNAL(clicked()), SLOT(statusmessage()));
     connect( ui.actionSet_your_Avatar, SIGNAL(triggered()), this, SLOT(getAvatar()));

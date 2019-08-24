@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * plugins/VOIP/gui/QVideoDevice.cpp                                           *
  *                                                                             *
@@ -21,10 +22,16 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
+//#include <opencv2/opencv.hpp>
+////#include <opencv2/highgui.h>
+//#include "opencv2/highgui/highgui.hpp"
+
 #include <QTimer>
 #include <QPainter>
 #include "QVideoDevice.h"
 #include "VideoProcessor.h"
+
+#define CV_BGR2RGB COLOR_BGR2RGB
 
 QVideoInputDevice::QVideoInputDevice(QWidget *parent)
   :QObject(parent)
@@ -101,7 +108,7 @@ void QVideoInputDevice::grabFrame()
 
     // convert to RGB and copy to new buffer, because cvQueryFrame tells us to not modify the buffer
     cv::Mat img_rgb;
-    cv::cvtColor(frame, img_rgb, CV_BGR2RGB);
+    cv::cvtColor(frame, img_rgb, cv::COLOR_BGR2RGB);
     QImage image = QImage(img_rgb.data,img_rgb.cols,img_rgb.rows,QImage::Format_RGB888);
 
     if(_video_processor != NULL)

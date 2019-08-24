@@ -37,7 +37,7 @@
 #include "gxs/rsgixs.h"
 #include "services/p3idservice.h"
 
-#define DEBUG_CHAT_LOBBIES 1
+//#define DEBUG_CHAT_LOBBIES 1
 
 static const int 		CONNECTION_CHALLENGE_MAX_COUNT 	  =   20 ; // sends a connection challenge every 20 messages
 static const rstime_t	CONNECTION_CHALLENGE_MAX_MSG_AGE	  =   30 ; // maximum age of a message to be used in a connection challenge
@@ -1303,6 +1303,7 @@ void DistributedChatService::handleRecvLobbyInvite_Deprecated(RsChatLobbyInviteI
 #ifdef DEBUG_CHAT_LOBBIES
 	std::cerr << "Received deprecated invite to lobby from " << item->PeerId() << " to lobby " << std::hex << item->lobby_id << std::dec << ", named " << item->lobby_name << item->lobby_topic << std::endl;
 #endif
+
 	RsChatLobbyInviteItem newItem ;
 
 	newItem.lobby_id = item->lobby_id ;
@@ -1312,6 +1313,7 @@ void DistributedChatService::handleRecvLobbyInvite_Deprecated(RsChatLobbyInviteI
 	newItem.PeerId( item->PeerId() );
 
 	handleRecvLobbyInvite(&newItem);	// The item is not deleted inside this function.
+
 }
 
 void DistributedChatService::handleRecvLobbyInvite(RsChatLobbyInviteItem *item) 

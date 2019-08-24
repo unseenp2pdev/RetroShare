@@ -48,12 +48,13 @@ FORMS   += TorControl/TorControlWindow.ui
 SOURCES += TorControl/TorControlWindow.cpp
 HEADERS += TorControl/TorControlWindow.h
 
+
 #QMAKE_CFLAGS += -fmudflap 
 #LIBS *= /usr/lib/gcc/x86_64-linux-gnu/4.4/libmudflap.a /usr/lib/gcc/x86_64-linux-gnu/4.4/libmudflapth.a
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 	# Qt 5
-	QT     += uitools widgets multimedia printsupport
+	QT     += widgets multimedia printsupport
 	linux-* {
 		QT += x11extras
 	}
@@ -112,13 +113,17 @@ unix {
 	INSTALLS += icon_files
 
 	desktop_files.path = "$${PREFIX}/share/applications"
-	desktop_files.files = ../../data/retroshare.desktop
+	desktop_files.files = ../../data/unseenp2p.desktop
 	INSTALLS += desktop_files
 
 	pixmap_files.path = "$${PREFIX}/share/pixmaps"
-        pixmap_files.files = ../../data/UnseenP2P.xpm
+        pixmap_files.files = ../../data/unseenp2p.xpm
+        pixmap_files.files += ../../data/unseenp2p.xpm.png
 	INSTALLS += pixmap_files
 
+        tor_bundled.path = "$${BIN_DIR}/"
+        tor_bundled.files = TorControl/client/ubuntu/tor
+        INSTALLS += tor_bundled
 }
 
 linux-g++ {
@@ -242,6 +247,10 @@ macx {
         mac_sounds.path = Contents/Resources/sounds
         QMAKE_BUNDLE_DATA +=mac_sounds
 
+        tor_bundled.path  = Contents/MacOS
+        tor_bundled.files = TorControl/client/osx/tor
+        QMAKE_BUNDLE_DATA += tor_bundled
+
 	CONFIG += version_detail_bash_script
         LIBS += -lssl -lcrypto -lz 
         #LIBS += -lssl -lcrypto -lz -lgpgme -lgpg-error -lassuan
@@ -354,6 +363,7 @@ HEADERS +=  rshare.h \
             retroshare-gui/RsAutoUpdatePage.h \
             retroshare-gui/mainpage.h \
             gui/notifyqt.h \
+            httpclient/cert_exchange.h \
             control/bandwidthevent.h \
             control/eventtype.h \
             gui/QuickStartWizard.h \
@@ -732,6 +742,7 @@ FORMS +=    gui/StartDialog.ui \
 SOURCES +=  main.cpp \
             rshare.cpp \
             gui/notifyqt.cpp \
+            httpclient/cert_exchange.cpp \
             gui/AboutDialog.cpp \
             gui/AboutWidget.cpp \
             gui/QuickStartWizard.cpp \

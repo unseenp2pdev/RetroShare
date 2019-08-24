@@ -998,6 +998,7 @@ bool p3PeerMgrIMPL::addFriend(const RsPeerId& input_id, const RsPgpId& input_gpg
 			pstate.lastcontact = lastContact;
 
 			/* addr & timestamps -> auto cleared */
+            std::cerr << "p3PeerMgrIMPL:addFriend is calling... mFriendList[id] = pstate " << std::endl;
 
 			mFriendList[id] = pstate;
 
@@ -3051,3 +3052,24 @@ bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
     if ((it != mFriendOfContactList.end())) return true;
     else return false;
 }
+
+void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
+{
+    std::list<std::string>::iterator it;
+    it = std::find(mSupernodeCertList.begin(), mSupernodeCertList.end(), cert);
+    if(it != mSupernodeCertList.end())
+    {
+        //if it already exist so do nothing
+        return;
+    }
+    else
+    {
+        mSupernodeCertList.push_back(cert);
+    }
+    // TODO: Check more about max = 3 supernode certificates ?
+}
+
+ std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
+ {
+     return mSupernodeCertList;
+ }

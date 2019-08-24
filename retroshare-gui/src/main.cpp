@@ -27,6 +27,9 @@ CrashStackTrace gCrashStackTrace;
 #include <QObject>
 #include <QMessageBox>
 #include <QSplashScreen>
+#include <QtNetwork>
+#include  <iostream>
+
 
 #include <rshare.h>
 #include "gui/FriendsDialog.h"
@@ -51,6 +54,9 @@ CrashStackTrace gCrashStackTrace;
 #include "util/RsGxsUpdateBroadcast.h"
 #include "util/rsdir.h"
 #include "util/rstime.h"
+
+//unseenp2p - meiyousixin - add cert exchange module for new node
+#include "httpclient/cert_exchange.h"
 
 #ifdef ENABLE_WEBUI
 #	include "gui/settings/WebuiPage.h"
@@ -493,19 +499,66 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
 
 	}
 
-	MainWindow *w = MainWindow::Create ();
+    // Need to check if user create new peer, need to call web services
+    // unseenp2p: meiyousixin - !sDefaultGXSIdToCreate.isEmpty() that means the app create new account!
+    // ==================================
+    // 1. Get supernode list from file
+    // 2. Send certificate/upload to supernodes (at least 3 supernodes from the list)
+    // 3. Get all these 3 supernode's certificates if these supernodes are available.
+    // 4. Save these 3 certificates to rsPeers object for adding supernode as friend later (in FriendList of Client)
+
+    if (!sDefaultGXSIdToCreate.isEmpty())
+    {
+        std::string cert;
+        cert = rsPeers->GetRetroshareInvite(false);
+
+        CertExchange* certEx = new CertExchange();
+        if (certEx)
+        {
+            int result = certEx->loadAllSupernodeListIPs();
+            if (result > 0)
+            {
+                std::map<std::string, std::string> ip_port_list = certEx->getIP_Port();
+                std::list<std::string> supernodeList = certEx->getSupernodeList();
+                int exchangeCount = 0;
+                std::map<std::string, std::string>::iterator ipPortIt;
+
+                for(ipPortIt = ip_port_list.begin(); ipPortIt != ip_port_list.end(); ipPortIt++)
+                {
+                    // Need to send certificate of this peer to some supernode from list
+                    if (certEx->submitCertToSuperNode(ipPortIt->first,ipPortIt->second, cert ) > 0)
+                    {
+                        //Need to get the certificate of this supernode for adding supernode as friend then
+                        std::string supernodeCert = certEx->getSupernodeCert(ipPortIt->first,ipPortIt->second);
+
+                        //And save to rsPeers object for later adding supernode as friend
+                        rsPeers->saveSupernodeCert(supernodeCert);
+
+                        // if we already exchange 3 of supernode, then we can stop
+                        exchangeCount++;
+                        if (exchangeCount >= 3) break;
+                    }
+                }
+
+            }
+        }
+    }
+
+    MainWindow *w = MainWindow::Create ();
     splashScreen.finish(w);
 
-	w->processLastArgs();
+    w->processLastArgs();
 
-	if (!sDefaultGXSIdToCreate.isEmpty()) {
-		RsIdentityParameters params;
-		params.nickname = sDefaultGXSIdToCreate.toUtf8().constData();
-		params.isPgpLinked = true;
-		params.mImage.clear();
-		uint32_t token = 0;
-		rsIdentity->createIdentity(token, params);
-	}
+    if (!sDefaultGXSIdToCreate.isEmpty()) {
+        RsIdentityParameters params;
+        params.nickname = sDefaultGXSIdToCreate.toUtf8().constData();
+        params.isPgpLinked = true;
+        params.mImage.clear();
+        uint32_t token = 0;
+        rsIdentity->createIdentity(token, params);
+    }
+
+
 	// I'm using a signal to transfer the hashing info to the mainwindow, because Qt schedules signals properly to
 	// avoid clashes between infos from threads.
 	//

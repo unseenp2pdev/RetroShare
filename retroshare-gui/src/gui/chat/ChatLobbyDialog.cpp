@@ -614,7 +614,7 @@ void ChatLobbyDialog::updateParticipantsList()
             if(isParticipantMuted(it2->first))
                 widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
             else if (tLastAct + timeToInactivity < now)
-                widgetitem->setIcon(COLUMN_ICON, bullet_grey_128);
+                widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
             else
                 widgetitem->setIcon(COLUMN_ICON, bullet_green_128);
 
