@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=unseenp2p
+Comment=Securely share files with your friends
+Exec=/usr/bin/unseenp2p %U
+Icon=/usr/share/pixmaps/unseenp2p.xpm
+Terminal=false
+Type=Application
+Categories=Application;Network;
+MimeType=x-scheme-handler/unseenp2p;
