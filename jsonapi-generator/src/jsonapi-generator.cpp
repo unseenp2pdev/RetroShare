@@ -401,7 +401,9 @@ int main(int argc, char *argv[])
 
 				wrappersDefFile.write(wrapperDef.toLocal8Bit());
 
-                cppApiIncludesSet.insert("#include \"UnseenP2P/" + headerFileName + "\"\n");
+                cppApiIncludesSet.insert("#include \"" + headerRelPath + "\"\n");
+
+                //cppApiIncludesSet.insert("#include \"UnseenP2P/" + headerFileName + "\"\n");
 			}
 		}
 	}

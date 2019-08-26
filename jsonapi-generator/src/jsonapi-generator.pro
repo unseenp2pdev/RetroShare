@@ -5,5 +5,4 @@ CONFIG += qt
 QT *= core xml
 QT -= gui
 
-SOURCES += jsonapi-generator.cpp \
-    jsonapi-generator.cpp
+SOURCES += jsonapi-generator.cpp
