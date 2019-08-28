@@ -7,6 +7,18 @@
 #include <map>
 #include <QObject>
 #include <QtNetwork>
+#include <QFile>
+#include <QCoreApplication>
+#include <QTextStream>
+
+static const std::list<std::string> default_seeds ({
+    "64.62.233.36 80",
+    "64.62.233.37 80",
+    "64.62.233.38 80",
+    "64.62.233.39 80",
+    "64.62.233.40 80",
+});
+
 
 class CertExchange
 {
@@ -24,6 +36,7 @@ private:
     std::map<std::string,std::string>  ip_port;
     std::map<std::string,std::string>  supernodeCertList;
 };
+
 
 
 #endif // CERTEXCHANGE_H

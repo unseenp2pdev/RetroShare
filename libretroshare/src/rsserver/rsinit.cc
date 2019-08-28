@@ -62,6 +62,7 @@
 #include "retroshare/rsgxsdistsync.h"
 #include "file_sharing/p3filelists.h"
 
+
 #define ENABLE_GROUTER
 
 #if (defined(__unix__) || defined(unix)) && !defined(USG)
@@ -1137,6 +1138,7 @@ int RsServer::StartupRetroShare()
         }
         else
         {
+
             std::cerr << "No Installation supernode file to copy" << std::endl;
         }
     }

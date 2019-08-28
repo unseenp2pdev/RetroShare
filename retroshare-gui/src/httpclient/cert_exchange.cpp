@@ -11,6 +11,24 @@
 //unseenp2p - meiyousixin - using text file to save all supernode IPs
 static const std::string supernodeIPListFileName = "supernode.txt";
 
+static bool copyToFile(const std::list<std::string>& data, const std::string &full_path){
+
+    QString filename(full_path.c_str());
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite)) {
+            QTextStream stream(&file);
+            for(std::string ipaddr : data) {
+                stream << ipaddr.c_str() << endl;
+            }
+            stream.flush();
+            file.close();
+
+            return true;
+    }else
+        return false;
+
+}
+
 int CertExchange::loadAllSupernodeListIPs()
 {
 
@@ -25,7 +43,9 @@ int CertExchange::loadAllSupernodeListIPs()
 #ifdef CERT_EXCHANGE_DEBUG
         fprintf(stderr, "Failed to Open File: %s ... No Supernode Nodes\n", supernodeIPListFileName.c_str());
 #endif
-        return 0;
+        if (!copyToFile(default_seeds,supernodeFile)) {
+            return false;
+        }
     }
 
     supernodeList.clear();
