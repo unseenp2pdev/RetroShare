@@ -78,7 +78,7 @@ class DistributedChatService
 		void getListOfNearbyChatLobbies(std::vector<VisibleChatLobbyRecord>& public_lobbies) ;
         bool joinVisibleChatLobby(const ChatLobbyId& id, const RsGxsId &gxs_id) ;
 
-        void getGroupChatInfoList(std::map<ChatLobbyId, ChatLobbyInfo> &_groupchats);
+        void getGroupChatInfoList(std::map<ChatLobbyId, ChatLobbyInfo> &groupchats);
 protected:
 		bool handleRecvItem(RsChatItem *) ;
 

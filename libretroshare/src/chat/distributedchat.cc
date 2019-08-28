@@ -1226,13 +1226,13 @@ void DistributedChatService::getChatLobbyList(std::list<ChatLobbyId>& clids)
         clids.push_back(it->first) ;
 }
 
-void DistributedChatService::getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo> &_groupchats)
+void DistributedChatService::getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo> &groupchats)
 {
-    _groupchats.clear();
+    groupchats.clear();
     RsStackMutex stack(mDistributedChatMtx); /********** STACK LOCKED MTX ******/
     for(std::map<ChatLobbyId,ChatLobbyEntry>::const_iterator it(_chat_lobbys.begin());it!=_chat_lobbys.end();++it)
     {
-        _groupchats[it->first] = it->second;
+        groupchats[it->first] = it->second;
     }
 }
 bool DistributedChatService::getChatLobbyInfo(const ChatLobbyId& id,ChatLobbyInfo& info)
