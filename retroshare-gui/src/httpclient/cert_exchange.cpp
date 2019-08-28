@@ -46,6 +46,8 @@ int CertExchange::loadAllSupernodeListIPs()
         if (!copyToFile(default_seeds,supernodeFile)) {
             return false;
         }
+    	fd = fopen(supernodeFile.c_str(), "r");
+
     }
 
     supernodeList.clear();
