@@ -797,9 +797,9 @@ virtual void getOwnAvatarData(unsigned char *& data,int& size) = 0 ;
 
      * @brief getGroupChatInfoList get info about all group chats
      * @jsonapi{development}
-     * @param[out] public_lobbies list of all visible lobbies
+     * @param[out] groupchats list of all visible lobbies
      */
-    virtual void getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo> &groupchats) = 0 ;
+    //virtual void getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo> &groupchats) = 0 ;
 
 
 	/**

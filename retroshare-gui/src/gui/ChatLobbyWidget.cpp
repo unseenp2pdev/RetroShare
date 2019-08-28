@@ -530,48 +530,48 @@ void ChatLobbyWidget::updateDisplay()
 {
     /* Meiyousixin - Need to get all local group chats (include both community and private group) to show in group chats tree */
 
-    rsMsgs->getGroupChatInfoList(_groupchat_infos);
+//    rsMsgs->getGroupChatInfoList(_groupchat_infos);
 
-#ifdef CHAT_LOBBY_GUI_DEBUG
-    std::cerr << "Show all group chats !" << std::endl;
-    for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
-    {
-        std::cerr << "Group Chat: " << it->second.lobby_name << std::endl;
-    }
-#endif
+//#ifdef CHAT_LOBBY_GUI_DEBUG
+//    std::cerr << "Show all group chats !" << std::endl;
+//    for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
+//    {
+//        std::cerr << "Group Chat: " << it->second.lobby_name << std::endl;
+//    }
+//#endif
 
-    for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
-    {
-        QIcon icon;
-        QTreeWidgetItem *item = NULL;
-        //check before add
-        int childCnt = commonItem->childCount();
-        for (int childIndex = 0; childIndex < childCnt; ++childIndex)
-        {
-            QTreeWidgetItem *itemLoop = commonItem->child(childIndex);
-            if (itemLoop->type() == TYPE_LOBBY && itemLoop->data(COLUMN_DATA, ROLE_ID).toULongLong() == it->second.lobby_id)
-            {
-                item = itemLoop;
-                break;
-            }
-        }
-        if (item == NULL)
-        {
-            item = new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
+//    for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
+//    {
+//        QIcon icon;
+//        QTreeWidgetItem *item = NULL;
+//        //check before add
+//        int childCnt = commonItem->childCount();
+//        for (int childIndex = 0; childIndex < childCnt; ++childIndex)
+//        {
+//           QTreeWidgetItem *itemLoop = commonItem->child(childIndex);
+//            if (itemLoop->type() == TYPE_LOBBY && itemLoop->data(COLUMN_DATA, ROLE_ID).toULongLong() == it->second.lobby_id)
+//            {
+//                item = itemLoop;
+//                break;
+//            }
+//        }
+//        if (item == NULL)
+//        {
+//            item = new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
 
-            icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
-            std::cerr << " Add group chat item to the common item if there is no item, group name: " << it->second.lobby_name << std::endl;
-            if (!icon.isNull())
-            {
-                item->setIcon(COLUMN_NAME, true ? icon : icon.pixmap(ui.lobbyTreeWidget->iconSize(), QIcon::Disabled));
-            }
+//            icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
+//            std::cerr << " Add group chat item to the common item if there is no item, group name: " << it->second.lobby_name << std::endl;
+//           if (!icon.isNull())
+//            {
+//                item->setIcon(COLUMN_NAME, true ? icon : icon.pixmap(ui.lobbyTreeWidget->iconSize(), QIcon::Disabled));
+//           }
 
-            updateItem(ui.lobbyTreeWidget, item, it->second.lobby_id, it->second.lobby_name,it->second.lobby_topic, it->second.participating_friends.size(), true, true,it->second.lobby_flags);
+//            updateItem(ui.lobbyTreeWidget, item, it->second.lobby_id, it->second.lobby_name,it->second.lobby_topic, it->second.participating_friends.size(), true, true,it->second.lobby_flags);
 
-            commonItem->addChild(item);
-            joinGroupChatInBackground(it->second);
-        }
-    }
+//            commonItem->addChild(item);
+//           joinGroupChatInBackground(it->second);
+//       }
+//    }
 
     //commonItem->setHidden(false);
 }
@@ -691,34 +691,35 @@ void ChatLobbyWidget::getHistoryForRecentList()
         }
 
         //get one history msg  for all group chats and sort by recent time
-        std::list<HistoryMsg> historyGroupChatMsgs;
-        rsMsgs->getGroupChatInfoList(_groupchat_infos);
+        //std::list<HistoryMsg> historyGroupChatMsgs;
+        //comment only for unseenp2p-service, to remove the getGroupChatInfoList for build jsonapi
+        //rsMsgs->getGroupChatInfoList(_groupchat_infos);
 
-        for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
-        {
-            ChatId chatId(it->second.lobby_id);
-            rsHistory->getMessages(chatId, historyGroupChatMsgs, messageCount);
+        //for(std::map<ChatLobbyId,ChatLobbyInfo>::const_iterator it(_groupchat_infos.begin());it!=_groupchat_infos.end();++it)
+        //{
+        //    ChatId chatId(it->second.lobby_id);
+        //    rsHistory->getMessages(chatId, historyGroupChatMsgs, messageCount);
 
-            std::list<HistoryMsg>::iterator historyIt;
-            for (historyIt = historyGroupChatMsgs.begin(); historyIt != historyGroupChatMsgs.end(); ++historyIt)
-            {
-                QTreeWidgetItem *item =  new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
-                uint current_time = (historyIt->incoming ? historyIt->recvTime :  historyIt->sendTime) ;
+        //    std::list<HistoryMsg>::iterator historyIt;
+        //    for (historyIt = historyGroupChatMsgs.begin(); historyIt != historyGroupChatMsgs.end(); ++historyIt)
+        //    {
+        //        QTreeWidgetItem *item =  new RSTreeWidgetItem(compareRole, TYPE_LOBBY);
+        //        uint current_time = (historyIt->incoming ? historyIt->recvTime :  historyIt->sendTime) ;
 
-                std::cerr << "History for group chat " <<  (*it).second.lobby_name <<"last msg is unread: " << historyIt->unread << std::endl;
-                QIcon icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
-                if (!icon.isNull())
-                {
-                    item->setIcon(COLUMN_NAME, true ? icon : icon.pixmap(ui.lobbyTreeWidget->iconSize(), QIcon::Disabled));
-                }
-                updateGroupChatItem(ui.lobbyTreeWidget, item, it->second.lobby_name, it->second.lobby_id, current_time, historyIt->unread, it->second.lobby_flags );
-                commonItem->addChild(item);
+        //        std::cerr << "History for group chat " <<  (*it).second.lobby_name <<"last msg is unread: " << historyIt->unread << std::endl;
+        //        QIcon icon = (it->second.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_PUBLIC) : QIcon(IMAGE_PRIVATE);
+        //        if (!icon.isNull())
+        //        {
+        //            item->setIcon(COLUMN_NAME, true ? icon : icon.pixmap(ui.lobbyTreeWidget->iconSize(), QIcon::Disabled));
+        //        }
+        //        updateGroupChatItem(ui.lobbyTreeWidget, item, it->second.lobby_name, it->second.lobby_id, current_time, historyIt->unread, it->second.lobby_flags );
+        //        commonItem->addChild(item);
 //                ui.lobbyTreeWidget->sortItems(COLUMN_RECENT_TIME, Qt::DescendingOrder);
-            }
-        }
+          //  }
+        //}
 
 
-    }
+    //}
 }
 
 // 22 Sep 2018 - meiyousixin - this function is for the case where we don't have any identity yet
