@@ -5,6 +5,6 @@
     <Title>Unseen P2P Communicator</Title>
     <Publisher>Unseen.is</Publisher>
     <!-- Directory name is used in component.xml -->
-    <StartMenuDir>Unseen P2P Communicator Installer </StartMenuDir>
+    <StartMenuDir>Unseen P2P Communicator </StartMenuDir>
     <TargetDir>@ApplicationsDir@/UnseenP2P</TargetDir>
 </Installer>
