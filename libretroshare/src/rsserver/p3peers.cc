@@ -1566,4 +1566,21 @@ void p3Peers::setServicePermissionFlags(const RsPgpId& gpg_id,const ServicePermi
 	mPeerMgr->setServicePermissionFlags(gpg_id,flags) ;
 }
 
+std::map<RsPgpId, RsPeerId> p3Peers::friendListOfContact()
+{
+    return	mPeerMgr->friendListOfContact() ;
+}
 
+std::map<RsPgpId, std::string> p3Peers::certListOfContact()
+{
+    return mPeerMgr->certListOfContact();
+}
+void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert)
+{
+    mPeerMgr->addFriendOfContact(rsPgpId, sslId, cert);
+}
+
+bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)
+{
+    return mPeerMgr->isFriendOfContact(rsPgpId);
+}

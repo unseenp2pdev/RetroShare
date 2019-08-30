@@ -92,6 +92,9 @@ virtual RsServiceInfo getServiceInfo();
 	bool getDiscPgpFriends(const RsPgpId &pgpid, std::list<RsPgpId> &gpg_friends);
 	bool getPeerVersion(const RsPeerId &id, std::string &version);
 	bool getWaitingDiscCount(size_t &sendCount, size_t &recvCount);
+    //unseenp2p - move from private to public for using from FriendList
+    void createPGPCertForSupernode( const RsPgpId &pgpid, std::string &cert);
+
         /************* from AuthGPService ****************/
 virtual AuthGPGOperation *getGPGOperation();
 virtual void setGPGOperation(AuthGPGOperation *operation);
@@ -117,6 +120,12 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 	void processPGPList(const SSLID &fromId, const RsDiscPgpListItem *item);
 
 	void processContactInfo(const SSLID &fromId, const RsDiscContactItem *info);
+    //unseenp2p
+    void fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,peerState &stateDetail);
+    void processFriendsOfContactInfo(const SSLID &fromId, const RsDiscContactItem *info);
+    void sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack );
+    void convertFromItemInfoToPeerState(const RsDiscContactItem *item, peerState &pState);
+
 
 	void requestPGPCertificate(const PGPID &aboutId, const SSLID &toId);
 	void recvPGPCertificateRequest(const SSLID &fromId, const RsDiscPgpListItem *item);

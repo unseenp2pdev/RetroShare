@@ -748,6 +748,10 @@ public:
     	virtual bool getPeerMaximumRates(const RsPeerId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate) =0;
     	virtual bool getPeerMaximumRates(const RsPgpId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate) =0;
 
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) =0;
+    virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
+    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
+    virtual std::map<RsPgpId, std::string> certListOfContact() =0;
 	RS_DEPRECATED_FOR(isPgpFriend)
 	virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend) = 0;
 };

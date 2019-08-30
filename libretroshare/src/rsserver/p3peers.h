@@ -165,6 +165,11 @@ public:
     	virtual bool setPeerMaximumRates(const RsPgpId& pid,uint32_t maxUploadRate,uint32_t maxDownloadRate);
     	virtual bool getPeerMaximumRates(const RsPgpId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate);
     	virtual bool getPeerMaximumRates(const RsPeerId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate);
+
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert);
+    virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
+    virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
+    virtual std::map<RsPgpId, std::string> certListOfContact();
 private:
 
 	p3LinkMgr *mLinkMgr;

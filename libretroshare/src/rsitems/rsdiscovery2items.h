@@ -137,6 +137,9 @@ public:
 
 	RsTlvIpAddrSet localAddrList;
 	RsTlvIpAddrSet extAddrList;
+    //unseenp2p
+    std::string full_cert;
+    std::string requestAboutCert;
 };
 
 class RsDiscIdentityListItem: public RsDiscItem
