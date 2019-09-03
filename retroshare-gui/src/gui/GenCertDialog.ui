@@ -98,6 +98,11 @@
             <string>Unseen Network (RS + TOR)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Retroshare Network (Normal RS)</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>
@@ -757,8 +762,8 @@
   <tabstop>importIdentity_PB</tabstop>
  </tabstops>
  <resources>
-  <include location="../Unseengui/unseengui.qrc"/>
   <include location="icons.qrc"/>
+  <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
