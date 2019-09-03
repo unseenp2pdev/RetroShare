@@ -32,9 +32,9 @@
 // Interface pointer.
 RsDisc *rsDisc = NULL;
 
-/****
- * #define P3DISC_DEBUG	1
- ****/
+/****/
+  #define P3DISC_DEBUG	1
+ /****/
 
 static bool populateContactInfo( const peerState &detail,
                                  RsDiscContactItem *pkt,
@@ -1481,7 +1481,9 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
                 //Need to set stateDetail from peerDetail
                 fromPeerDetailToStateDetail(peerDetail, stateDetail);
                 RsDiscContactItem *pkt = new RsDiscContactItem();
-                populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+                //populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+                //we can share the Ip info to friend
+                populateContactInfo(stateDetail, pkt, true);
                 pkt->version = RS_HUMAN_READABLE_VERSION;
                 //add full certificate to share with friend
                 pkt->full_cert = rsPeers->GetRetroshareInvite(*it);
