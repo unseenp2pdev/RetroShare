@@ -162,6 +162,9 @@ if "%QtMainVersion%"=="5" (
 echo copy bdboot.txt
 copy "%SourcePath%\libbitdht\src\bitdht\bdboot.txt" "%RsDeployPath%" %Quite%
 
+echo copy supernode.txt
+copy "%SourcePath%\libbitdht\src\bitdht\supernode.txt" "%RsDeployPath%" %Quite%
+
 echo copy changelog.txt
 copy "%SourcePath%\retroshare-gui\src\changelog.txt" "%RsDeployPath%" %Quite%
 

@@ -95,17 +95,7 @@
           </property>
           <item>
            <property name="text">
-            <string>Standard node</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Hidden node (over Tor)</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Hidden node (Tor/I2P - Manually configured)</string>
+            <string>Unseen Network (RS + TOR)</string>
            </property>
           </item>
          </widget>

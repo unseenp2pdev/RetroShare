@@ -1,9 +1,10 @@
 #include "cert_exchange.h"
-#include <string.h>
+//#include <string.h> //for C, for Windows is not good
 #include <stdlib.h>
-#include <stdio.h>
+//#include <stdio.h> //for C, for Windows is not good if compiling with C++
 #include <QtNetwork>
-#include  <iostream>
+#include <sstream>
+#include <iostream> //for C++ library
 #include <retroshare/rsinit.h>
 #include <QObject>
 
@@ -92,7 +93,7 @@ int CertExchange::submitCertToSuperNode(std::string ip, std::string port, std::s
     QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 
-    timer.start(1500);   // 1.5 secs. timeout
+    timer.start(3000);   // 3 secs. timeout
     loop.exec();
     while (!reply->isFinished())
     {
@@ -179,7 +180,7 @@ std::string CertExchange::getSupernodeCert(std::string ip, std::string port)
      QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
      QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
 
-     timer.start(1500);   // 1.5 secs. timeout
+     timer.start(3000);   // 3 secs. timeout
      loop.exec();
      while (!reply->isFinished())
      {
