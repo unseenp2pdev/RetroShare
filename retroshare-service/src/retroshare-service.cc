@@ -57,9 +57,9 @@ CrashStackTrace gCrashStackTrace;
 #	include "util/androiddebug.h"
 #endif
 
-//#ifndef RS_JSONAPI
-//#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
-//#endif
+#ifndef RS_JSONAPI
+#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
+#endif
 
 int main(int argc, char* argv[])
 {
