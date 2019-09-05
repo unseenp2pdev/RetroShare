@@ -126,7 +126,13 @@ int main(int argc, char* argv[])
         bool makeAutoTor = true;
 
         bool is_pgpid =  AuthGPG::getAuthGPG()->GeneratePGPCertificate(name, email, passphrase, pgp_id, keynumbits, errorMessage);
-        bool okGen = RsAccounts::createNewAccount(pgp_id, "", genLoc, "", makeHidden, makeHidden, passwd, sslId, errorMessage);
+
+        if (!is_pgpid){
+            std::cerr <<"Failed to generate PGP Certificate"<<std::endl;
+            return 0;
+        }
+        //RsInit::LoadCertificateStatus login = rsLoginHelper->attemptLogin(sslId, passwd);
+        //bool okGen = RsAccounts::createNewAccount(pgp_id, "", genLoc, "", makeHidden, makeHidden, passwd, sslId, errorMessage);
 
         //fake initialized
         RsLoginHelper::Location location;
@@ -135,13 +141,25 @@ int main(int argc, char* argv[])
         location.mLocationName=name;
         location.mPpgName="TestSpnode";
 
+        std::cerr << "Before Create New Location: "<<std::endl;
+        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
+        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
+        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
+        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
         
-	 bool ret = rsLoginHelper->createLocation(location, passwd, errorMessage, makeHidden,makeAutoTor );
+        bool ret = rsLoginHelper->createLocation(location, passwd, errorMessage, makeHidden,makeAutoTor );
 
         if (!ret){
             std::cerr <<"Failed to createLocation C) "<<std::endl;
             return 0;
         }
+
+        std::cerr << "After Created New Location: "<<std::endl;
+        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
+        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
+        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
+        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
+
 	
         // setting hidden service
         QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
@@ -165,10 +183,11 @@ int main(int argc, char* argv[])
             TorControlConsole tcd(torManager, NULL) ;
             QString error_msg ;
 
-            while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)	// runs until some status is reached: either tor works, or it fails.
+            while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+                // runs until some status is reached: either tor works, or it fails.
             {
                 QCoreApplication::processEvents();
-                rstime::rs_usleep(0.2*1000*1000) ;
+                rstime::rs_usleep(1.0*1000*1000) ;
 
                 if(!error_msg.isNull())
                 {
