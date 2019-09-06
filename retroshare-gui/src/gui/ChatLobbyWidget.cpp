@@ -1517,7 +1517,7 @@ QPixmap ChatLobbyWidget::currentStatusIcon(RsPeerId peerId, QFont& gpgFontOut)
     switch (statusContactInfo.status)
     {
         case RS_STATUS_INACTIVE:
-            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_OFFLINE));
+            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_AWAY));
             gpgFont.setBold(false);
             break;
 
