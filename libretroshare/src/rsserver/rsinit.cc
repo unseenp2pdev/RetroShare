@@ -1771,80 +1771,7 @@ int RsServer::StartupRetroShare()
 		mPeerMgr->forceHiddenNode();
 	}
 
-    if (isTorAuto){
-        // setting hidden service
-        QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
-        QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
 
-        Tor::TorManager *torManager = Tor::TorManager::instance();
-        torManager->setTorDataDirectory(rs_baseDir);
-        torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is run
-
-        if(!RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) )
-            return 0;
-
-         torManager->setupHiddenService();
-         // launching tor process
-         //launch Tor process
-         if(! torManager->start() || torManager->hasError())
-         {
-             std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
-             return 1 ;
-         }
-
-         {
-             TorControlConsole tcd(torManager, NULL) ;
-             QString error_msg ;
-
-             while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-                 // runs until some status is reached: either tor works, or it fails.
-             {
-                 QCoreApplication::processEvents();
-                 rstime::rs_usleep(1.0*1000*1000) ;
-
-                 if(!error_msg.isNull())
-                 {
-                     std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-                     return 1;
-                 }
-             }
-
-             if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-             {
-                 std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-                 return 1 ;
-             }
-         }
-         //
-         //attach torproxy or sock5 to rsPeers.
-         // Tor works with viable hidden service. Let's use it!
-
-         QString service_id ;
-         QString onion_address ;
-         uint16_t service_port ;
-         uint16_t service_target_port ;
-         uint16_t proxy_server_port ;
-         QHostAddress service_target_address ;
-         QHostAddress proxy_server_address ;
-
-         torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
-         torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
-
-         std::cerr << "Got hidden service info: " << std::endl;
-         std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
-         std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
-         std::cerr << "  service port   : " << service_port << std::endl;
-         std::cerr << "  target port    : " << service_target_port << std::endl;
-         std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
-
-         std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
-
-         rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
-         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
-         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
-
-    }
-    //end tor proxy setup
 	if (!rsInitConfig->opModeStr.empty())
 	{
         rsConfig->setOperatingMode(rsInitConfig->opModeStr);
@@ -1993,10 +1920,85 @@ int RsServer::StartupRetroShare()
 	/* Startup this thread! */
 	start("rs main") ;
 
+
+
+    if (isTorAuto){
+        // setting hidden service
+        QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
+        QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
+
+        Tor::TorManager *torManager = Tor::TorManager::instance();
+        torManager->setTorDataDirectory(rs_baseDir);
+        torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is run
+
+        if(!RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) )
+            return 0;
+
+         torManager->setupHiddenService();
+         // launching tor process
+         //launch Tor process
+         if(! torManager->start() || torManager->hasError())
+         {
+             std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
+             return 1 ;
+         }
+
+         {
+             TorControlConsole tcd(torManager, NULL) ;
+             QString error_msg ;
+
+             while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+                 // runs until some status is reached: either tor works, or it fails.
+             {
+                 QCoreApplication::processEvents();
+                 rstime::rs_usleep(1.0*1000*1000) ;
+
+                 if(!error_msg.isNull())
+                 {
+                     std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
+                     return 1;
+                 }
+             }
+
+             if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+             {
+                 std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
+                 return 1 ;
+             }
+         }
+         //
+         //attach torproxy or sock5 to rsPeers.
+         // Tor works with viable hidden service. Let's use it!
+
+         QString service_id ;
+         QString onion_address ;
+         uint16_t service_port ;
+         uint16_t service_target_port ;
+         uint16_t proxy_server_port ;
+         QHostAddress service_target_address ;
+         QHostAddress proxy_server_address ;
+
+         torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
+         torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
+
+         std::cerr << "Got hidden service info: " << std::endl;
+         std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
+         std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
+         std::cerr << "  service port   : " << service_port << std::endl;
+         std::cerr << "  target port    : " << service_target_port << std::endl;
+         std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
+
+         std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
+
+         rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
+         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
+         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
+
+    }
+    //end tor proxy setup
     std::cerr << "========================================================================" << std::endl;
     std::cerr << "==                 RsInit:: Retroshare core started                   ==" << std::endl;
     std::cerr << "========================================================================" << std::endl;
-
 	coreReady = true;
 	return 1;
 }

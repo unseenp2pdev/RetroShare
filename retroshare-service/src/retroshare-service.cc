@@ -19,9 +19,9 @@
 #include <unistd.h>
 #include <set>
 
-#include <QTimer>
-#include <QFile>
-#include <QTcpServer>
+//#include <QTimer>
+//#include <QFile>
+//#include <QTcpServer>
 #include <QCoreApplication>
 #include <QObject>
 #include <iostream>
@@ -34,8 +34,8 @@ CrashStackTrace gCrashStackTrace;
 
 //#include <QStringList>
 
-#include "TorControl/TorManager.h"
-#include "TorControl/TorControlConsole.h"
+//#include "TorControl/TorManager.h"
+//#include "TorControl/TorControlConsole.h"
 
 #include "retroshare/rsidentity.h"
 #include "retroshare/rspeers.h"
@@ -106,59 +106,59 @@ int main(int argc, char* argv[])
     //2. Generate Tor Hidden Services
     //3. Launch Tor Embed or Bunble Process
     //4. Attach Tor socket/TorControl in to rsPeer-->Proxy.
-
+/*
     if(is_auto_tor)
     {
         // Now that we know the Tor service running, and we know the SSL id, we can make sure it provides a viable hidden service
-        //create a HID_XXX Account
-        RsPgpId pgp_id("C4466A0E5438F17D");  //fake pgp_id
-        std::string passwd("iloveu!!");
-        RsPeerId sslId("42eedef688cda0b38bb19c4078d99837"); //fake sslid
-        std::string errorMessage;
-        std::string passphrase;
-        int keynumbits=2048;
-        std::string email("sp@unseen.is");
-        std::string name("spnodeUSA");
-        std::string genLoc("USA");
+//        //create a HID_XXX Account
+//        RsPgpId pgp_id("C4466A0E5438F17D");  //fake pgp_id
+//        std::string passwd("iloveu!!");
+//        RsPeerId sslId("42eedef688cda0b38bb19c4078d99837"); //fake sslid
+//        std::string errorMessage;
+//        std::string passphrase;
+//        int keynumbits=2048;
+//        std::string email("sp@unseen.is");
+//        std::string name("spnodeUSA");
+//        std::string genLoc("USA");
 
 
-        bool makeHidden = true;
-        bool makeAutoTor = true;
+//        bool makeHidden = true;
+//        bool makeAutoTor = true;
 
-        bool is_pgpid =  AuthGPG::getAuthGPG()->GeneratePGPCertificate(name, email, passphrase, pgp_id, keynumbits, errorMessage);
+//        bool is_pgpid =  AuthGPG::getAuthGPG()->GeneratePGPCertificate(name, email, passphrase, pgp_id, keynumbits, errorMessage);
 
-        if (!is_pgpid){
-            std::cerr <<"Failed to generate PGP Certificate"<<std::endl;
-            return 0;
-        }
-        //RsInit::LoadCertificateStatus login = rsLoginHelper->attemptLogin(sslId, passwd);
-        //bool okGen = RsAccounts::createNewAccount(pgp_id, "", genLoc, "", makeHidden, makeHidden, passwd, sslId, errorMessage);
+//        if (!is_pgpid){
+//            std::cerr <<"Failed to generate PGP Certificate"<<std::endl;
+//            return 0;
+//        }
+//        //RsInit::LoadCertificateStatus login = rsLoginHelper->attemptLogin(sslId, passwd);
+//        //bool okGen = RsAccounts::createNewAccount(pgp_id, "", genLoc, "", makeHidden, makeHidden, passwd, sslId, errorMessage);
 
-        //fake initialized
-        RsLoginHelper::Location location;
-        location.mLocationId = sslId;
-        location.mPgpId = pgp_id;
-        location.mLocationName=name;
-        location.mPpgName="TestSpnode";
+//        //fake initialized
+//        RsLoginHelper::Location location;
+//        location.mLocationId = sslId;
+//        location.mPgpId = pgp_id;
+//        location.mLocationName=name;
+//        location.mPpgName="TestSpnode";
 
-        std::cerr << "Before Create New Location: "<<std::endl;
-        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
-        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
-        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
-        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
+//        std::cerr << "Before Create New Location: "<<std::endl;
+//        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
+//        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
+//        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
+//        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
         
-        bool ret = rsLoginHelper->createLocation(location, passwd, errorMessage, makeHidden,makeAutoTor );
+//        bool ret = rsLoginHelper->createLocation(location, passwd, errorMessage, makeHidden,makeAutoTor );
 
-        if (!ret){
-            std::cerr <<"Failed to createLocation C) "<<std::endl;
-            return 0;
-        }
+//        if (!ret){
+//            std::cerr <<"Failed to createLocation C) "<<std::endl;
+//            return 0;
+//        }
 
-        std::cerr << "After Created New Location: "<<std::endl;
-        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
-        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
-        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
-        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
+//        std::cerr << "After Created New Location: "<<std::endl;
+//        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
+//        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
+//        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
+//        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
 
 	
         // setting hidden service
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 
 
     }
-
+*/
 	RsControl::earlyInitNotificationSystem();
 	rsControl->setShutdownCallback(QCoreApplication::exit);
 	QObject::connect(

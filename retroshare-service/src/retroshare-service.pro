@@ -1,3 +1,4 @@
+
 !include("../../retroshare.pri"): error("Could not include file ../../retroshare.pri")
 
 TARGET = retroshare-service
