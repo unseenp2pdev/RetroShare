@@ -24,7 +24,13 @@ TARGET = retroshare
 TARGET_PRL = libretroshare
 DESTDIR = lib
 
+
+
 !include("use_libretroshare.pri"):error("Including")
+
+QT  += network xml
+CONFIG += qt console
+
 
 # the dht stunner is used to obtain RS external ip addr. when it is natted
 # this system is unreliable and rs supports a newer and better one (asking connected peers)
@@ -130,7 +136,45 @@ SOURCES +=	tcponudp/udppeer.cc \
 	LIBS *= $${BITDHT_DIR}/lib/libbitdht.a
 }
 
+HEADERS += 	torcontrol/AddOnionCommand.h \
+                torcontrol/AuthenticateCommand.h \
+                torcontrol/CryptoKey.h \
+                torcontrol/GetConfCommand.h \
+                torcontrol/HiddenService.h \
+                torcontrol/PendingOperation.h  \
+                torcontrol/ProtocolInfoCommand.h \
+                torcontrol/SecureRNG.h \
+                torcontrol/SetConfCommand.h \
+                torcontrol/Settings.h \
+                torcontrol/StrUtil.h \
+                torcontrol/TorControl.h \
+                torcontrol/TorControlCommand.h \
+                torcontrol/TorControlConsole.h \
+                torcontrol/TorControlSocket.h \
+                torcontrol/TorManager.h \
+                torcontrol/TorProcess.h \
+                torcontrol/TorProcess_p.h \
+                torcontrol/TorSocket.h \
+                torcontrol/Useful.h
 
+SOURCES += 	torcontrol/AddOnionCommand.cpp \
+                          torcontrol/AuthenticateCommand.cpp \
+                          torcontrol/GetConfCommand.cpp \
+                          torcontrol/HiddenService.cpp \
+                          torcontrol/ProtocolInfoCommand.cpp \
+                          torcontrol/SetConfCommand.cpp \
+                          torcontrol/TorControlCommand.cpp \
+                          torcontrol/TorControl.cpp \
+                          torcontrol/TorControlConsole.cpp \
+                          torcontrol/TorControlSocket.cpp \
+                          torcontrol/TorManager.cpp \
+                          torcontrol/TorProcess.cpp \
+                          torcontrol/TorSocket.cpp \
+                          torcontrol/CryptoKey.cpp         \
+                          torcontrol/PendingOperation.cpp  \
+                          torcontrol/SecureRNG.cpp         \
+                          torcontrol/Settings.cpp          \
+                          torcontrol/StrUtil.cpp
 
 
 PUBLIC_HEADERS =	retroshare/rsdisc.h \
