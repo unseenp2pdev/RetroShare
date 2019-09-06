@@ -28,7 +28,9 @@ DESTDIR = lib
 
 !include("use_libretroshare.pri"):error("Including")
 
-QT  += network xml
+QT += core
+QT -= gui
+QT += network xml
 CONFIG += qt console
 
 
