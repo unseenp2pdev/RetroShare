@@ -101,6 +101,26 @@ extern QString setTorProxy( ){
         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
     }
+
+    RsPeerDetails detail;
+
+    if (!rsPeers->getPeerDetails(rsPeers->getOwnId(), detail))
+    {
+        std::cerr << "(EE) Cannot retrieve information about own certificate. That is a real problem!!" << std::endl;
+        return QString("Failed");
+    }
+    std::cerr <<"PeerDetails:"<<std::endl;
+    std::cerr <<"PeerID:  "<<detail.id<<std::endl;
+    std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
+    std::cerr <<"Name:  "<<detail.name<<std::endl;
+    std::cerr <<"Location:  "<<detail.location<<std::endl;
+    std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
+    std::cerr <<"isHiddenNode:  "<<detail.isHiddenNode<<std::endl;
+    std::cerr <<"Local Address: "<<detail.localAddr<<std::endl;
+
+    std::string cert = rsPeers->saveCertificateToString(rsPeers->getOwnId());
+    std::cerr << "Own Certificate: "<< cert << endl;
+
     return QString("SetTorProxy successful!");
 
 }
