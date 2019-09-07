@@ -159,7 +159,8 @@ extern QString setTorProxy( ){
     std::cerr <<"isHiddenNode:  "<<detail.isHiddenNode<<std::endl;
     std::cerr <<"Local Address: "<<detail.localAddr<<std::endl;
 
-    std::string cert = rsPeers->saveCertificateToString(rsPeers->getOwnId());
+    //std::string cert = rsPeers->saveCertificateToString(rsPeers->getOwnId());
+    std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
     std::cerr << "Own Certificate: "<< cert << endl;
 
     return QString("SetTorProxy successful!");
