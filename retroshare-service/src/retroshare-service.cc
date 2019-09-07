@@ -161,7 +161,7 @@ extern QString setTorProxy( ){
 
     //std::string cert = rsPeers->saveCertificateToString(rsPeers->getOwnId());
     std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
-    std::cerr << "Own Certificate: "<< cert << endl;
+    std::cerr << "Displaying Certificate: \n"<< cert << endl;
 
     return QString("SetTorProxy successful!");
 
