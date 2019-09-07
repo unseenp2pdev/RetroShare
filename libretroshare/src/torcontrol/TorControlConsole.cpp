@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QFile>
 #include <QTcpServer>
+#include <QCoreApplication>
 
 #include <iostream>
 #include "util/rstime.h"

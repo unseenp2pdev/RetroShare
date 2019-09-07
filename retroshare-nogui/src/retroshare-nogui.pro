@@ -18,6 +18,8 @@
 
 !include("../../retroshare.pri"): error("Could not include file ../../retroshare.pri")
 
+
+
 TEMPLATE = app
 TARGET = retroshare-nogui
 CONFIG -= qt xml gui
@@ -34,7 +36,10 @@ libresapihttpserver {
     !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 }
 
-
+QT += core
+QT -= gui
+QT += network xml
+CONFIG += qt console
 
 ################################# Linux ##########################################
 linux-* {

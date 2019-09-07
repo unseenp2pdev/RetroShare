@@ -1787,62 +1787,62 @@ int RsServer::StartupRetroShare()
          torManager->setupHiddenService();
          // launching tor process
          //launch Tor process
-         if(! torManager->start() || torManager->hasError())
-         {
-             std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
-             return 1 ;
-         }
+//         if(! torManager->start() || torManager->hasError())
+//         {
+//             std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
+//             return 1 ;
+//         }
 
-         {
-             TorControlConsole tcd(torManager, NULL) ;
-             QString error_msg ;
+//         {
+//             TorControlConsole tcd(torManager, NULL) ;
+//             QString error_msg ;
 
-             while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-                 // runs until some status is reached: either tor works, or it fails.
-             {
-                 QCoreApplication::processEvents();
-                 rstime::rs_usleep(1.0*1000*1000) ;
+//             while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+//                 // runs until some status is reached: either tor works, or it fails.
+//             {
+//                 QCoreApplication::processEvents();
+//                 rstime::rs_usleep(1.0*1000*1000) ;
 
-                 if(!error_msg.isNull())
-                 {
-                     std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-                     return 1;
-                 }
-             }
+//                 if(!error_msg.isNull())
+//                 {
+//                     std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
+//                     return 1;
+//                 }
+//             }
 
-             if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-             {
-                 std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-                 return 1 ;
-             }
-         }
-         //
-         //attach torproxy or sock5 to rsPeers.
-         // Tor works with viable hidden service. Let's use it!
+//             if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+//             {
+//                 std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
+//                 return 1 ;
+//             }
+//         }
+//         //
+//         //attach torproxy or sock5 to rsPeers.
+//         // Tor works with viable hidden service. Let's use it!
 
-         QString service_id ;
-         QString onion_address ;
-         uint16_t service_port ;
-         uint16_t service_target_port ;
-         uint16_t proxy_server_port ;
-         QHostAddress service_target_address ;
-         QHostAddress proxy_server_address ;
+//         QString service_id ;
+//         QString onion_address ;
+//         uint16_t service_port ;
+//         uint16_t service_target_port ;
+//         uint16_t proxy_server_port ;
+//         QHostAddress service_target_address ;
+//         QHostAddress proxy_server_address ;
 
-         torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
-         torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
+//         torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
+//         torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
 
-         std::cerr << "Got hidden service info: " << std::endl;
-         std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
-         std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
-         std::cerr << "  service port   : " << service_port << std::endl;
-         std::cerr << "  target port    : " << service_target_port << std::endl;
-         std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
+//         std::cerr << "Got hidden service info: " << std::endl;
+//         std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
+//         std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
+//         std::cerr << "  service port   : " << service_port << std::endl;
+//         std::cerr << "  target port    : " << service_target_port << std::endl;
+//         std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
 
-         std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
+//         std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
 
-         rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
-         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
-         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
+//         rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
+//         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
+//         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
 
     }
 

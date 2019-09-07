@@ -25,6 +25,10 @@
 #include <QCoreApplication>
 #include <QObject>
 #include <iostream>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentRun>
+#include <QFuture>
+#include <QtCore>
 
 #include "util/rstime.h"
 #include "util/stacktrace.h"
@@ -34,8 +38,8 @@ CrashStackTrace gCrashStackTrace;
 
 //#include <QStringList>
 
-//#include "TorControl/TorManager.h"
-//#include "TorControl/TorControlConsole.h"
+#include "TorControl/TorManager.h"
+#include "TorControl/TorControlConsole.h"
 
 #include "retroshare/rsidentity.h"
 #include "retroshare/rspeers.h"
@@ -57,9 +61,49 @@ CrashStackTrace gCrashStackTrace;
 #	include "util/androiddebug.h"
 #endif
 
-#ifndef RS_JSONAPI
-#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
-#endif
+//#ifndef RS_JSONAPI
+//#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
+//#endif
+extern QString setTorProxy( ){
+
+    QString service_id ;
+    QString onion_address ;
+    uint16_t service_port ;
+    uint16_t service_target_port ;
+    uint16_t proxy_server_port ;
+    QHostAddress service_target_address ;
+    QHostAddress proxy_server_address ;
+
+
+    while(rsPeers == NULL)
+        // runs until some status is reached: either tor works, or it fails.
+    {
+        QCoreApplication::processEvents();
+        rstime::rs_usleep(1.0*1000*1000) ;
+        std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
+
+    }
+    Tor::TorManager *torManager =  Tor::TorManager::instance();
+
+    torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
+    torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
+
+    std::cerr << "Got hidden service info: " << std::endl;
+    std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
+    std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
+    std::cerr << "  service port   : " << service_port << std::endl;
+    std::cerr << "  target port    : " << service_target_port << std::endl;
+    std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
+
+    if(rsPeers != NULL){
+        std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
+        rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
+        rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
+        rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
+    }
+    return QString("SetTorProxy successful!");
+
+}
 
 int main(int argc, char* argv[])
 {
@@ -106,7 +150,7 @@ int main(int argc, char* argv[])
     //2. Generate Tor Hidden Services
     //3. Launch Tor Embed or Bunble Process
     //4. Attach Tor socket/TorControl in to rsPeer-->Proxy.
-/*
+
     if(is_auto_tor)
     {
         // Now that we know the Tor service running, and we know the SSL id, we can make sure it provides a viable hidden service
@@ -223,15 +267,18 @@ int main(int argc, char* argv[])
         std::cerr << "  target port    : " << service_target_port << std::endl;
         std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
 
-        std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
-
-        rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
-        rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
-        rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
-
-
+        if(rsPeers != NULL){
+            std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
+            rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
+            rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
+            rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
+        }
+        else {
+            QFuture<QString> future = QtConcurrent::run(setTorProxy);
+            //QString result = future.result();
+        }
     }
-*/
+
 	RsControl::earlyInitNotificationSystem();
 	rsControl->setShutdownCallback(QCoreApplication::exit);
 	QObject::connect(
