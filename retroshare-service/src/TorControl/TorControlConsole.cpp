@@ -27,12 +27,12 @@ TorControlConsole::TorControlConsole(Tor::TorManager *tm,QObject *parent)
 
     //QTimer::singleShot(2000,this,SLOT(checkForHiddenService())) ;
 
-    mIncomingServer = new QTcpServer() ;
-    mIncomingServer->moveToThread(&workerThread);
+    mIncomingServer = new QTcpServer(this) ;
+    //mIncomingServer->moveToThread(&workerThread);
 
-    connect(&workerThread, &QThread::finished, mIncomingServer, &QObject::deleteLater);
-    connect(mIncomingServer, &QTcpServer::newConnection, this, &TorControlConsole::onIncomingConnection);
-    workerThread.start();
+    //connect(&workerThread, &QThread::finished, mIncomingServer, &QObject::deleteLater);
+    //connect(mIncomingServer, &QTcpServer::newConnection, this, &TorControlConsole::onIncomingConnection);
+    //workerThread.start();
 
  //   QObject::moveToThread(QThread *thread(this));
 //    QTcpSocket* socket = new QTcpSocket(); // Remove the parent from here
@@ -43,8 +43,7 @@ TorControlConsole::TorControlConsole(Tor::TorManager *tm,QObject *parent)
 	mHiddenServiceStatus = HIDDEN_SERVICE_STATUS_UNKNOWN;
 	//mBootstrapPhaseFinished = false ;
 
-    //connect(mIncomingServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
-
+    connect(mIncomingServer, SIGNAL(QTcpServer::newConnection()), this, SLOT(onIncomingConnection()));
 
 
     QTimer *timer = new QTimer ;

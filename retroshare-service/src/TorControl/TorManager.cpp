@@ -103,8 +103,10 @@ TorManagerPrivate::TorManagerPrivate(TorManager *parent)
 TorManager *TorManager::instance()
 {
     static TorManager *p = 0;
-    if (!p)
+    if (!p){
         p = new TorManager(qApp);
+
+    }
     return p;
 }
 
