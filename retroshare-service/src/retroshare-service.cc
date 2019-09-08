@@ -79,7 +79,7 @@ extern QString setTorProxy( ){
         // runs until some status is reached: either tor works, or it fails.
     {
         QCoreApplication::processEvents();
-        rstime::rs_usleep(1.0*1000*1000) ;
+        rstime::rs_usleep(3.0*1000*1000) ;
         std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
 
     }
@@ -116,16 +116,17 @@ extern QString setTorProxy( ){
             if(!error_msg.isNull())
             {
                 std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-                return "";
+                return QString("Failed to Start Tor");
             }
         }
 
         if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
         {
             std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-            return "" ;
+            return QString("Failed to create hidden_service") ;
         }
     }
+
     torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
     torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
 
@@ -141,6 +142,8 @@ extern QString setTorProxy( ){
         rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
         rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
         rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
+    }else{
+        return QString("rsPeers failed to intialized");
     }
 
     RsPeerDetails detail;
@@ -163,32 +166,32 @@ extern QString setTorProxy( ){
     std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
     std::cerr << "\n***************\n Displaying Certificate: *****************\n"<< cert << "\n\n *****************" <<std::endl;
 
-    std::string addCert(std::string("CQEGAcGcxsBNBF1CmBQBCADBjYJ4syFSeDEN/199lAZKU3by1I/WgRG2PLH3RQmJ\n") +
-                        std::string("+fq8VNmcbAsFpn44sfdH+QBLAiMHApjJu10Gq21lP6jVRilPXblTKnYkQdmKYrBb\n") +
-                        std::string("cChsDDEMaEQRZQOEa+lcka4AUeeYSeL5f4gbkYZ+4TprYAPmqc+9VyCGNmyroGoW\n") +
-                        std::string("/f+bXcoSh3gPRlVqeIRX6wpcrD1nFET38v808zv/SitiXT02GU604gMUBZIQUHgd\n") +
-                        std::string("NRu8uL3aS3OvvD9MSrABVS6e4BnHSXUJPcPpL017CW94cZ1841TuVdezUpGDSS+i\n") +
-                        std::string("77XWXLzYv5UgW8Aj1EK10R9Vi+WmIQLwHXgQuN2lXmczABEBAAHNKFVidW50dURl\n") +
-                        std::string("dlRvciAoR2VuZXJhdGVkIGJ5IFVuc2VlblAyUCkgPD7CwF8EEwECABMFAl1CmBQJ\n") +
-                        std::string("EDYNjr6dHYquAhkBAADwjQf/TCXf0vRNfFXeVocXsF2uY/qNHhdYBDoRWv+XQCj+\n") +
-                        std::string("uv+/O3tAb/RNrqns/iL/ZL06fukTjShi2o79zlOZOf0R7UW99i8A+yYo+yaGe7JW\n") +
-                        std::string("H3uCwQpyglV0d0/1hOQhYbDgs4aebUcr/aK3kiiDChbpqvNsNUaLIKiNPZ0sw5MZ\n") +
-                        std::string("RmA4Ir+nahjRZvkGBTuerPwCRfb7Rwx949djkgJzhVOn87FaCfe66aX5EU1Apr2G\n") +
-                        std::string("qoJ8f3gdPQN0sYWTOJ1+oglLxCgXZDZBXXwsRmlnX+B5LHeztEqi5KUsJyWeTZTM\n") +
-                        std::string("L+IcTH7tc0r4rbFN2N7VimPsTBuyzgdKYtBztUu8wnBGHggbMjN2NmV6ejJubHY0\n") +
-                        std::string("dGJ2dy5vbmlvbjo5ODc4BgtNeSBjb21wdXRlcgUQNas9Wn6OqCe866eUr5MdHgcD\n") +
-                        std::string("shQX"));
+//    std::string addCert(std::string("CQEGAcGcxsBNBF1CmBQBCADBjYJ4syFSeDEN/199lAZKU3by1I/WgRG2PLH3RQmJ\n") +
+//                        std::string("+fq8VNmcbAsFpn44sfdH+QBLAiMHApjJu10Gq21lP6jVRilPXblTKnYkQdmKYrBb\n") +
+//                        std::string("cChsDDEMaEQRZQOEa+lcka4AUeeYSeL5f4gbkYZ+4TprYAPmqc+9VyCGNmyroGoW\n") +
+//                        std::string("/f+bXcoSh3gPRlVqeIRX6wpcrD1nFET38v808zv/SitiXT02GU604gMUBZIQUHgd\n") +
+//                        std::string("NRu8uL3aS3OvvD9MSrABVS6e4BnHSXUJPcPpL017CW94cZ1841TuVdezUpGDSS+i\n") +
+//                        std::string("77XWXLzYv5UgW8Aj1EK10R9Vi+WmIQLwHXgQuN2lXmczABEBAAHNKFVidW50dURl\n") +
+//                        std::string("dlRvciAoR2VuZXJhdGVkIGJ5IFVuc2VlblAyUCkgPD7CwF8EEwECABMFAl1CmBQJ\n") +
+//                        std::string("EDYNjr6dHYquAhkBAADwjQf/TCXf0vRNfFXeVocXsF2uY/qNHhdYBDoRWv+XQCj+\n") +
+//                        std::string("uv+/O3tAb/RNrqns/iL/ZL06fukTjShi2o79zlOZOf0R7UW99i8A+yYo+yaGe7JW\n") +
+//                        std::string("H3uCwQpyglV0d0/1hOQhYbDgs4aebUcr/aK3kiiDChbpqvNsNUaLIKiNPZ0sw5MZ\n") +
+//                        std::string("RmA4Ir+nahjRZvkGBTuerPwCRfb7Rwx949djkgJzhVOn87FaCfe66aX5EU1Apr2G\n") +
+//                        std::string("qoJ8f3gdPQN0sYWTOJ1+oglLxCgXZDZBXXwsRmlnX+B5LHeztEqi5KUsJyWeTZTM\n") +
+//                        std::string("L+IcTH7tc0r4rbFN2N7VimPsTBuyzgdKYtBztUu8wnBGHggbMjN2NmV6ejJubHY0\n") +
+//                        std::string("dGJ2dy5vbmlvbjo5ODc4BgtNeSBjb21wdXRlcgUQNas9Wn6OqCe866eUr5MdHgcD\n") +
+//                        std::string("shQX"));
 
-    //import SSL Certificate into Keyring
-    RsPeerId friend_SSLId;
-    RsPgpId  friend_PGPId;
-    std::string errorString;
-    rsPeers->loadCertificateFromString(addCert,friend_SSLId,friend_PGPId,errorString);
-    std::cerr<< "Successful load Friend Certificate :\n" << addCert <<std::endl;
+//    //import SSL Certificate into Keyring
+//    RsPeerId friend_SSLId;
+//    RsPgpId  friend_PGPId;
+//    std::string errorString;
+//    rsPeers->loadCertificateFromString(addCert,friend_SSLId,friend_PGPId,errorString);
+//    std::cerr<< "Successful load Friend Certificate :\n" << addCert <<std::endl;
 
-    rsPeers->addFriend(friend_SSLId,friend_PGPId);
-    std::cerr << "Successful Add a Friend PGPID: "<<friend_PGPId <<std::endl;
-    std::cerr << "Successful Add a Friend SSLID: "<<friend_SSLId <<std::endl;
+//    rsPeers->addFriend(friend_SSLId,friend_PGPId);
+//    std::cerr << "Successful Add a Friend PGPID: "<<friend_PGPId <<std::endl;
+//    std::cerr << "Successful Add a Friend SSLID: "<<friend_SSLId <<std::endl;
 
 
     return QString("SetTorProxy successful!");
@@ -236,138 +239,15 @@ int main(int argc, char* argv[])
     }
 
 
-    //1. Set location to HID_XXX
-    //2. Generate Tor Hidden Services
-    //3. Launch Tor Embed or Bunble Process
+    //1. Set location for TorDataDir = ~/.retroshare/tor
+    //2. Generate Tor Hidden Services = ~/.retroshare/LOC_XXX/hidden_service/
+    //3. Launch Tor Embed or Bunble Process (Tor Process and TorSocket)
     //4. Attach Tor socket/TorControl in to rsPeer-->Proxy.
 
-    if(is_auto_tor)
-    {
-        // Now that we know the Tor service running, and we know the SSL id, we can make sure it provides a viable hidden service
-//        //create a HID_XXX Account
-//        RsPgpId pgp_id("C4466A0E5438F17D");  //fake pgp_id
-//        std::string passwd("iloveu!!");
-//        RsPeerId sslId("42eedef688cda0b38bb19c4078d99837"); //fake sslid
-//        std::string errorMessage;
-//        std::string passphrase;
-//        int keynumbits=2048;
-//        std::string email("sp@unseen.is");
-//        std::string name("spnodeUSA");
-//        std::string genLoc("USA");
-
-
-//        bool makeHidden = true;
-//        bool makeAutoTor = true;
-
-//        bool is_pgpid =  AuthGPG::getAuthGPG()->GeneratePGPCertificate(name, email, passphrase, pgp_id, keynumbits, errorMessage);
-
-//        if (!is_pgpid){
-//            std::cerr <<"Failed to generate PGP Certificate"<<std::endl;
-//            return 0;
-//        }
-//        //RsInit::LoadCertificateStatus login = rsLoginHelper->attemptLogin(sslId, passwd);
-//        //bool okGen = RsAccounts::createNewAccount(pgp_id, "", genLoc, "", makeHidden, makeHidden, passwd, sslId, errorMessage);
-
-//        //fake initialized
-//        RsLoginHelper::Location location;
-//        location.mLocationId = sslId;
-//        location.mPgpId = pgp_id;
-//        location.mLocationName=name;
-//        location.mPpgName="TestSpnode";
-
-//        std::cerr << "Before Create New Location: "<<std::endl;
-//        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
-//        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
-//        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
-//        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
-        
-//        bool ret = rsLoginHelper->createLocation(location, passwd, errorMessage, makeHidden,makeAutoTor );
-
-//        if (!ret){
-//            std::cerr <<"Failed to createLocation C) "<<std::endl;
-//            return 0;
-//        }
-
-//        std::cerr << "After Created New Location: "<<std::endl;
-//        std::cerr << "mLocationId:" << location.mLocationId.toStdString()<<std::endl;
-//        std::cerr << "mPgpId: "<< location.mPgpId.toStdString()<<std::endl;
-//        std::cerr << "mLocationName:"<< location.mLocationName <<std::endl;
-//        std::cerr << "mPpgName:"<<location.mPpgName<<std::endl;
-
-	
-//        // setting hidden service
-//        QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
-//        QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
-
-//        Tor::TorManager *torManager = Tor::TorManager::instance();
-//        torManager->setTorDataDirectory(rs_baseDir);
-//        torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is run
-
-//        RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
-//        torManager->setupHiddenService();
-
-//        //launch Tor process
-//        if(! torManager->start() || torManager->hasError())
-//        {
-//            std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
-//            return 1 ;
-//        }
-
-//        {
-//            TorControlConsole tcd(torManager, NULL) ;
-//            QString error_msg ;
-
-//            while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-//                // runs until some status is reached: either tor works, or it fails.
-//            {
-//                QCoreApplication::processEvents();
-//                rstime::rs_usleep(1.0*1000*1000) ;
-
-//                if(!error_msg.isNull())
-//                {
-//                    std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-//                    return 1;
-//                }
-//            }
-
-//            if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-//            {
-//                std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-//                return 1 ;
-//            }
-//        }
-//        //attach torproxy or sock5 to rsPeers.
-//        // Tor works with viable hidden service. Let's use it!
-
-//        QString service_id ;
-//        QString onion_address ;
-//        uint16_t service_port ;
-//        uint16_t service_target_port ;
-//        uint16_t proxy_server_port ;
-//        QHostAddress service_target_address ;
-//        QHostAddress proxy_server_address ;
-
-//        torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
-//        torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
-
-//        std::cerr << "Got hidden service info: " << std::endl;
-//        std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
-//        std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
-//        std::cerr << "  service port   : " << service_port << std::endl;
-//        std::cerr << "  target port    : " << service_target_port << std::endl;
-//        std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
-
-//        if(rsPeers != NULL){
-//            std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
-//            rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
-//            rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
-//            rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
-//        }
-//        else {
+    if(is_auto_tor){
       QFuture<QString> future = QtConcurrent::run(setTorProxy);
-            //QString result = future.result();
-       // }
-    }
+      //QString result = future.result();
+     }
 
 	RsControl::earlyInitNotificationSystem();
 	rsControl->setShutdownCallback(QCoreApplication::exit);
