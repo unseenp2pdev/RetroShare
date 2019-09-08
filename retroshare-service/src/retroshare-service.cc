@@ -25,7 +25,6 @@
 #include <iostream>
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
-//#include <QtCore>
 
 #include "util/rstime.h"
 #include "util/stacktrace.h"
