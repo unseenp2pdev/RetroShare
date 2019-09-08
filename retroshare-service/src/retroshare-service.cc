@@ -57,117 +57,10 @@ CrashStackTrace gCrashStackTrace;
 #	include "util/androiddebug.h"
 #endif
 
-//#ifndef RS_JSONAPI
-//#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
-//#endif
-extern QString setTorProxy( ){
+#ifndef RS_JSONAPI
+#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
+#endif
 
-    QString service_id ;
-    QString onion_address ;
-    uint16_t service_port ;
-    uint16_t service_target_port ;
-    uint16_t proxy_server_port ;
-    QHostAddress service_target_address ;
-    QHostAddress proxy_server_address ;
-
-
-    while(rsPeers == NULL)
-        // runs until some status is reached: either tor works, or it fails.
-    {
-        QCoreApplication::processEvents();
-        rstime::rs_usleep(5.0*1000*1000) ;
-        std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
-
-    }
-    std::cerr <<"Calling TorManger instance to install Torproxy..."<<std::endl;
-    Tor::TorManager *torManager =  Tor::TorManager::instance();
-    std::cerr <<"Called TorManger instance to install Torproxy and start setting..."<<std::endl;
-
-    // setting hidden service
-    QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
-    QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
-
-    torManager->setTorDataDirectory(rs_baseDir);
-    torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is run
-
-    RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
-    torManager->setupHiddenService();
-
-    //launch Tor process
-    if(! torManager->start() || torManager->hasError())
-    {
-        std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
-        return "Failed to Start Tor Process" ;
-    }
-
-    {
-        std::cerr <<"Calling TorControlConsle instance..."<<std::endl;
-        TorControlConsole tcd(torManager, NULL) ;
-        QString error_msg ;
-        std::cerr <<"Called TorControlConsle ..."<<std::endl;
-
-
-        while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-            // runs until some status is reached: either tor works, or it fails.
-        {
-            QCoreApplication::processEvents();
-            rstime::rs_usleep(5.0*1000*1000) ;
-
-            if(!error_msg.isNull())
-            {
-                std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-                return QString("Failed to Start Tor");
-            }
-        }
-
-        if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-        {
-            std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-            return QString("Failed to create hidden_service") ;
-        }
-    }
-
-    torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
-    torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
-
-    std::cerr << "Got hidden service info: " << std::endl;
-    std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
-    std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
-    std::cerr << "  service port   : " << service_port << std::endl;
-    std::cerr << "  target port    : " << service_target_port << std::endl;
-    std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
-
-    if(rsPeers != NULL){
-        std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
-        rsPeers->setLocalAddress(rsPeers->getOwnId(), service_target_address.toString().toStdString(), service_target_port);
-        rsPeers->setHiddenNode(rsPeers->getOwnId(), onion_address.toStdString(), service_port);
-        rsPeers->setProxyServer(RS_HIDDEN_TYPE_TOR, proxy_server_address.toString().toStdString(),proxy_server_port) ;
-    }else{
-        return QString("rsPeers failed to intialized");
-    }
-
-    RsPeerDetails detail;
-
-    if (!rsPeers->getPeerDetails(rsPeers->getOwnId(), detail))
-    {
-        std::cerr << "(EE) Cannot retrieve information about own certificate. That is a real problem!!" << std::endl;
-        return QString("Failed");
-    }
-    std::cerr <<"PeerDetails:"<<std::endl;
-    std::cerr <<"PeerID:  "<<detail.id<<std::endl;
-    std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
-    std::cerr <<"Name:  "<<detail.name<<std::endl;
-    std::cerr <<"Location:  "<<detail.location<<std::endl;
-    std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
-    std::cerr <<"isHiddenNode:  "<<detail.isHiddenNode<<std::endl;
-    std::cerr <<"Local Address: "<<detail.localAddr<<std::endl;
-
-    std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
-    std::cerr << "\n*************** Displaying Certificate: *****************\n"<< cert << "\n\n *****************" <<std::endl;
-
-    return QString("SetTorProxy successful!");
-
-}
 
 int main(int argc, char* argv[])
 {
@@ -210,10 +103,6 @@ int main(int argc, char* argv[])
     }
 
 
-    std::cerr <<"***********Calling TorManger instance to install Torproxy...*********"<<std::endl;
-    Tor::TorManager *torManager =  Tor::TorManager::instance();
-    std::cerr <<"***********Called TorManger instance to install Torproxy and start setting...**********"<<std::endl;
-
     //1. Set location for TorDataDir = ~/.retroshare/tor
     //2. Generate Tor Hidden Services = ~/.retroshare/LOC_XXX/hidden_service/
     //3. Launch Tor Embed or Bunble Process (Tor Process and TorSocket)
@@ -228,7 +117,7 @@ int main(int argc, char* argv[])
     QHostAddress proxy_server_address ;
 
     QFuture<int> future = QtConcurrent::run([=]() {
-            // Code in this block will run in another thread
+            // Code in this block will run in another thread and waiting until rsPeers is available before assign hidden service to the account.
             while(rsPeers == NULL)
             {
                 QCoreApplication::processEvents();
@@ -240,9 +129,7 @@ int main(int argc, char* argv[])
 
     if(future.result()){
 
-        std::cerr <<"Calling TorManger instance to install Torproxy..."<<std::endl;
         Tor::TorManager *torManager =  Tor::TorManager::instance();
-        std::cerr <<"Called TorManger instance to install Torproxy and start setting..."<<std::endl;
 
         // setting hidden service
         QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
@@ -264,7 +151,6 @@ int main(int argc, char* argv[])
         {
             TorControlConsole tcd(torManager, NULL) ;
             QString error_msg ;
-
 
             while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
                 // runs until some status is reached: either tor works, or it fails.
@@ -312,6 +198,9 @@ int main(int argc, char* argv[])
             std::cerr << "(EE) Cannot retrieve information about own certificate. That is a real problem!!" << std::endl;
              return 0;
         }
+
+        std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
+
         std::cerr <<"PeerDetails:"<<std::endl;
         std::cerr <<"PeerID:  "<<detail.id<<std::endl;
         std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
@@ -320,16 +209,11 @@ int main(int argc, char* argv[])
         std::cerr <<"GPG ID:  "<<detail.gpg_id<<std::endl;
         std::cerr <<"isHiddenNode:  "<<detail.isHiddenNode<<std::endl;
         std::cerr <<"Local Address: "<<detail.localAddr<<std::endl;
-
-        std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
         std::cerr << "\n*************** Displaying Certificate: *****************\n"<< cert << "\n\n *****************" <<std::endl;
 
     }
 
-    //if(is_auto_tor){
-    //  QFuture<QString> future = QtConcurrent::run(setTorProxy);
-      //QString result = future.result();
-    // }
+
 
 	RsControl::earlyInitNotificationSystem();
 	rsControl->setShutdownCallback(QCoreApplication::exit);
