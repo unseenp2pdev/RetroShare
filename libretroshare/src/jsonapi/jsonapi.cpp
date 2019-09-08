@@ -134,8 +134,8 @@ JsonApiServer::JsonApiServer(uint16_t port, const std::string& bindAddress,
 			RsLoginHelper::Location location;
 			std::string password;
 			std::string errorMessage;
-            bool makeHidden = false;
-            bool makeAutoTor = false;
+            bool makeHidden = true;
+            bool makeAutoTor = true;
 
 			// deserialize input parameters from JSON
 			{
