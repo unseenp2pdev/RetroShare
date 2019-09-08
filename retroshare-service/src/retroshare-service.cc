@@ -210,6 +210,10 @@ int main(int argc, char* argv[])
     }
 
 
+    std::cerr <<"***********Calling TorManger instance to install Torproxy...*********"<<std::endl;
+    Tor::TorManager *torManager =  Tor::TorManager::instance();
+    std::cerr <<"***********Called TorManger instance to install Torproxy and start setting...**********"<<std::endl;
+
     //1. Set location for TorDataDir = ~/.retroshare/tor
     //2. Generate Tor Hidden Services = ~/.retroshare/LOC_XXX/hidden_service/
     //3. Launch Tor Embed or Bunble Process (Tor Process and TorSocket)
