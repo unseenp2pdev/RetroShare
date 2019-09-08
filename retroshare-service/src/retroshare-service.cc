@@ -57,9 +57,9 @@ CrashStackTrace gCrashStackTrace;
 #	include "util/androiddebug.h"
 #endif
 
-#ifndef RS_JSONAPI
-#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
-#endif
+//#ifndef RS_JSONAPI
+//#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
+//#endif
 extern QString setTorProxy( ){
 
     QString service_id ;
@@ -75,7 +75,7 @@ extern QString setTorProxy( ){
         // runs until some status is reached: either tor works, or it fails.
     {
         QCoreApplication::processEvents();
-        rstime::rs_usleep(3.0*1000*1000) ;
+        rstime::rs_usleep(5.0*1000*1000) ;
         std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
 
     }
@@ -107,7 +107,7 @@ extern QString setTorProxy( ){
             // runs until some status is reached: either tor works, or it fails.
         {
             QCoreApplication::processEvents();
-            rstime::rs_usleep(1.0*1000*1000) ;
+            rstime::rs_usleep(5.0*1000*1000) ;
 
             if(!error_msg.isNull())
             {

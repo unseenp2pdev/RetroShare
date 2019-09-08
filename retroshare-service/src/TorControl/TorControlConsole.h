@@ -8,6 +8,7 @@
 #include <csignal>
 #include <QObject>
 #include <QStringList>
+#include <QThread>
 
 
 class QTcpServer ;
@@ -20,9 +21,15 @@ namespace Tor {
 class TorControlConsole:  public QObject
 {
 	Q_OBJECT
+    QThread workerThread;
 
 public:
         TorControlConsole(Tor::TorManager *tm,QObject *parent =NULL);
+
+        ~TorControlConsole() {
+               workerThread.quit();
+               workerThread.wait();
+        }
 
 	enum TorStatus {
 		TOR_STATUS_UNKNOWN = 0x00,
