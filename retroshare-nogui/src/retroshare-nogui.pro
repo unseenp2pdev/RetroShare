@@ -36,11 +36,6 @@ libresapihttpserver {
     !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 }
 
-QT += core
-QT -= gui
-QT += network xml
-CONFIG += qt console
-
 ################################# Linux ##########################################
 linux-* {
         CONFIG += link_pkgconfig

@@ -19,16 +19,13 @@
 #include <unistd.h>
 #include <set>
 
-//#include <QTimer>
-//#include <QFile>
-//#include <QTcpServer>
+
 #include <QCoreApplication>
 #include <QObject>
 #include <iostream>
 #include <QtConcurrent/QtConcurrent>
-#include <QtConcurrent/QtConcurrentRun>
 #include <QFuture>
-#include <QtCore>
+//#include <QtCore>
 
 #include "util/rstime.h"
 #include "util/stacktrace.h"
@@ -36,7 +33,6 @@
 
 CrashStackTrace gCrashStackTrace;
 
-//#include <QStringList>
 
 #include "TorControl/TorManager.h"
 #include "TorControl/TorControlConsole.h"
@@ -61,9 +57,9 @@ CrashStackTrace gCrashStackTrace;
 #	include "util/androiddebug.h"
 #endif
 
-//#ifndef RS_JSONAPI
-//#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
-//#endif
+#ifndef RS_JSONAPI
+#	error Inconsistent build configuration retroshare_service needs rs_jsonapi
+#endif
 extern QString setTorProxy( ){
 
     QString service_id ;
@@ -100,7 +96,7 @@ extern QString setTorProxy( ){
     if(! torManager->start() || torManager->hasError())
     {
         std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
-        return "" ;
+        return "Failed to Start Tor Process" ;
     }
 
     {
@@ -162,37 +158,8 @@ extern QString setTorProxy( ){
     std::cerr <<"isHiddenNode:  "<<detail.isHiddenNode<<std::endl;
     std::cerr <<"Local Address: "<<detail.localAddr<<std::endl;
 
-    //std::string cert = rsPeers->saveCertificateToString(rsPeers->getOwnId());
     std::string cert = rsPeers->GetRetroshareInvite(RsPeerId(),false,false);
-    std::cerr << "\n***************\n Displaying Certificate: *****************\n"<< cert << "\n\n *****************" <<std::endl;
-
-//    std::string addCert(std::string("CQEGAcGcxsBNBF1CmBQBCADBjYJ4syFSeDEN/199lAZKU3by1I/WgRG2PLH3RQmJ\n") +
-//                        std::string("+fq8VNmcbAsFpn44sfdH+QBLAiMHApjJu10Gq21lP6jVRilPXblTKnYkQdmKYrBb\n") +
-//                        std::string("cChsDDEMaEQRZQOEa+lcka4AUeeYSeL5f4gbkYZ+4TprYAPmqc+9VyCGNmyroGoW\n") +
-//                        std::string("/f+bXcoSh3gPRlVqeIRX6wpcrD1nFET38v808zv/SitiXT02GU604gMUBZIQUHgd\n") +
-//                        std::string("NRu8uL3aS3OvvD9MSrABVS6e4BnHSXUJPcPpL017CW94cZ1841TuVdezUpGDSS+i\n") +
-//                        std::string("77XWXLzYv5UgW8Aj1EK10R9Vi+WmIQLwHXgQuN2lXmczABEBAAHNKFVidW50dURl\n") +
-//                        std::string("dlRvciAoR2VuZXJhdGVkIGJ5IFVuc2VlblAyUCkgPD7CwF8EEwECABMFAl1CmBQJ\n") +
-//                        std::string("EDYNjr6dHYquAhkBAADwjQf/TCXf0vRNfFXeVocXsF2uY/qNHhdYBDoRWv+XQCj+\n") +
-//                        std::string("uv+/O3tAb/RNrqns/iL/ZL06fukTjShi2o79zlOZOf0R7UW99i8A+yYo+yaGe7JW\n") +
-//                        std::string("H3uCwQpyglV0d0/1hOQhYbDgs4aebUcr/aK3kiiDChbpqvNsNUaLIKiNPZ0sw5MZ\n") +
-//                        std::string("RmA4Ir+nahjRZvkGBTuerPwCRfb7Rwx949djkgJzhVOn87FaCfe66aX5EU1Apr2G\n") +
-//                        std::string("qoJ8f3gdPQN0sYWTOJ1+oglLxCgXZDZBXXwsRmlnX+B5LHeztEqi5KUsJyWeTZTM\n") +
-//                        std::string("L+IcTH7tc0r4rbFN2N7VimPsTBuyzgdKYtBztUu8wnBGHggbMjN2NmV6ejJubHY0\n") +
-//                        std::string("dGJ2dy5vbmlvbjo5ODc4BgtNeSBjb21wdXRlcgUQNas9Wn6OqCe866eUr5MdHgcD\n") +
-//                        std::string("shQX"));
-
-//    //import SSL Certificate into Keyring
-//    RsPeerId friend_SSLId;
-//    RsPgpId  friend_PGPId;
-//    std::string errorString;
-//    rsPeers->loadCertificateFromString(addCert,friend_SSLId,friend_PGPId,errorString);
-//    std::cerr<< "Successful load Friend Certificate :\n" << addCert <<std::endl;
-
-//    rsPeers->addFriend(friend_SSLId,friend_PGPId);
-//    std::cerr << "Successful Add a Friend PGPID: "<<friend_PGPId <<std::endl;
-//    std::cerr << "Successful Add a Friend SSLID: "<<friend_SSLId <<std::endl;
-
+    std::cerr << "\n*************** Displaying Certificate: *****************\n"<< cert << "\n\n *****************" <<std::endl;
 
     return QString("SetTorProxy successful!");
 
