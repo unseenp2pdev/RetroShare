@@ -79,8 +79,9 @@ extern QString setTorProxy( ){
         std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
 
     }
+    std::cerr <<"Calling TorManger instance to install Torproxy..."<<std::endl;
     Tor::TorManager *torManager =  Tor::TorManager::instance();
-
+    std::cerr <<"Called TorManger instance to install Torproxy and start setting..."<<std::endl;
 
     // setting hidden service
     QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
@@ -100,8 +101,11 @@ extern QString setTorProxy( ){
     }
 
     {
+        std::cerr <<"Calling TorControlConsle instance..."<<std::endl;
         TorControlConsole tcd(torManager, NULL) ;
         QString error_msg ;
+        std::cerr <<"Called TorControlConsle ..."<<std::endl;
+
 
         while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
             // runs until some status is reached: either tor works, or it fails.
@@ -211,10 +215,10 @@ int main(int argc, char* argv[])
     //3. Launch Tor Embed or Bunble Process (Tor Process and TorSocket)
     //4. Attach Tor socket/TorControl in to rsPeer-->Proxy.
 
-    if(is_auto_tor){
+    //if(is_auto_tor){
       QFuture<QString> future = QtConcurrent::run(setTorProxy);
       //QString result = future.result();
-     }
+    // }
 
 	RsControl::earlyInitNotificationSystem();
 	rsControl->setShutdownCallback(QCoreApplication::exit);
