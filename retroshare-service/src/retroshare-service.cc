@@ -70,17 +70,14 @@ extern QString setTorProxy( ){
     QHostAddress service_target_address ;
     QHostAddress proxy_server_address ;
 
-    int counter=0;
+
     while(rsPeers == NULL)
         // runs until some status is reached: either tor works, or it fails.
     {
-        if (counter > 20)
-            return QString("Wait too Long!!");  //Exit this while-loop becauese QTConcurent doesn't provide interrupt signal.
-
         QCoreApplication::processEvents();
         rstime::rs_usleep(3.0*1000*1000) ;
         std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
-        counter++;
+
     }
     Tor::TorManager *torManager =  Tor::TorManager::instance();
 
