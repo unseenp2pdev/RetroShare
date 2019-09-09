@@ -43,7 +43,7 @@ TorControlConsole::TorControlConsole(Tor::TorManager *tm,QObject *parent)
 	mHiddenServiceStatus = HIDDEN_SERVICE_STATUS_UNKNOWN;
 	//mBootstrapPhaseFinished = false ;
 
-    connect(mIncomingServer, SIGNAL(newConnection()), this, SLOT(onIncomingConnection()));
+    connect(mIncomingServer, SIGNAL(QTcpServer::newConnection()), this, SLOT(onIncomingConnection()));
 
 
     QTimer *timer = new QTimer ;

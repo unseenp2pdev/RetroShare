@@ -134,10 +134,13 @@ int main(int argc, char* argv[])
         QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
         QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
 
-        torManager->setTorDataDirectory(rs_baseDir);
-        torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is run
-
-        RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
+        if (!RsDirUtil::checkDirectory(tor_hidden_service_dir.toStdString())){
+            RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
+            torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is ru
+        }
+        if(!RsDirUtil::checkDirectory(rs_baseDir.toStdString())){
+            torManager->setTorDataDirectory(rs_baseDir);
+        }
         torManager->setupHiddenService();
 
         //launch Tor process
@@ -155,7 +158,7 @@ int main(int argc, char* argv[])
                 // runs until some status is reached: either tor works, or it fails.
             {
                 QCoreApplication::processEvents();
-                rstime::rs_usleep(5.0*1000*1000) ;
+                rstime::rs_usleep(0.2*1000*1000) ;
 
                 if(!error_msg.isNull())
                 {
