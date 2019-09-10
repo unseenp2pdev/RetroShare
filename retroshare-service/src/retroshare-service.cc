@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
     // setting hidden service
     QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
     Tor::TorManager *torManager =  Tor::TorManager::instance();
-    torManager->setTorDataDirectory(rs_baseDir);
+
     //launch Tor process
     if(! torManager->start() || torManager->hasError())
     {
@@ -127,7 +127,48 @@ int main(int argc, char* argv[])
          return 0;
     }
 
+    QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/hidden_service/") ;
+    RsDirUtil::checkCreateDirectory(std::string(rs_baseDir.toUtf8())) ;
+    RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
+    torManager->setHiddenServiceDirectory(tor_hidden_service_dir);
+    torManager->setTorDataDirectory(rs_baseDir);// re-set it, because now it's changed to the specific location that is ru
+    torManager->setupHiddenService();
 
+    {
+        TorControlConsole tcd(torManager, NULL) ;
+        QString error_msg ;
+
+        while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+            // runs until some status is reached: either tor works, or it fails.
+        {
+            QCoreApplication::processEvents();
+            rstime::rs_usleep(0.2*1000*1000) ;
+
+            if(!error_msg.isNull())
+            {
+                std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
+                 return 0;
+            }
+        }
+
+        if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
+        {
+            std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
+             return 0;
+        }
+    }
+
+    torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
+    torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
+
+    std::cerr << "Got hidden service info: " << std::endl;
+    std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
+    std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
+    std::cerr << "  service port   : " << service_port << std::endl;
+    std::cerr << "  target port    : " << service_target_port << std::endl;
+    std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
+
+  //
     QFuture<int> future = QtConcurrent::run([=]() {
             // Code in this block will run in another thread and waiting until rsPeers is available before assign hidden service to the account.
             while(rsPeers == NULL)
@@ -141,45 +182,6 @@ int main(int argc, char* argv[])
 
     if(future.result()){
 
-        QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
-        RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
-        torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is ru
-        torManager->setupHiddenService();
-
-
-        {
-            TorControlConsole tcd(torManager, NULL) ;
-            QString error_msg ;
-
-            while(tcd.checkForTor(error_msg) != TorControlConsole::TOR_STATUS_OK || tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-                // runs until some status is reached: either tor works, or it fails.
-            {
-                QCoreApplication::processEvents();
-                rstime::rs_usleep(0.2*1000*1000) ;
-
-                if(!error_msg.isNull())
-                {
-                    std::cerr <<"Cannot start Tor \n Sorry but Tor cannot be started on your system!\n\nThe error reported is:"<< error_msg.toStdString() <<std::endl;
-                     return 0;
-                }
-            }
-
-            if(tcd.checkForHiddenService() != TorControlConsole::HIDDEN_SERVICE_STATUS_OK)
-            {
-                std::cerr <<"Cannot start a hidden tor service!\n It was not possible to start a hidden service.";
-                 return 0;
-            }
-        }
-
-        torManager->getHiddenServiceInfo(service_id,onion_address,service_port,service_target_address,service_target_port);
-        torManager->getProxyServerInfo(proxy_server_address,proxy_server_port) ;
-
-        std::cerr << "Got hidden service info: " << std::endl;
-        std::cerr << "  onion address  : " << onion_address.toStdString() << std::endl;
-        std::cerr << "  service_id     : " << service_id.toStdString() << std::endl;
-        std::cerr << "  service port   : " << service_port << std::endl;
-        std::cerr << "  target port    : " << service_target_port << std::endl;
-        std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
 
         if(rsPeers != NULL){
             std::cerr << "Setting proxy server to " << service_target_address.toString().toStdString() << ":" << service_target_port << std::endl;
