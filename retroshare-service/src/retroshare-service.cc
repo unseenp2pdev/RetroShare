@@ -118,7 +118,13 @@ int main(int argc, char* argv[])
 
     // setting hidden service
     QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
+    QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/hidden_service/") ;
+    RsDirUtil::checkCreateDirectory(std::string(rs_baseDir.toUtf8())) ;
+    RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
+
     Tor::TorManager *torManager =  Tor::TorManager::instance();
+    torManager->setHiddenServiceDirectory(tor_hidden_service_dir);
+    torManager->setTorDataDirectory(rs_baseDir);// re-set it, because now it's changed to the specific location that is ru
 
     //launch Tor process
     if(! torManager->start() || torManager->hasError())
@@ -126,14 +132,7 @@ int main(int argc, char* argv[])
         std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
          return 0;
     }
-
-    QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/hidden_service/") ;
-    RsDirUtil::checkCreateDirectory(std::string(rs_baseDir.toUtf8())) ;
-    RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
-    torManager->setHiddenServiceDirectory(tor_hidden_service_dir);
-    torManager->setTorDataDirectory(rs_baseDir);// re-set it, because now it's changed to the specific location that is ru
     torManager->setupHiddenService();
-
     {
         TorControlConsole tcd(torManager, NULL) ;
         QString error_msg ;
