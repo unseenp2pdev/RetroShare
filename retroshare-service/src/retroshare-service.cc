@@ -117,7 +117,6 @@ int main(int argc, char* argv[])
 
 
     // setting hidden service
-    QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
     QString rs_baseDir = QString::fromStdString(RsAccounts::ConfigDirectory()) + QString("/tor/");
     Tor::TorManager *torManager =  Tor::TorManager::instance();
     torManager->setTorDataDirectory(rs_baseDir);
@@ -142,6 +141,7 @@ int main(int argc, char* argv[])
 
     if(future.result()){
 
+        QString tor_hidden_service_dir = QString::fromStdString(RsAccounts::AccountDirectory()) + QString("/hidden_service/") ;
         RsDirUtil::checkCreateDirectory(std::string(tor_hidden_service_dir.toUtf8())) ;
         torManager->setHiddenServiceDirectory(tor_hidden_service_dir);	// re-set it, because now it's changed to the specific location that is ru
         torManager->setupHiddenService();
