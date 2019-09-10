@@ -85,21 +85,7 @@ int main(int argc, char* argv[])
                 is_auto_tor = true;
     }
 
-    int initResult;
-	// clumsy way to enable JSON API by default
-	if(!QCoreApplication::arguments().contains("--jsonApiPort"))
-	{
-		int argc2 = argc + 2;
-		char* argv2[argc2]; for (int i = 0; i < argc; ++i ) argv2[i] = argv[i];
-		char opt[] = "--jsonApiPort";
-		char val[] = "9092";
-		argv2[argc] = opt;
-		argv2[argc+1] = val;
-        initResult = RsInit::InitRetroShare(argc2, argv2, true);
-	}
-    else {
-       initResult= RsInit::InitRetroShare(argc, argv, true);
-    }
+
 
 
     //1. Set location for TorDataDir = ~/.retroshare/tor
@@ -167,7 +153,24 @@ int main(int argc, char* argv[])
     std::cerr << "  target port    : " << service_target_port << std::endl;
     std::cerr << "  target address : " << service_target_address.toString().toStdString() << std::endl;
 
-  //
+
+
+    int initResult;
+    // clumsy way to enable JSON API by default
+    if(!QCoreApplication::arguments().contains("--jsonApiPort"))
+    {
+        int argc2 = argc + 2;
+        char* argv2[argc2]; for (int i = 0; i < argc; ++i ) argv2[i] = argv[i];
+        char opt[] = "--jsonApiPort";
+        char val[] = "9092";
+        argv2[argc] = opt;
+        argv2[argc+1] = val;
+        initResult = RsInit::InitRetroShare(argc2, argv2, true);
+    }
+    else {
+       initResult= RsInit::InitRetroShare(argc, argv, true);
+    }
+
     QFuture<int> future = QtConcurrent::run([=]() {
             // Code in this block will run in another thread and waiting until rsPeers is available before assign hidden service to the account.
             while(rsPeers == NULL)
