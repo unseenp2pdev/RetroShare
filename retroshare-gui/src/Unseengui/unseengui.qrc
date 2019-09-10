@@ -189,5 +189,6 @@
         <file>home/img/file/locked-padlock.png</file>
         <file>home/img/file/unlocked-padlock.png</file>
         <file>home/img/face_icon/confbtn.png</file>
+        <file>chat/img/groundchat_private_unread.png</file>
     </qresource>
 </RCC>

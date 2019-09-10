@@ -1427,6 +1427,7 @@ cmark {
 
 DISTFILES += \
     ../../data/UnseenP2P.xpm \
+    Unseengui/chat/img/groundchat_private_unread.png \
     retroshare_win.rc \
     Unseengui/home/img/face_icon/newsfeed_128.png \
     Unseengui/home/img/face_icon/newsfeed_v_128.png \
