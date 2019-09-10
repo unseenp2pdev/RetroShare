@@ -540,6 +540,7 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
 
     w->processLastArgs();
 
+
     if (!sDefaultGXSIdToCreate.isEmpty()) {
         RsIdentityParameters params;
         params.nickname = sDefaultGXSIdToCreate.toUtf8().constData();

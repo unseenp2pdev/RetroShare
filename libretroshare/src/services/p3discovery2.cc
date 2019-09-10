@@ -1221,15 +1221,15 @@ void p3discovery2::createPGPCertForSupernode(const RsPgpId &pgpid, std::string &
     item->pgpCert = cert;
     peerState pstate;
     mPeerMgr->getOwnNetStatus(pstate);
-    if (pstate.vs_disc != RS_VS_DISC_FULL)
-    {
-    #ifdef P3DISC_DEBUG
-        std::cerr << "p3discovery2::recvPGPCertificate() Not Loading Certificates as in MINIMAL MODE";
-        std::cerr << std::endl;
-    #endif
+//    if (pstate.vs_disc != RS_VS_DISC_FULL)
+//    {
+//    #ifdef P3DISC_DEBUG
+//        std::cerr << "p3discovery2::recvPGPCertificate() Not Loading Certificates as in MINIMAL MODE";
+//        std::cerr << std::endl;
+//    #endif
 
-        delete item;
-    }
+//        delete item;
+//    }
 
     RsStackMutex stack(mDiscMtx); /********** STACK LOCKED MTX ******/
     /* push this back to be processed by pgp when possible */
