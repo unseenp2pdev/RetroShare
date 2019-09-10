@@ -87,7 +87,6 @@ void TorControlConsole::statusChanged()
 	case Tor::TorControl::TorReady: 	torstatus_str = "Tor ready" ; break ;
 	}
 
-	//torStatus_LB->setText(torstatus_str) ;
 
 	if(torstatus == Tor::TorControl::TorUnknown)
 		std::cerr<<"Check that Tor is accessible in your executable path"<<std::endl ;
