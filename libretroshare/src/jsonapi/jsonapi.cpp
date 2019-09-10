@@ -169,6 +169,34 @@ JsonApiServer::JsonApiServer(uint16_t port, const std::string& bindAddress,
 		} );
 	}, false);
 
+    registerHandler("/rsLoginHelper/getLocation",
+                    [this](const std::shared_ptr<rb::Session> session)
+    {
+        size_t reqSize = session->get_request()->get_header("Content-Length", 0);
+        session->fetch( reqSize, [this](
+                        const std::shared_ptr<rb::Session> session,
+                        const rb::Bytes& body )
+        {
+            INITIALIZE_API_CALL_JSON_CONTEXT;
+
+            std::vector<RsLoginHelper::Location> locations;
+
+            // call retroshare C++ API
+            rsLoginHelper->getLocations(locations);
+            // serialize out parameters and return value to JSON
+            {
+                RsGenericSerializer::SerializeContext& ctx(cAns);
+                RsGenericSerializer::SerializeJob j(RsGenericSerializer::TO_JSON);
+                for (RsLoginHelper::Location location: locations){
+                    RS_SERIAL_PROCESS(location);
+                }
+            }
+
+            // return them to the API caller
+            DEFAULT_API_CALL_JSON_RETURN(rb::OK);
+        } );
+    }, false);
+
 	registerHandler("/rsLoginHelper/attemptLogin",
 	                [this](const std::shared_ptr<rb::Session> session)
 	{
