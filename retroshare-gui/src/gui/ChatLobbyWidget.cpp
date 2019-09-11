@@ -74,7 +74,7 @@
 #define IMAGE_PEER_LEAVING    ":/chat/img/personal_remove_64.png"       //d: Update unseen icon
 #define IMAGE_TYPING		  ":/chat/img/typing.png"                   //d: Update unseen icon
 #define IMAGE_MESSAGE	      ":/chat/img/chat_32.png"                  //d: Update unseen icon
-#define IMAGE_MESSAGE_PRIVATE ":/chat/img/chat_g_32.png"                //d: Notification icon for private group
+#define IMAGE_MESSAGE_PRIVATE ":/chat/img/groundchat_private_unread.png"                //d: Notification icon for private group
 #define IMAGE_AUTOSUBSCRIBE   ":/images/accepted16.png"
 #define IMAGE_COPYRSLINK      ":/images/copyrslink.png"
 #define IMAGE_UNSEEN          ":/app/images/unseen32.png"
@@ -1189,12 +1189,12 @@ void ChatLobbyWidget::updateMessageChanged(bool incoming, ChatLobbyId id, QDateT
     if (incoming && item)
     {
         //ChatId chatId(id);
-        if (recentUnreadListOfChatId.count(chatId) == 0) recentUnreadListOfChatId.insert(chatId);
+//        if (recentUnreadListOfChatId.count(chatId) == 0) recentUnreadListOfChatId.insert(chatId);
 
-        //_lobby_infos[id].default_icon = QIcon(IMAGE_MESSAGE) ;
-        ChatLobbyFlags flags(current_item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
-        QIcon icon = (flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_MESSAGE) : QIcon(IMAGE_MESSAGE_PRIVATE);
-        item->setIcon(COLUMN_NAME,icon) ;
+        _lobby_infos[id].default_icon = QIcon(IMAGE_MESSAGE_PRIVATE) ;
+//        ChatLobbyFlags flags(current_item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
+//        QIcon icon = (flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_MESSAGE) : QIcon(IMAGE_MESSAGE_PRIVATE);
+//        item->setIcon(COLUMN_NAME,icon) ;
     }
 
 }
@@ -1517,7 +1517,7 @@ QPixmap ChatLobbyWidget::currentStatusIcon(RsPeerId peerId, QFont& gpgFontOut)
     switch (statusContactInfo.status)
     {
         case RS_STATUS_INACTIVE:
-            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_OFFLINE));
+            gpgOverlayIcon = QPixmap(StatusDefs::imageStatus(RS_STATUS_AWAY));
             gpgFont.setBold(false);
             break;
 

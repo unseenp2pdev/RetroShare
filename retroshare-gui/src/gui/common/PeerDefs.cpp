@@ -35,9 +35,10 @@ const QString PeerDefs::nameOnly(const RsPeerDetails &details)
 const QString PeerDefs::nameWithLocation(const RsPeerDetails &details)
 {
     QString name = QString::fromUtf8(details.name.c_str());
-    if (details.location.empty() == false) {
-        name += " (" + QString::fromUtf8(details.location.c_str()) + ")";
-    }
+// Hide location name
+//    if (details.location.empty() == false) {
+//        name += " (" + QString::fromUtf8(details.location.c_str()) + ")";
+//    }
 
     return name;
 }

@@ -174,6 +174,7 @@ GenCertDialog::GenCertDialog(bool onlyGenerateIdentity, QWidget *parent)
 
     ui.node_input->setText("My computer") ;
 
+
 #if QT_VERSION >= 0x040700
 	ui.node_input->setPlaceholderText(tr("Node name")) ;
 	ui.hiddenaddr_input->setPlaceholderText(tr("Tor/I2P address")) ;
@@ -202,6 +203,7 @@ GenCertDialog::GenCertDialog(bool onlyGenerateIdentity, QWidget *parent)
 	ui.adv_checkbox->setVisible(false);
     ui.nodeType_CB->setCurrentIndex(0);
 	ui.nodeType_CB->setEnabled(false);
+
 #endif
 //#ifdef RETROTOR
 //	ui.adv_checkbox->setChecked(false);
@@ -318,9 +320,12 @@ void GenCertDialog::setupState()
 	ui.nickname_label->setVisible(adv_state && !mOnlyGenerateIdentity);
 	ui.nickname_input->setVisible(adv_state && !mOnlyGenerateIdentity);
 
-	ui.node_name_check_LB->setVisible(adv_state);
-	ui.node_label->setVisible(adv_state);
-	ui.node_input->setVisible(adv_state);
+    //ui.node_name_check_LB->setVisible(adv_state);
+    //ui.node_label->setVisible(adv_state);
+    //ui.node_input->setVisible(adv_state);
+    ui.node_name_check_LB->hide();
+    ui.node_input->hide();
+    ui.node_label->hide(); //hide node name (my computer)
 
 	ui.password_input->setVisible(true);
 	ui.password_label->setVisible(true);
