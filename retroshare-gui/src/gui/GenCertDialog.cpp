@@ -319,7 +319,8 @@ void GenCertDialog::setupState()
 
 	ui.nickname_label->setVisible(adv_state && !mOnlyGenerateIdentity);
 	ui.nickname_input->setVisible(adv_state && !mOnlyGenerateIdentity);
-
+    ui.nickname_label->hide();
+    ui.nickname_input->hide(); //hide name chat
     //ui.node_name_check_LB->setVisible(adv_state);
     //ui.node_label->setVisible(adv_state);
     //ui.node_input->setVisible(adv_state);
