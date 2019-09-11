@@ -98,6 +98,11 @@
             <string>Unseen Network (RS + TOR)</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Retroshare Network (Normal RS)</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>
@@ -281,6 +286,9 @@
            </item>
            <item row="5" column="2">
             <widget class="QLineEdit" name="node_input">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -298,6 +306,9 @@
              </property>
              <property name="maxLength">
               <number>64</number>
+             </property>
+             <property name="clearButtonEnabled">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -594,6 +605,9 @@
            </item>
            <item row="5" column="1">
             <widget class="QLabel" name="node_label">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="maximumSize">
               <size>
                <width>24</width>
@@ -757,8 +771,8 @@
   <tabstop>importIdentity_PB</tabstop>
  </tabstops>
  <resources>
-  <include location="../Unseengui/unseengui.qrc"/>
   <include location="icons.qrc"/>
+  <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>

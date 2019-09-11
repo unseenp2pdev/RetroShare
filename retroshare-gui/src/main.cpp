@@ -498,6 +498,7 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
     // 3. Get all these 3 supernode's certificates if these supernodes are available.
     // 4. Save these 3 certificates to rsPeers object for adding supernode as friend later (in FriendList of Client)
 
+    QSplashScreen splashScreen2(QPixmap(":/app/images/Login2.png")/* , Qt::WindowStaysOnTopHint*/);
     if (!sDefaultGXSIdToCreate.isEmpty())
     {
         std::string cert;
@@ -509,6 +510,8 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
             int result = certEx->loadAllSupernodeListIPs();
             if (result > 0)
             {
+                 splashScreen2.show();
+                 splashScreen2.showMessage(rshare.translate("SplashScreen", "Waiting to key exchange with supernodes..."), Qt::AlignHCenter | Qt::AlignBottom);
                 std::map<std::string, std::string> ip_port_list = certEx->getIP_Port();
                 std::list<std::string> supernodeList = certEx->getSupernodeList();
                 int exchangeCount = 0;
@@ -530,14 +533,14 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
                         if (exchangeCount >= 3) break;
                     }
                 }
-
+                splashScreen2.hide();
             }
         }
     }
 
     MainWindow *w = MainWindow::Create ();
     splashScreen.finish(w);
-
+    splashScreen2.finish(w);
     w->processLastArgs();
 
 

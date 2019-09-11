@@ -1742,31 +1742,32 @@ void ChatWidget::updateStatus(const QString &peer_id, int status)
 	    QScrollBar *scrollbar = ui->textBrowser->verticalScrollBar();
 	    bool atEnd = (scrollbar->value() == scrollbar->maximum());
 
-	    switch (status) {
-	    case RS_STATUS_OFFLINE:
-		    ui->infoFrame->setVisible(true);
-		    ui->infoLabel->setText(peerName + " " + tr("appears to be Offline.") +"\n" + tr("Messages you send will be delivered after Friend is again Online."));
-		    break;
+        ui->infoLabel->hide(); //hide infoLabel in chat window
+//	    switch (status) {
+//	    case RS_STATUS_OFFLINE:
+//		    ui->infoFrame->setVisible(true);
+//		    ui->infoLabel->setText(peerName + " " + tr("appears to be Offline.") +"\n" + tr("Messages you send will be delivered after Friend is again Online."));
+//		    break;
 
-        case RS_STATUS_AWAY:
-            ui->infoLabel->setText(peerName + " " + tr("is Away and may not reply"));
-            ui->infoFrame->setVisible(true);
-            break;
+//        case RS_STATUS_AWAY:
+//            ui->infoLabel->setText(peerName + " " + tr("is Away and may not reply"));
+//            ui->infoFrame->setVisible(true);
+//            break;
 
-        case RS_STATUS_BUSY:
-            ui->infoLabel->setText(peerName + " " + tr("is Busy and may not reply"));
-            ui->infoFrame->setVisible(true);
-            break;
+//        case RS_STATUS_BUSY:
+//            ui->infoLabel->setText(peerName + " " + tr("is Busy and may not reply"));
+//            ui->infoFrame->setVisible(true);
+//            break;
 
-        case RS_STATUS_ONLINE:
-            ui->infoFrame->setVisible(false);
-            break;
+//        case RS_STATUS_ONLINE:
+//            ui->infoFrame->setVisible(false);
+//            break;
 
-	    case RS_STATUS_INACTIVE:
-		    ui->infoFrame->setVisible(true);
-		    ui->infoLabel->setText(peerName + " " + tr("is Idle and may not reply"));
-		    break;
-	    }
+//	    case RS_STATUS_INACTIVE:
+//		    ui->infoFrame->setVisible(true);
+//		    ui->infoLabel->setText(peerName + " " + tr("is Idle and may not reply"));
+//		    break;
+//	    }
 
 	    ui->titleLabel->setText(peerName);
 	    ui->statusLabel->setText(QString("(%1)").arg(StatusDefs::name(status)));
