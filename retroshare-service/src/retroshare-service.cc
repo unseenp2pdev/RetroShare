@@ -78,18 +78,18 @@ int main(int argc, char* argv[])
 
 	RsInit::InitRsConfig();
 
-    //check to see if the service want to want to run hidden_mode=TOR
-    bool is_auto_tor = false;
-    for (int i = 1; i < argc; ++i) {
-            if (std::string(argv[i]) == "--tor")
-                is_auto_tor = true;
-    }
+//    //check to see if the service want to want to run hidden_mode=TOR
+//    bool is_auto_tor = false;
+//    for (int i = 1; i < argc; ++i) {
+//            if (std::string(argv[i]) == "--tor")
+//                is_auto_tor = true;
+//    }
 
 
 
 
     //1. Set location for TorDataDir = ~/.retroshare/tor
-    //2. Generate Tor Hidden Services = ~/.retroshare/LOC_XXX/hidden_service/
+    //2. Generate Tor Hidden Services = ~/.retroshare/hidden_service/
     //3. Launch Tor Embed or Bunble Process (Tor Process and TorSocket)
     //4. Attach Tor socket/TorControl in to rsPeer-->Proxy.
 
@@ -118,8 +118,9 @@ int main(int argc, char* argv[])
         std::cerr<< "Cannot start Tor Manager! \\n and Tor cannot be started on your system: "<< torManager->errorMessage().toStdString() << std::endl ;
          return 0;
     }
-    torManager->setupHiddenService();
+
     {
+        torManager->setupHiddenService();
         TorControlConsole tcd(torManager, NULL) ;
         QString error_msg ;
 
@@ -157,6 +158,7 @@ int main(int argc, char* argv[])
 
     QFuture<int> future = QtConcurrent::run([=]() {
 
+        // Code in this block will run in another thread and waiting until rsPeers is available before assign hidden service to the account.
         int initResult;
         // clumsy way to enable JSON API by default
         if(!QCoreApplication::arguments().contains("--jsonApiPort"))
@@ -172,11 +174,10 @@ int main(int argc, char* argv[])
         else {
            initResult= RsInit::InitRetroShare(argc, argv, true);
         }
-            // Code in this block will run in another thread and waiting until rsPeers is available before assign hidden service to the account.
             while(rsPeers == NULL)
             {
                 QCoreApplication::processEvents();
-                rstime::rs_usleep(5.0*1000*1000) ;
+                rstime::rs_usleep(1.0*1000*1000) ;
                 std::cerr <<"*******Waiting for rsPeers is enable betore set  Tor Proxy *******"<<std::endl;
            }
             return 1;
