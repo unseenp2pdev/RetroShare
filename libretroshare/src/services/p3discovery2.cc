@@ -1500,7 +1500,7 @@ void p3discovery2::fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,p
 }
 
 // unseenp2p: need to send all my friends info to this peer for share info using populateContactInfo(detail, pkt, !rsPeers->isHiddenNode(sslid));
-
+// meiyousixin - 11 Sep 2019: update function:   share network contacts instead of friendlist
 void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
 {
 #ifdef P3DISC_DEBUG
@@ -1511,35 +1511,48 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
     // atai: try to get all friend's sslId and send to this peer (sslid)
     // ...
     std::list<RsPeerId> sslIdList;
-    if (rsPeers->getFriendList(sslIdList))
+    rsPeers->getFriendList(sslIdList);
+    std::map<RsPgpId, RsPeerId> networkContacts = rsPeers->friendListOfContact();
+
+    // Need to merge between friendList and network contact
+    for ( std::map<RsPgpId, RsPeerId>::iterator netConIt = networkContacts.begin(); netConIt != networkContacts.end(); netConIt++)
     {
-        for(std::list<RsPeerId>::iterator it = sslIdList.begin(); it != sslIdList.end(); it++)
+        RsPeerId id = netConIt->second;
+        std::list<RsPeerId>::iterator lit = std::find( sslIdList.begin(), sslIdList.end(), id);
+        if (lit == sslIdList.end()) //if not exist then need to add to list
         {
-            ///////////////////
-            RsPeerDetails peerDetail;
-            if (rsPeers->getPeerDetails(*it, peerDetail))
-            {
-                peerState stateDetail;
-                //Need to set stateDetail from peerDetail
-                fromPeerDetailToStateDetail(peerDetail, stateDetail);
-                RsDiscContactItem *pkt = new RsDiscContactItem();
-                populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
-                pkt->version = RS_HUMAN_READABLE_VERSION;
-                //add full certificate to share with friend
-                pkt->full_cert = rsPeers->GetRetroshareInvite(*it);
-                if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
-                else pkt->requestAboutCert = "NO_REQUEST";
-                pkt->PeerId(sslid);
+            sslIdList.push_back(id);
+        }
 
-        #ifdef P3DISC_DEBUG
-                std::cerr << "p3discovery2::sendAllMyFriendsInfo() is sending to sslid :" << sslid << " about ssl info of: " << *it << std::endl;
-                pkt -> print(std::cerr);
-                std::cerr  << std::endl;
-        #endif
-                sendItem(pkt);
+    }
 
-            }
+    for(std::list<RsPeerId>::iterator it = sslIdList.begin(); it != sslIdList.end(); it++)
+    {
+        ///////////////////
+        RsPeerDetails peerDetail;
+        if (rsPeers->getPeerDetails(*it, peerDetail))
+        {
+            peerState stateDetail;
+            //Need to set stateDetail from peerDetail
+            fromPeerDetailToStateDetail(peerDetail, stateDetail);
+            RsDiscContactItem *pkt = new RsDiscContactItem();
+            populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+            pkt->version = RS_HUMAN_READABLE_VERSION;
+            //add full certificate to share with friend
+            pkt->full_cert = rsPeers->GetRetroshareInvite(*it);
+            if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
+            else pkt->requestAboutCert = "NO_REQUEST";
+            pkt->PeerId(sslid);
+
+#ifdef P3DISC_DEBUG
+            std::cerr << "p3discovery2::sendAllMyFriendsInfo() is sending to sslid :" << sslid << " about ssl info of: " << *it << std::endl;
+            pkt -> print(std::cerr);
+            std::cerr  << std::endl;
+#endif
+            sendItem(pkt);
+
         }
     }
+
 
 }

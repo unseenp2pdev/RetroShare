@@ -526,7 +526,7 @@ void NetworkDialog::updateDisplay()
     rsPeers->getGPGAllList(new_neighs);
     //unseenp2p - need to check all PGPId that we can get the cert or sslId
 
-    //filterGPGIdWithAvailableCert(new_neighs);
+    filterGPGIdWithAvailableCert(new_neighs);
     //refresh model
     PGPIdItemModel->data_updated(new_neighs);
 
