@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>654</width>
+    <width>445</width>
     <height>350</height>
    </rect>
   </property>
@@ -189,45 +189,8 @@
         </property>
        </spacer>
       </item>
-      <item row="3" column="1">
-       <layout class="QHBoxLayout" name="newHLayout">
-        <item>
-         <spacer name="newHSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelProfile">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-           </font>
-          </property>
-          <property name="toolTip">
-           <string>Opens a dialog for creating a new profile or 
-adding locations to an existing profile. 
-The current identities/locations will not be affected.</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;Create new Profile...&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; text-decoration: underline; color:#babdb6;&quot;&gt;New Profile/Node&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="2" column="1">
-       <widget class="QFrame" name="profilGBox">
+       <widget class="QGroupBox" name="profilGBox">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -240,8 +203,8 @@ The current identities/locations will not be affected.</string>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
-        <property name="lineWidth">
-         <number>0</number>
+        <property name="title">
+         <string/>
         </property>
         <layout class="QGridLayout" name="profilGBoxGLayout">
          <property name="leftMargin">
@@ -340,6 +303,43 @@ The current identities/locations will not be affected.</string>
          </item>
         </layout>
        </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="newHLayout">
+        <item>
+         <spacer name="newHSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelProfile">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string>Opens a dialog for creating a new profile or 
+adding locations to an existing profile. 
+The current identities/locations will not be affected.</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;Create new Profile...&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:14pt; text-decoration: underline; color:#babdb6;&quot;&gt;New Profile/Node&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

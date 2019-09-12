@@ -39,20 +39,11 @@
          <height>0</height>
         </size>
        </property>
-       <property name="tabletTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>true</bool>
-       </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
        </property>
        <layout class="QVBoxLayout" name="chatTextFrameVLayout">
         <property name="leftMargin">
@@ -217,14 +208,11 @@ border-image: url(:/images/closepressed.png)
         </item>
         <item>
          <widget class="QSplitter" name="chatVSplitter">
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="handleWidth">
-           <number>0</number>
+           <number>2</number>
           </property>
           <property name="childrenCollapsible">
            <bool>false</bool>
@@ -542,7 +530,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../WikiPoos/Wiki_images.qrc">
+              <iconset resource="../images.qrc">
                <normaloff>:/images/arrow-left.png</normaloff>:/images/arrow-left.png</iconset>
              </property>
              <property name="autoRaise">
@@ -568,7 +556,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../WikiPoos/Wiki_images.qrc">
+              <iconset resource="../images.qrc">
                <normaloff>:/images/arrow-right.png</normaloff>:/images/arrow-right.png</iconset>
              </property>
              <property name="autoRaise">
@@ -1025,11 +1013,6 @@ border-image: url(:/images/closepressed.png)
    <header>gui/common/StyledLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>MimeTextEdit</class>
-   <extends>QTextEdit</extends>
-   <header location="global">gui/common/MimeTextEdit.h</header>
-  </customwidget>
-  <customwidget>
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
    <header location="global">gui/common/LineEditClear.h</header>
@@ -1045,9 +1028,13 @@ border-image: url(:/images/closepressed.png)
    <header location="global">gui/common/HashBox.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>MimeTextEdit</class>
+   <extends>QTextEdit</extends>
+   <header location="global">gui/common/MimeTextEdit.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../WikiPoos/Wiki_images.qrc"/>
   <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
  </resources>
