@@ -32,9 +32,9 @@
 // Interface pointer.
 RsDisc *rsDisc = NULL;
 
-/****/
+/**
   #define P3DISC_DEBUG	1
- /****/
+**/
 
 static bool populateContactInfo( const peerState &detail,
                                  RsDiscContactItem *pkt,
