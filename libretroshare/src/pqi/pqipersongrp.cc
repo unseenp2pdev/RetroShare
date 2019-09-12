@@ -399,9 +399,8 @@ int     pqipersongrp::addPeer(const RsPeerId& id)
 {
 	pqioutput(PQL_DEBUG_BASIC, pqipersongrpzone, "pqipersongrp::addPeer() PeerId: " + id.toStdString());
 
-	std::cerr << "pqipersongrp::addPeer() id: " << id;
-	std::cerr << std::endl;
 #ifdef PGRP_DEBUG
+	std::cerr << "pqipersongrp::addPeer() id: " << id << std::endl;
 #endif
 
 	SearchModule *sm = NULL;

@@ -838,7 +838,9 @@ bool 	p3Peers::setLocation(const RsPeerId &ssl_id, const std::string &location)
 
 bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &port)
 {
+#ifdef P3PEERS_DEBUG
         std::cerr << "splitAddressString() Input: " << addr << std::endl;
+#endif
 
 	size_t cpos = addr.rfind(':');
 	if (cpos == std::string::npos)
