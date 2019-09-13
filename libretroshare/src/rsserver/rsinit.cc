@@ -61,6 +61,7 @@
 #include "gxstunnel/p3gxstunnel.h"
 #include "retroshare/rsgxsdistsync.h"
 #include "file_sharing/p3filelists.h"
+#include "bitdht/bdboot.h"
 
 
 #define ENABLE_GROUTER
@@ -1106,7 +1107,12 @@ int RsServer::StartupRetroShare()
 		}
 		else
 		{
-			std::cerr << "No Installation DHT bootstrap file to copy" << std::endl;
+            //vivo010 generate new bdboot.txt if it's doesn't exist on the configuration.
+            if(RsDirUtil::saveStringToFile(bootstrapfile,bdboot_default)){
+                std::cerr << "Successful generated DHT bootstrap file " << bootstrapfile << std::endl;
+            }
+            else
+                std::cerr << "No Installation DHT bootstrap file to copy" << std::endl;
 		}
 #endif // def __ANDROID__
 	}
@@ -1138,8 +1144,12 @@ int RsServer::StartupRetroShare()
         }
         else
         {
-
-            std::cerr << "No Installation supernode file to copy" << std::endl;
+            //vivo010 generate new supernode.txt if it's doesn't exist on the configuration.
+            if(RsDirUtil::saveStringToFile(supernodefile,supernode_default)){
+                std::cerr << "Successful generated DHT bootstrap file " << bootstrapfile << std::endl;
+            }
+	    else 
+		std::cerr << "No Installation supernode file to copy" << std::endl;
         }
     }
 
