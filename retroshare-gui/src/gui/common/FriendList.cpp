@@ -218,29 +218,38 @@ void FriendList::addSupernodeAsFriend()
 
                       //if it is not a friend so need to add!!!
                       rsPeers->addFriend(ssl_id, pgp_id);
+                      if (peerDetails.isHiddenNode)
+                      {
+                          std::cerr << "If this supernode is hidden node (using tor) : setting hidden node." << std::endl;
+                          rsPeers->setHiddenNode(peerDetails.id, peerDetails.hiddenNodeAddress, peerDetails.hiddenNodePort);
+                      }
+                      else
+                      {
+                          if (!peerDetails.location.empty()) {
+                              std::cerr << "PGPKeyDialog::makeFriend() : setting location." << std::endl;
+                              rsPeers->setLocation(peerDetails.id, peerDetails.location);
+                          }
+                           //let's check if there is ip adresses in the wizard.
+                          if (!peerDetails.extAddr.empty() && peerDetails.extPort) {
+                             std::cerr << "PGPKeyDialog::makeFriend() : setting ip ext address." << std::endl;
+                             rsPeers->setExtAddress(peerDetails.id, peerDetails.extAddr, peerDetails.extPort);
+                          }
+                          if (!peerDetails.localAddr.empty() && peerDetails.localPort) {
+                                std::cerr << "PGPKeyDialog::makeFriend() : setting ip local address." << std::endl;
+                                                                   rsPeers->setLocalAddress(peerDetails.id, peerDetails.localAddr, peerDetails.localPort);
+                          }
+                          if (!peerDetails.dyndns.empty()) {
+                                std::cerr << "PGPKeyDialog::makeFriend() : setting DynDNS." << std::endl;
+                                rsPeers->setDynDNS(peerDetails.id, peerDetails.dyndns);
+                          }
+                          for(auto&& ipr : peerDetails.ipAddressList)
+                                    rsPeers->addPeerLocator(
+                                                               peerDetails.id,
+                                                               RsUrl(ipr.substr(0, ipr.find(' '))) );
+                                                               rsPeers->signGPGCertificate(pgp_id);
+                      }
 
-                      if (!peerDetails.location.empty()) {
-                          std::cerr << "PGPKeyDialog::makeFriend() : setting location." << std::endl;
-                          rsPeers->setLocation(peerDetails.id, peerDetails.location);
-                      }
-                       //let's check if there is ip adresses in the wizard.
-                      if (!peerDetails.extAddr.empty() && peerDetails.extPort) {
-                         std::cerr << "PGPKeyDialog::makeFriend() : setting ip ext address." << std::endl;
-                         rsPeers->setExtAddress(peerDetails.id, peerDetails.extAddr, peerDetails.extPort);
-                      }
-                      if (!peerDetails.localAddr.empty() && peerDetails.localPort) {
-                            std::cerr << "PGPKeyDialog::makeFriend() : setting ip local address." << std::endl;
-                                                               rsPeers->setLocalAddress(peerDetails.id, peerDetails.localAddr, peerDetails.localPort);
-                      }
-                      if (!peerDetails.dyndns.empty()) {
-                            std::cerr << "PGPKeyDialog::makeFriend() : setting DynDNS." << std::endl;
-                            rsPeers->setDynDNS(peerDetails.id, peerDetails.dyndns);
-                      }
-                      for(auto&& ipr : peerDetails.ipAddressList)
-                                rsPeers->addPeerLocator(
-                                                           peerDetails.id,
-                                                           RsUrl(ipr.substr(0, ipr.find(' '))) );
-                                                           rsPeers->signGPGCertificate(pgp_id);
+
                  }
                  emit configChanged();
               }

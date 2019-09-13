@@ -447,7 +447,7 @@ bool AuthGPG::getGPGDetails(const RsPgpId& pgp_id, RsPeerDetails &d)
 
 	const PGPCertificateInfo& cert(*pc) ;
 
-	d.id.clear() ;
+    d.id.clear() ;
 	d.gpg_id = pgp_id ;
 	d.name = cert._name;
 	d.lastUsed = cert._time_stamp;

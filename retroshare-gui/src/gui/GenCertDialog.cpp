@@ -174,6 +174,7 @@ GenCertDialog::GenCertDialog(bool onlyGenerateIdentity, QWidget *parent)
 
     ui.node_input->setText("My computer") ;
 
+
 #if QT_VERSION >= 0x040700
 	ui.node_input->setPlaceholderText(tr("Node name")) ;
 	ui.hiddenaddr_input->setPlaceholderText(tr("Tor/I2P address")) ;
@@ -200,8 +201,9 @@ GenCertDialog::GenCertDialog(bool onlyGenerateIdentity, QWidget *parent)
 #ifdef RS_ONLYHIDDENNODE
 	ui.adv_checkbox->setChecked(true);
 	ui.adv_checkbox->setVisible(false);
-	ui.nodeType_CB->setCurrentIndex(1);
+    ui.nodeType_CB->setCurrentIndex(0);
 	ui.nodeType_CB->setEnabled(false);
+
 #endif
 //#ifdef RETROTOR
 //	ui.adv_checkbox->setChecked(false);
@@ -279,17 +281,17 @@ void GenCertDialog::setupState()
 //    ui.nodeType_LB->setVisible(adv_state) ;
 //    ui.nodeTypeExplanation_TE->setVisible(adv_state) ;
 
-	bool hidden_state = ui.nodeType_CB->currentIndex()==1 || ui.nodeType_CB->currentIndex()==2;
+    bool hidden_state = ui.nodeType_CB->currentIndex()==0 || ui.nodeType_CB->currentIndex()==2;
     bool generate_new = !ui.reuse_existing_node_CB->isChecked();
-    bool tor_auto = ui.nodeType_CB->currentIndex()==1;
+    bool tor_auto = ui.nodeType_CB->currentIndex()==0;
 
 	genNewGPGKey = generate_new;
 
     switch(ui.nodeType_CB->currentIndex())
     {
-    case 0: ui.nodeTypeExplanation_TE->setText(tr("<b>Your IP is visible to trusted nodes only. You can also connect to hidden nodes if running Tor on your machine. Best choice for sharing with trusted friends.</b>"));
+    case 0: ui.nodeTypeExplanation_TE->setText(tr("<b>Your IP is hidden. All traffic happens over the Tor network. Best choice if you cannot trust friend nodes with your own IP.</b>"));
         break;
-    case 1: ui.nodeTypeExplanation_TE->setText(tr("<b>Your IP is hidden. All traffic happens over the Tor network. Best choice if you cannot trust friend nodes with your own IP.</b>"));
+    case 1: ui.nodeTypeExplanation_TE->setText(tr("<b>Your IP is visible to trusted nodes only. You can also connect to hidden nodes if running Tor on your machine. Best choice for sharing with trusted friends.</b>"));
         break;
     case 2: ui.nodeTypeExplanation_TE->setText(tr("<b>Hidden node for advanced users only. Allows to use other proxy solutions such as I2P.</b>"));
         break;
@@ -317,10 +319,14 @@ void GenCertDialog::setupState()
 
 	ui.nickname_label->setVisible(adv_state && !mOnlyGenerateIdentity);
 	ui.nickname_input->setVisible(adv_state && !mOnlyGenerateIdentity);
-
-	ui.node_name_check_LB->setVisible(adv_state);
-	ui.node_label->setVisible(adv_state);
-	ui.node_input->setVisible(adv_state);
+    ui.nickname_label->hide();
+    ui.nickname_input->hide(); //hide name chat
+    //ui.node_name_check_LB->setVisible(adv_state);
+    //ui.node_label->setVisible(adv_state);
+    //ui.node_input->setVisible(adv_state);
+    ui.node_name_check_LB->hide();
+    ui.node_input->hide();
+    ui.node_label->hide(); //hide node name (my computer)
 
 	ui.password_input->setVisible(true);
 	ui.password_label->setVisible(true);
@@ -519,8 +525,8 @@ void GenCertDialog::genPerson()
 		}
 	}
 
-	bool isHiddenLoc = (ui.nodeType_CB->currentIndex()>0);
-    bool isAutoTor = (ui.nodeType_CB->currentIndex()==1);
+    bool isHiddenLoc = (ui.nodeType_CB->currentIndex()==0 || ui.nodeType_CB->currentIndex()==2);
+    bool isAutoTor = (ui.nodeType_CB->currentIndex()==0);
 
     if(isAutoTor && !Tor::TorManager::isTorAvailable())
     {
