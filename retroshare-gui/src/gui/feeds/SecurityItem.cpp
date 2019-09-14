@@ -56,7 +56,7 @@ SecurityItem::SecurityItem(FeedHolder *parent, uint32_t feedId, const RsPgpId &g
 	removeFriendButton->setEnabled(false);
 	removeFriendButton->hide();
 	peerDetailsButton->setEnabled(false);
-	friendRequesttoolButton->hide();
+    friendRequestpushButton->hide();
 	requestLabel->hide();
 
 	/* general ones */
@@ -70,7 +70,7 @@ SecurityItem::SecurityItem(FeedHolder *parent, uint32_t feedId, const RsPgpId &g
 
 	connect( removeFriendButton, SIGNAL(clicked()), this, SLOT(removeFriend()));
 	connect( peerDetailsButton, SIGNAL(clicked()), this, SLOT(peerDetails()));
-	connect( friendRequesttoolButton, SIGNAL(clicked()), this, SLOT(friendRequest()));
+    connect( friendRequestpushButton, SIGNAL(clicked()), this, SLOT(friendRequest()));
 
 	connect(NotifyQt::getInstance(), SIGNAL(friendsChanged()), this, SLOT(updateItem()));
 
@@ -110,7 +110,7 @@ void SecurityItem::updateItemStatic()
 		case RS_FEED_ITEM_SEC_CONNECT_ATTEMPT:
 			title = tr("Connect Attempt");
 			requestLabel->show();
-			avatar->setDefaultAvatar(":images/avatar_request.png");
+			avatar->setDefaultAvatar(":/images/avatar_request.png");
 			break;
 		case RS_FEED_ITEM_SEC_AUTH_DENIED:
 			title = tr("Connection refused by remote peer");
@@ -120,7 +120,7 @@ void SecurityItem::updateItemStatic()
 		case RS_FEED_ITEM_SEC_UNKNOWN_IN:
 			title = tr("Unknown (Incoming) Connect Attempt");
 			requestLabel->hide();
-			avatar->setDefaultAvatar(":images/avatar_request_unknown.png");
+			avatar->setDefaultAvatar(":/images/avatar_request_unknown.png");
 			break;
 		case RS_FEED_ITEM_SEC_UNKNOWN_OUT:
 			title = tr("Unknown (Outgoing) Connect Attempt");
@@ -258,14 +258,14 @@ void SecurityItem::updateItem()
 
 		if (details.accept_connection)
 		{
-			friendRequesttoolButton->hide();
+            friendRequestpushButton->hide();
 			requestLabel->hide();
 			removeFriendButton->setEnabled(true);
 			removeFriendButton->show();
 		}
 		else
 		{
-			friendRequesttoolButton->show();
+            friendRequestpushButton->show();
 			requestLabel->show();
 			removeFriendButton->setEnabled(false);
 			removeFriendButton->hide();
