@@ -230,7 +230,7 @@
          <item row="1" column="1" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QToolButton" name="friendRequesttoolButton">
+            <widget class="QPushButton" name="friendRequestpushButton">
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -247,16 +247,10 @@
                <height>24</height>
               </size>
              </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="peerDetailsButton">
+            <widget class="QPushButton" name="peerDetailsButton">
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -264,8 +258,8 @@
               <string>Peer details</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/informations_24x24.png</normaloff>:/images/informations_24x24.png</iconset>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/home/img/Setting/information-symbol_x.svg</normaloff>:/home/img/Setting/information-symbol_x.svg</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -273,16 +267,10 @@
                <height>24</height>
               </size>
              </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="removeFriendButton">
+            <widget class="QPushButton" name="removeFriendButton">
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -290,20 +278,14 @@
               <string>Deny friend</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/denied16.png</normaloff>:/images/denied16.png</iconset>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/chat/img/personal_remove_64.png</normaloff>:/chat/img/personal_remove_64.png</iconset>
              </property>
              <property name="iconSize">
               <size>
                <width>16</width>
                <height>16</height>
               </size>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -324,7 +306,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QToolButton" name="chatButton">
+            <widget class="QPushButton" name="chatButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -341,14 +323,8 @@
               <string>Start Chat</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/chat_24.png</normaloff>:/images/chat_24.png</iconset>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/chat/img/chat_32.png</normaloff>:/chat/img/chat_32.png</iconset>
              </property>
             </widget>
            </item>
@@ -380,8 +356,8 @@
               <string>Expand</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/edit_add24.png</normaloff>:/images/edit_add24.png</iconset>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/home/img/plus-black-symbol.png</normaloff>:/home/img/plus-black-symbol.png</iconset>
              </property>
             </widget>
            </item>
@@ -400,8 +376,8 @@
               <string>Remove Item</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/close_normal.png</normaloff>:/images/close_normal.png</iconset>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/home/img/Traymenu/power-button-off.png</normaloff>:/home/img/Traymenu/power-button-off.png</iconset>
              </property>
             </widget>
            </item>
@@ -643,6 +619,7 @@
  </customwidgets>
  <resources>
   <include location="../images.qrc"/>
+  <include location="../../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
