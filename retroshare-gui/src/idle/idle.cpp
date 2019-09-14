@@ -104,7 +104,7 @@ int Idle::secondsIdle()
 	}
 
 	// set 'beginIdle' to the beginning of the idle time (by backtracking 'i' seconds from now)
-    QDateTime beginIdle = QDateTime::currentDateTime().addSecs(-i+15);//set Idle after 18s
+    QDateTime beginIdle = QDateTime::currentDateTime().addSecs(-i+55);//set Idle after 60s
 
 	// set 't' to hold the number of seconds between 'beginIdle' and 'startTime'
 	int t = beginIdle.secsTo(d->startTime);
