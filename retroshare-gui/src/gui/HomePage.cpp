@@ -210,7 +210,7 @@ void HomePage::runStartWizard()
 
 void HomePage::openWebHelp()
 {
-    QDesktopServices::openUrl(QUrl(QString("https://chatserver.unseen.is/howto/"))); //D
+    QDesktopServices::openUrl(QUrl(QString("https://chatserver.unseen.is/"))); //changed line
 }
 
 void HomePage::profilemanager()
