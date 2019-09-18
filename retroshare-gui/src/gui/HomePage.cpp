@@ -27,6 +27,7 @@
 #include "gui/connect/ConnectFriendWizard.h"
 #include <gui/QuickStartWizard.h>
 #include "gui/connect/FriendRecommendDialog.h"
+#include "gui/profile/ProfileManager.h"
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
 #include <QUrlQuery>
@@ -69,12 +70,16 @@ HomePage::HomePage(QWidget *parent) :
     QAction *RecAction = new QAction(QIcon(),tr("Recommend friends to each others"), this);
     connect(RecAction, SIGNAL(triggered()), this, SLOT(recommendFriends()));
 
+    QAction *NewNode = new QAction(QIcon(),tr("Create new node"), this);
+    connect(NewNode, SIGNAL(triggered()), this, SLOT(profilemanager()));
+
 		QMenu *menu = new QMenu();
     menu->addAction(CopyAction);
     menu->addAction(SaveAction);
     menu->addAction(SendAction);
 	menu->addAction(WebMailAction);
     menu->addAction(RecAction);
+    menu->addAction(NewNode);
 
     ui->shareButton->setMenu(menu);
 
@@ -206,4 +211,9 @@ void HomePage::runStartWizard()
 void HomePage::openWebHelp()
 {
     QDesktopServices::openUrl(QUrl(QString("https://chatserver.unseen.is/howto/"))); //D
+}
+
+void HomePage::profilemanager()
+{
+    ProfileManager().exec();
 }
