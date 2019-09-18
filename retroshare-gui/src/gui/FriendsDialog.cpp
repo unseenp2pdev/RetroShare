@@ -45,6 +45,7 @@
 #include "NetworkView.h"
 #include "NetworkDialog.h"
 #include "gui/Identity/IdDialog.h"
+#include "gui/common/FriendList.h"
 #ifdef RS_USE_CIRCLES
 #include "gui/Circles/CirclesDialog.h"
 #endif
@@ -93,6 +94,9 @@ FriendsDialog::FriendsDialog(QWidget *parent)
     connect( ui.mypersonalstatusLabel, SIGNAL(clicked()), SLOT(statusmessage()));
     connect( ui.actionSet_your_Avatar, SIGNAL(triggered()), this, SLOT(getAvatar()));
     connect( ui.actionSet_your_Personal_Message, SIGNAL(triggered()), this, SLOT(statusmessage()));
+//Add Export friendlist and Import friendlist button
+    connect(ui.importfriendlistButton, SIGNAL(clicked()), ui.friendList, SLOT(importFriendlistClicked()));
+    connect(ui.exportfriendlistButton, SIGNAL(clicked()), ui.friendList, SLOT(exportFriendlistClicked()));
 
     ui.avatar->setOwnId();
     ui.avatar->setFrameType(AvatarWidget::STATUS_FRAME);
