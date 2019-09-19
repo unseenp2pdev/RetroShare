@@ -911,6 +911,10 @@ int pqissllistener::completeConnection(int fd, IncomingSSLInfo& info)
 #else
 		RsPgpId pgpid(std::string(getX509CNString(X509_get_issuer_name(peercert))));
 #endif
+
+        //unseenp2p - try to set add friend option then we can differenciate which case we call addFriend in p3PeerMgrIMPL
+        mPeerMgr->setAddFriendOption(ADDFRIEND_PQISSLLISTENNER);
+
 		mPeerMgr->addFriend(newPeerId, pgpid);
 	
 		X509_free(peercert);
