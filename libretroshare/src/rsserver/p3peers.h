@@ -165,12 +165,16 @@ public:
     	virtual bool getPeerMaximumRates(const RsPgpId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate);
     	virtual bool getPeerMaximumRates(const RsPeerId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate);
 
+    //unseenp2p
     virtual void addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert);
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
     virtual std::map<RsPgpId, std::string> certListOfContact();
     virtual void saveSupernodeCert(const std::string& cert);
     virtual std::list<std::string> getSupernodeCertList();
+    virtual std::string getAddFriendOption();
+    virtual void setAddFriendOption(const std::string& option);
+
 private:
 
 	p3LinkMgr *mLinkMgr;

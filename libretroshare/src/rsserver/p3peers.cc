@@ -1141,7 +1141,10 @@ bool p3Peers::acceptInvite( const std::string& invite,
 	if(peerDetails.gpg_id.isNull())
 		return false;
 
-	addFriend(peerDetails.id, peerDetails.gpg_id, flags);
+    //unseenp2p - only for supernode, set the case addFriend
+    setAddFriendOption(ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE);
+
+    addFriend(peerDetails.id, peerDetails.gpg_id, flags);
 
 	if (!peerDetails.location.empty())
 		setLocation(peerDetails.id, peerDetails.location);
@@ -1171,7 +1174,6 @@ bool p3Peers::acceptInvite( const std::string& invite,
 			            peerDetails.id,
 			            RsUrl(ipr.substr(0, ipr.find(' '))) );
 	}
-
 	return true;
 }
 
@@ -1584,7 +1586,16 @@ void p3Peers::saveSupernodeCert(const std::string& cert)
     mPeerMgr->saveSupernodeCert(cert);
 }
 
- std::list<std::string> p3Peers::getSupernodeCertList()
+std::list<std::string> p3Peers::getSupernodeCertList()
 {
     return mPeerMgr->getSupernodeCertList();
+}
+
+std::string p3Peers::getAddFriendOption()
+{
+    return mPeerMgr->getAddFriendOption();
+}
+void p3Peers::setAddFriendOption(const std::string&  option)
+{
+    mPeerMgr->setAddFriendOption(option);
 }

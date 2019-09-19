@@ -1973,6 +1973,7 @@ int RsServer::StartupRetroShare()
     std::cerr << "========================================================================" << std::endl;
 
 	coreReady = true;
+
 	return 1;
 }
 

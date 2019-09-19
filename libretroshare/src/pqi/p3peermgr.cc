@@ -49,6 +49,17 @@
 #include "retroshare/rspeers.h" // Needed for Group Parameters.
 #include "retroshare/rsbanlist.h" // Needed for banned IPs
 
+#include "pqi/p3notify.h"
+#include "retroshare/rsversion.h"
+
+#include "retroshare/rsiface.h"
+#include "rsserver/p3face.h"
+#include "pqi/p3netmgr.h"
+
+//unseenp2p
+#include "rsitems/rsdiscovery2items.h"
+
+
 /* Network setup States */
 
 //Defined and used in /libretroshare/src/pqi/p3netmgr.cc
@@ -72,6 +83,7 @@ static struct RsLog::logInfo p3peermgrzoneInfo = {RsLog::Default, "p3peermgr"};
  * #define PEER_DEBUG 1
  * #define PEER_DEBUG_LOG 1
  ***/
+#define PEER_DEBUG 1
 
 #define MAX_AVAIL_PERIOD 230 //times a peer stay in available state when not connected
 #define MIN_RETRY_PERIOD 140
@@ -998,7 +1010,7 @@ bool p3PeerMgrIMPL::addFriend(const RsPeerId& input_id, const RsPgpId& input_gpg
 			pstate.lastcontact = lastContact;
 
 			/* addr & timestamps -> auto cleared */
-            std::cerr << "p3PeerMgrIMPL:addFriend is calling... mFriendList[id] = pstate " << std::endl;
+            std::cerr << "p3PeerMgrIMPL:addFriend is calling... add name: " << pstate.name << std::endl;
 
 			mFriendList[id] = pstate;
 
@@ -3071,4 +3083,13 @@ void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
  std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
  {
      return mSupernodeCertList;
+ }
+
+ std::string p3PeerMgrIMPL::getAddFriendOption()
+ {
+     return mAddFriendOption;
+ }
+ void p3PeerMgrIMPL::setAddFriendOption(const std::string&  option)
+ {
+     mAddFriendOption = option;
  }

@@ -391,6 +391,9 @@ void PGPKeyDialog::makeFriend()
         std::cerr << std::endl;
     }
 
+    //unseenp2p - set option of addFriend when user click on Make Friend button, do not broadcast this anymore
+    rsPeers->setAddFriendOption(ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND);
+
     rsPeers->addFriend(peerId, pgpId);
 
     //at first we parse the cert str of this peer

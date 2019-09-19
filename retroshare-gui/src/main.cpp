@@ -25,6 +25,8 @@
 #include <QtNetwork>
 #include  <iostream>
 
+//unseenp2p
+#include <retroshare/rsdisc.h>
 
 #include <rshare.h>
 #include "gui/FriendsDialog.h"

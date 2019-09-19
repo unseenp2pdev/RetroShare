@@ -74,10 +74,10 @@ void    mergeFriendList(const std::set<PGPID> &friends);
 
 class p3discovery2: public RsDisc, public p3Service, public pqiServiceMonitor, public AuthGPGService
 {
-	public:
-
-	p3discovery2(p3PeerMgr *peerMgr, p3LinkMgr *linkMgr, p3NetMgr *netMgr, p3ServiceControl *sc,RsGixs *gixs);
+public:
+    p3discovery2(p3PeerMgr *peerMgr, p3LinkMgr *linkMgr, p3NetMgr *netMgr, p3ServiceControl *sc,RsGixs *gixs);
 virtual ~p3discovery2();
+
 
 virtual RsServiceInfo getServiceInfo();
 
@@ -131,9 +131,12 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 
 	bool setPeerVersion(const SSLID &peerId, const std::string &version);
 
+    //unseenp2p
     void fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,peerState &stateDetail);
     void sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack );
     void convertFromItemInfoToPeerState(const RsDiscContactItem *item, peerState &pState);
+    void broadcastThisCertToAllFriendList(const RsPeerId& exceptThisId);
+
 	private:
 
 	p3PeerMgr *mPeerMgr;

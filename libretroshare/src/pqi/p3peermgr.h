@@ -31,6 +31,8 @@
 
 #include "util/rsthreads.h"
 
+#include "services/p3service.h"
+
 /* RS_VIS_STATE -> specified in rspeers.h
  */
 
@@ -112,6 +114,7 @@ class p3NetMgr;
 
 class p3LinkMgrIMPL;
 class p3NetMgrIMPL;
+class p3Service;
 
 class p3PeerMgr
 {
@@ -228,6 +231,8 @@ virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage 
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
     virtual void saveSupernodeCert(const std::string& cert) =0;
     virtual std::list<std::string> getSupernodeCertList() =0;
+    virtual std::string getAddFriendOption() =0;
+    virtual void setAddFriendOption(const std::string&  option) = 0;
 
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -348,6 +353,8 @@ public:
     virtual std::map<RsPgpId, std::string> certListOfContact();
     virtual void saveSupernodeCert(const std::string& cert);
     virtual std::list<std::string> getSupernodeCertList();
+    virtual std::string getAddFriendOption();
+    virtual void setAddFriendOption(const std::string& option);
     /************************************************************************************************/
     /* Extra IMPL Functions (used by p3LinkMgr, p3NetMgr + Setup) */
     /************************************************************************************************/
@@ -418,6 +425,7 @@ private:
     std::map<RsPgpId, RsPeerId> mFriendOfContactList;
     std::map<RsPgpId, std::string> mCertList;
     std::list<std::string> mSupernodeCertList;  //save at least 3 supernode certificates
+    std::string mAddFriendOption; //
 
     std::list<RsItem *> saveCleanupList; /* TEMPORARY LIST WHEN SAVING */
 
