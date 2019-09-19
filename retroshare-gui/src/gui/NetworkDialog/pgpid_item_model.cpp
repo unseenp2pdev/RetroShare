@@ -311,6 +311,7 @@ void pgpid_item_model::data_updated(std::list<RsPgpId> &new_neighs)
     new_size = new_neighs.size();
     //set model data to new cleaned up data
     neighs = new_neighs;
+    if(old_size == new_size) return;
     neighs.sort();
     neighs.unique(); //remove possible dups
 

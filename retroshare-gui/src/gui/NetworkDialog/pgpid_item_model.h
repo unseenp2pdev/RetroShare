@@ -5,9 +5,9 @@
 #include <retroshare/rspeers.h>
 #include <QColor>
 
-#define IMAGE_AUTHED         ":/images/accepted16.png"
-#define IMAGE_DENIED         ":/images/denied16.png"
-#define IMAGE_TRUSTED        ":/images/rs-2.png"
+//#define IMAGE_AUTHED         ":/images/accepted16.png"
+//#define IMAGE_DENIED         ":/images/denied16.png"
+//#define IMAGE_TRUSTED        ":/images/rs-2.png"
 
 #define IMAGE_ADD_FRIEND       ":/images/addFriend.png"
 #define IMAGE_DENY_FRIEND         ":/images/denyFriend.png"

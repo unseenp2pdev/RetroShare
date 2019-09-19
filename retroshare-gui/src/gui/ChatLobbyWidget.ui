@@ -95,7 +95,7 @@
       <item>
        <widget class="QPushButton" name="addContactButton">
         <property name="text">
-         <string>Add contact</string>
+         <string>Add friends certificate</string>
         </property>
        </widget>
       </item>

@@ -128,8 +128,10 @@ void AppearancePage::switch_status(MainWindow::StatusElement s,const QString& ke
 void AppearancePage::updateLanguageCode()     { Settings->setLanguageCode(LanguageSupport::languageCode(ui.cmboLanguage->currentText())); }
 void AppearancePage::updateInterfaceStyle()
 {
-    Rshare::setStyle(ui.cmboStyle->currentText());
-    Settings->setInterfaceStyle(ui.cmboStyle->currentText());
+//    Rshare::setStyle(ui.cmboStyle->currentText());
+//    Settings->setInterfaceStyle(ui.cmboStyle->currentText());
+    Settings->setInterfaceStyle("Fusion");
+    Rshare::setStyle("Fusion");
 }
 void AppearancePage::updateSheetName()        { Settings->setSheetName(ui.cmboStyleSheet->itemData(ui.cmboStyleSheet->currentIndex()).toString()); }
 void AppearancePage::updateRbtPageOnToolBar()

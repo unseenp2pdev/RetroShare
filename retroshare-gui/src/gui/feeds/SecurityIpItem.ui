@@ -162,8 +162,8 @@
               <string>Peer details</string>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
-               <normaloff>:/images/informations_24x24.png</normaloff>:/images/informations_24x24.png</iconset>
+              <iconset resource="../../Unseengui/unseengui.qrc">
+               <normaloff>:/home/img/Setting/information-symbol_x.svg</normaloff>:/home/img/Setting/information-symbol_x.svg</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -493,6 +493,7 @@
  </customwidgets>
  <resources>
   <include location="../images.qrc"/>
+  <include location="../../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
