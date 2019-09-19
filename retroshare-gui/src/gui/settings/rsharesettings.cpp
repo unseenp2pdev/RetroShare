@@ -113,18 +113,20 @@ void RshareSettings::initSettings()
 #else
 	static QStringList styles = QStyleFactory::keys();
 #if defined(Q_OS_WIN)
-    if (styles.contains("windowsvista", Qt::CaseInsensitive))
-        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
-    else if (styles.contains("windowsxp", Qt::CaseInsensitive))
-        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
-    else
-        setDefault(SETTING_STYLE, "Fusion");
+    setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    if (styles.contains("windowsvista", Qt::CaseInsensitive))
+//        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    else if (styles.contains("windowsxp", Qt::CaseInsensitive))
+//        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    else
+//        setDefault(SETTING_STYLE, "Fusion");
 #endif
 	{
-		if (styles.contains("cleanlooks", Qt::CaseInsensitive))
-			setDefault(SETTING_STYLE, "cleanlooks");
-		else
-			setDefault(SETTING_STYLE, "plastique");
+        setDefault(SETTING_STYLE, "Fusion");
+//		if (styles.contains("cleanlooks", Qt::CaseInsensitive))
+//			setDefault(SETTING_STYLE, "cleanlooks");
+//		else
+//			setDefault(SETTING_STYLE, "plastique");
 	}
 #endif
 #endif
