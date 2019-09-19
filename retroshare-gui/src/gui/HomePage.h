@@ -58,6 +58,7 @@ private slots:
 	void runStartWizard() ;
 	void openWebHelp() ;
 	void recommendFriends();
+    void profilemanager();
 
 private:
 	Ui::HomePage *ui;

@@ -101,7 +101,7 @@
       <item>
        <widget class="QPushButton" name="addContactButton">
         <property name="text">
-         <string>Add contact</string>
+         <string>Add friends certificate</string>
         </property>
        </widget>
       </item>
@@ -124,7 +124,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="icon">
-         <iconset resource="../icons.qrc">
+         <iconset resource="../../Unseengui/unseengui.qrc">
           <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
         </property>
         <property name="checkable">
@@ -293,8 +293,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1068</width>
-             <height>1081</height>
+             <width>1003</width>
+             <height>1090</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="scrollAreaWidgetContentsVLayout">
@@ -1124,8 +1124,8 @@ p, li { white-space: pre-wrap; }
  </tabstops>
  <resources>
   <include location="../icons.qrc"/>
-  <include location="../images.qrc"/>
   <include location="../../Unseengui/unseengui.qrc"/>
+  <include location="../images.qrc"/>
  </resources>
  <connections/>
 </ui>

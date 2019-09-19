@@ -93,9 +93,23 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="importfriendlistButton">
+        <property name="text">
+         <string>Import friendlist</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exportfriendlistButton">
+        <property name="text">
+         <string>Export friendlist</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="addContactButton">
         <property name="text">
-         <string>Add contact</string>
+         <string>Add friends certificate</string>
         </property>
        </widget>
       </item>
@@ -405,8 +419,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../Unseengui/unseengui.qrc"/>
   <include location="images.qrc"/>
+  <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>
