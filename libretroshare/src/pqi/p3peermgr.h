@@ -226,7 +226,8 @@ virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage 
     virtual std::map<RsPgpId, std::string> certListOfContact() = 0;
     virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) = 0;
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
-
+    virtual std::string getAddFriendOption() =0;
+    virtual void setAddFriendOption(const std::string&  option) = 0;
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -345,6 +346,8 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
     virtual std::map<RsPgpId, std::string> certListOfContact();
+    virtual std::string getAddFriendOption();
+    virtual void setAddFriendOption(const std::string& option);
     /************************************************************************************************/
     /* Extra IMPL Functions (used by p3LinkMgr, p3NetMgr + Setup) */
     /************************************************************************************************/
@@ -415,6 +418,7 @@ private:
     //unseenp2p
     std::map<RsPgpId, RsPeerId> mFriendOfContactList;
     std::map<RsPgpId, std::string> mCertList;
+    std::string mAddFriendOption;
 
     std::list<RsItem *> saveCleanupList; /* TEMPORARY LIST WHEN SAVING */
 

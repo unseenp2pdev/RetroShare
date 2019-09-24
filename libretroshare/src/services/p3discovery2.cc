@@ -32,9 +32,14 @@
 // Interface pointer.
 RsDisc *rsDisc = NULL;
 
+static const std::string  ONLINE_BROADCAST_CERT_REQ_SYNC = "BROADCAST_CERT_TO_ALL_FRIENDLIST";
+static const std::string  ONLINE_SEND_ME_CERT_REQ_SYNC  =  "SEND_ME_CERT";
+static const std::string  ONLINE_NO_REQ_SYNC            =  "NO_REQUEST";
+
 /**
   #define P3DISC_DEBUG	1
 **/
+#define P3DISC_DEBUG	1
 
 static bool populateContactInfo( const peerState &detail,
                                  RsDiscContactItem *pkt,
@@ -936,6 +941,13 @@ void p3discovery2::processContactInfo(const SSLID &fromId, const RsDiscContactIt
             return;
         }
 
+        // if nodes broadcast friend of contact cert to me, and friend of contact is my friend too, so DO nothing.
+        if (item->requestAboutCert == ONLINE_BROADCAST_CERT_REQ_SYNC)
+        {
+            std::cerr << "Yes I receive the item with requestAboutCert == BROADCAST_CERT_TO_ALL_FRIENDLIST!!!"  << std::endl;
+            return;
+        }
+
 	std::map<PGPID, DiscPgpInfo>::iterator it;
 	it = mFriendList.find(item->pgpId);
 	if (it == mFriendList.end())
@@ -1070,9 +1082,19 @@ void p3discovery2::processFriendsOfContactInfo(const SSLID &fromId, const RsDisc
         //rsPeers->getFriendList()
         rsPeers->addFriendOfContact(item->pgpId, item->sslId, item->full_cert); // mFriendOfContactList
 
-        if (item->requestAboutCert == "SEND_ME_CERT")
+        if (item->requestAboutCert == ONLINE_SEND_ME_CERT_REQ_SYNC)
         {
             sendAllMyFriendsInfo(fromId, false);
+        }
+
+        else if (item->requestAboutCert == ONLINE_BROADCAST_CERT_REQ_SYNC)
+        {
+            // when node broadcast new-comer cert to all friends, and I receive
+            // at first, i will check if it exist in friend list or network contact list (this already checked before go here)
+            // , if yes, then DO Nothing, if no, need to add and save to network contact list, then broadcast this cert to all friends
+            // to this point [of code], that mean this new-comer is a network contact, so just broadcast to other
+            broadcastThisCertToAllFriendList(item->sslId);
+
         }
 
         //mPeerMgr->addFriendOfContact(item->pgpId, pState);
@@ -1204,7 +1226,7 @@ void p3discovery2::recvPGPCertificate(const SSLID &/*fromId*/, RsDiscPgpCertItem
     mPendingDiscPgpCertInList.push_back(item);
 }
 
-void p3discovery2::createPGPCertForSupernode(const RsPgpId &pgpid, std::string &cert)
+void p3discovery2::addPGPCertToPublicKeyRing(const RsPgpId &pgpid, const std::string &cert)
 {
     /* should only happen if in FULL Mode */
 
@@ -1264,6 +1286,21 @@ void p3discovery2::statusChange(const std::list<pqiServicePeer> &plist)
             std::cerr << "p3discovery2::statusChange() Adding Friend: " << pit->id << std::endl;
 #endif
             addFriend(pit->id);
+
+            std::cerr << "p3discovery2::statusChange() RS_SERVICE_PEER_NEW: " << pit->id << std::endl;
+
+            std::string addFriendOption = rsPeers->getAddFriendOption();
+            std::cerr << "Here we will check which addFriend option was called, addFriendOption: " << addFriendOption << std::endl;
+            // we will broadcast the new node certificate in these cases:
+            if (addFriendOption == ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE ||
+                    addFriendOption == ADDFRIEND_PQISSLLISTENNER ||
+                    addFriendOption == ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT)
+            {
+                //unseenp2p: try to broadcast the cert of this peer to all online friendlist except this one
+                std::cerr << "Begin broadcast the cert, because the addFriendOption =  " << addFriendOption << std::endl;
+                broadcastThisCertToAllFriendList(pit->id);
+            }
+
         }
         else if (pit->actions & RS_SERVICE_PEER_REMOVED)
         {
@@ -1452,7 +1489,7 @@ void p3discovery2::setGPGOperation(AuthGPGOperation *operation)
             item->pgpCert = loadOrSave->m_certGpg;
 
 #ifdef P3DISC_DEBUG
-            std::cerr << "p3discovery2::setGPGOperation() Sending Message:" << std::endl;
+            std::cerr << "  p3discovery2::setGPGOperation() Sending Message:" << std::endl;
             item->print(std::cerr, 5);
 #endif
 
@@ -1520,8 +1557,9 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
             pkt->version = RS_HUMAN_READABLE_VERSION;
             //add full certificate to share with friend
             pkt->full_cert = rsPeers->GetRetroshareInvite(*it);
-            if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
-            else pkt->requestAboutCert = "NO_REQUEST";
+            if (sendCertBack) pkt->requestAboutCert = ONLINE_SEND_ME_CERT_REQ_SYNC;
+            else pkt->requestAboutCert = ONLINE_NO_REQ_SYNC;
+
             pkt->PeerId(sslid);
 
 #ifdef P3DISC_DEBUG
@@ -1563,8 +1601,8 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
                     pkt->version = RS_HUMAN_READABLE_VERSION;
                     //add full certificate to share with friend
                     pkt->full_cert = certStr;
-                    if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
-                    else pkt->requestAboutCert = "NO_REQUEST";
+                    if (sendCertBack) pkt->requestAboutCert = ONLINE_SEND_ME_CERT_REQ_SYNC;
+                    else pkt->requestAboutCert = ONLINE_NO_REQ_SYNC;
                     pkt->PeerId(sslid);
                     sendItem(pkt);
 
@@ -1577,4 +1615,92 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
 
 
 }
+
+//There are two LISTs that we concern: friend list and network contact list
+// if one is in friend list then it can not be in network contact list and vice verse.
+// When we the first time broadcast the cert, that mean we broadcast our friend cert to all other friend.
+// On the receiving side, it can be a friend or a contact of friend, a just a network contact
+
+// This broadcast is also called ONLINE broadcast, it applies only for online nodes.
+// The network contact syncing is related to offline syncing, when the node goes to online, it need to be sync
+// all the network contact from other online nodes, include supernodes.
+
+// The process of broadcast is implemented by the following algorithm:
+// 1. After 2 nodes A and B connected together, they will be friends each other.
+//    The first time of connection will get action "RS_SERVICE_PEER_NEW" (check statusChange in this class)
+// 2. p3LinkMgrIMPL will raise the action RS_PEER_NEW when A and B connected the first time,
+//    A look B as new peer and B look A as new peer too.
+// 3. A will send B's cert to all A's friends and B will send A's cert to all B's friends.
+// 4. When A's friends receive B's cert, they will check if B's cert already exist or not in a) friend list, b) network contact
+// 5. If it exist, then A's friends DO nothing, just ignore.
+// 6. If NO exist, then A's friends will a) add and save B's cert to network contact list (because it can not be friend)
+//                                       b) broadcast B's cert to all friends of A's friends except the sender and continue.
+
+void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisId)
+{
+      //get the certificate of this peer (exceptThisId)
+      PGPID pgpId = getPGPId(exceptThisId);
+      std::string cert ="";
+      std::map<RsPgpId, std::string> certList = rsPeers->certListOfContact();
+      std::map<RsPgpId, std::string>::iterator itCert = certList.find(pgpId);
+      if (itCert != certList.end() )
+      {
+            cert = (*itCert).second;
+            std::cerr << " Certificate need to be broadcast is " << cert << std::endl;
+      }
+      else
+      {
+            std::cerr << " There is no cert in the certificate list! " << std::endl;
+            //return;
+      }
+
+      //Begin to broadcast this new node cert to all online friends .
+      std::list<RsPeerId> sslIdFriendList;
+      rsPeers->getOnlineList(sslIdFriendList);
+
+      for(std::list<RsPeerId>::iterator it = sslIdFriendList.begin(); it != sslIdFriendList.end(); it++)
+      {
+          //do not send again to sender that send this cert
+          if ((*it) == exceptThisId) continue;
+          RsPeerDetails peerDetail;
+          uint32_t cert_error_code;
+          if (cert != "" && rsPeers->loadDetailsFromStringCert(cert, peerDetail, cert_error_code))
+
+          {
+              peerState stateDetail;
+              //Need to set stateDetail from peerDetail
+              fromPeerDetailToStateDetail(peerDetail, stateDetail);
+              RsDiscContactItem *pkt = new RsDiscContactItem();
+              populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+              pkt->version = RS_HUMAN_READABLE_VERSION;
+              //add full certificate to share with friend
+              pkt->full_cert = cert;
+
+              pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
+              pkt->PeerId((*it));
+              std::cerr << " Broadcast this cert to friend: " << peerDetail.name << ", with cert : " << pkt->full_cert << std::endl;
+              sendItem(pkt);
+
+          }
+          else if (rsPeers->isFriend(exceptThisId))
+          {
+
+              peerState stateDetail;
+              fromPeerDetailToStateDetail(peerDetail, stateDetail);
+              RsDiscContactItem *pkt = new RsDiscContactItem();
+              populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
+              pkt->version = RS_HUMAN_READABLE_VERSION;
+              pkt->full_cert = rsPeers->GetRetroshareInvite(exceptThisId);
+
+              pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
+              pkt->PeerId((*it));
+              std::cerr << " This cert is friend cert. Broadcast this cert to online friend: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
+              sendItem(pkt);
+
+          }
+
+      }
+}
+
+
 

@@ -197,6 +197,15 @@ static const RsNodeGroupId RS_GROUP_ID_FAVORITES ("00000000000000000000000000000
 
 const uint32_t RS_GROUP_FLAG_STANDARD = 0x0001;
 
+//unseenp2p - add friend options
+static const std::string ADDFRIEND_PQISSLLISTENNER = "ADDFRIEND_PQISSLLISTENNER";
+static const std::string ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT = "ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT";
+static const std::string ADDFRIEND_CONNECT_FRIEND_WIZARD_SIGN_ALL_USERS = "ADDFRIEND_CONNECT_FRIEND_WIZARD_SIGN_ALL_USERS";
+static const std::string ADDFRIEND_LOADFRIENDS_FROM_LOCALFILE = "ADDFRIEND_LOADFRIENDS_FROM_LOCALFILE";
+static const std::string ADDFRIEND_PEERHANDLER_HANDLEWILDCARD = "ADDFRIEND_PEERHANDLER_HANDLEWILDCARD";
+static const std::string ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE = "ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE";
+static const std::string ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND = "ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND";
+
 /* A couple of helper functions for translating the numbers games */
 
 std::string RsPeerTrustString(uint32_t trustLvl);
@@ -752,6 +761,8 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
+    virtual std::string getAddFriendOption() =0;
+    virtual void setAddFriendOption(const std::string&  option) = 0;
 	RS_DEPRECATED_FOR(isPgpFriend)
 	virtual bool isGPGAccepted(const RsPgpId &gpg_id_is_friend) = 0;
 };
