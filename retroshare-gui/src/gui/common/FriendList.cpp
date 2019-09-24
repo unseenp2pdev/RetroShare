@@ -214,7 +214,7 @@ void FriendList::addSupernodeAsFriend()
                 {
 
                       // save this supernode CERT in public_keyrings_map
-                      rsDisc->createPGPCertForSupernode(pgp_id,certstr );
+                      rsDisc->addPGPCertToPublicKeyRing(pgp_id,certstr );
 
                       //if it is not a friend so need to add!!!
                       rsPeers->addFriend(ssl_id, pgp_id);

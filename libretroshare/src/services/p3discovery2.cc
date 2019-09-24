@@ -1081,6 +1081,8 @@ void p3discovery2::processFriendsOfContactInfo(const SSLID &fromId, const RsDisc
         // ...then add to friend of contact list,
         // this addFriendOfContact not only add to friend of contact, but add all network contact, it saves all here.
         rsPeers->addFriendOfContact(item->pgpId, item->sslId, item->full_cert); // mFriendOfContactList
+        //addPGPCertToPublicKeyRing(item->pgpId, item->full_cert);
+//        addFriend(item->sslId);
 
         if (item->requestAboutCert == ONLINE_SEND_ME_CERT_REQ_SYNC)
         {
@@ -1225,7 +1227,7 @@ void p3discovery2::recvPGPCertificate(const SSLID &/*fromId*/, RsDiscPgpCertItem
 	mPendingDiscPgpCertInList.push_back(item);
 }
 
-void p3discovery2::createPGPCertForSupernode(const RsPgpId &pgpid, std::string &cert)
+void p3discovery2::addPGPCertToPublicKeyRing(const RsPgpId &pgpid, const std::string &cert)
 {
     /* should only happen if in FULL Mode */
 
