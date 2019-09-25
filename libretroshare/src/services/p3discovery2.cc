@@ -1530,7 +1530,7 @@ void p3discovery2::fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,p
 }
 
 // unseenp2p: need to send all my friends info to this peer for share info using populateContactInfo(detail, pkt, !rsPeers->isHiddenNode(sslid));
-// meiyousixin - 11 Sep 2019: update function:   share network contacts instead of friendlist
+// meiyousixin - 11 Sep 2019: update function:   share network contacts + friendlist
 void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
 {
 #ifdef P3DISC_DEBUG
@@ -1665,7 +1665,6 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
           RsPeerDetails peerDetail;
           uint32_t cert_error_code;
           if (cert != "" && rsPeers->loadDetailsFromStringCert(cert, peerDetail, cert_error_code))
-
           {
               peerState stateDetail;
               //Need to set stateDetail from peerDetail
@@ -1687,7 +1686,7 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
 
               peerState stateDetail;
               RsPeerDetails peerDetail;
-              rsPeers->getPeerDetails(*it, peerDetail);
+              rsPeers->getPeerDetails(exceptThisId, peerDetail);
               fromPeerDetailToStateDetail(peerDetail, stateDetail);
               RsDiscContactItem *pkt = new RsDiscContactItem();
               populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
