@@ -1678,7 +1678,7 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
 
               pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
               pkt->PeerId((*it));
-              std::cerr << " Broadcast this cert to friend: " << peerDetail.name << ", with cert : " << pkt->full_cert << std::endl;
+              std::cerr << " Broadcast this cert to friend: " << peerDetail.name << "sslid: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
               sendItem(pkt);
 
           }
@@ -1686,6 +1686,8 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
           {
 
               peerState stateDetail;
+              RsPeerDetails peerDetail;
+              rsPeers->getPeerDetails(*it, peerDetail);
               fromPeerDetailToStateDetail(peerDetail, stateDetail);
               RsDiscContactItem *pkt = new RsDiscContactItem();
               populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
@@ -1694,7 +1696,7 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
 
               pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
               pkt->PeerId((*it));
-              std::cerr << " This cert is friend cert. Broadcast this cert to online friend: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
+              std::cerr << " This cert is friend cert. Broadcast this cert to online friend: " << peerDetail.name << "sslid: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
               sendItem(pkt);
 
           }
