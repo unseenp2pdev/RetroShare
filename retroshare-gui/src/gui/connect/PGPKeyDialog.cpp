@@ -375,21 +375,35 @@ void PGPKeyDialog::makeFriend()
 
     //Add friend first, then set location, ip go after
     //we can get peerId here for add friend!!!
-    std::map<RsPgpId, RsPeerId> list = rsPeers->friendListOfContact();
-    std::map<RsPgpId, RsPeerId>::iterator it;
-    it = list.find(pgpId);
-    if (it != list.end())
-    {
-        peerId = it->second;
-        std::cerr << "we can find you sslId: " << peerId << ") is Friend of contact  ";
-        std::cerr << std::endl;
+    //std::map<RsPgpId, RsPeerId> list = rsPeers->friendListOfContact();
+    //std::map<RsPgpId, RsPeerId>::iterator it;
 
+    std::map<RsPgpId, UnseenNetworkContactsItem> rsDetailsList = rsPeers->networkContacts();
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+
+    itDetails = rsDetailsList.find(pgpId);
+    if (itDetails != rsDetailsList.end() )
+    {
+        peerId = itDetails->second.id;
+        std::cerr << "we can find you sslId from RsPeerDetails network contact map: " << peerId << std::endl;;
     }
     else
     {
-        std::cerr << "we CAN NOT find you is Friend of contact  ";
-        std::cerr << std::endl;
+        std::cerr << "we CAN NOT find you in RsPeerDetails network contact map " << std::endl; ;
     }
+//    it = list.find(pgpId);
+//    if (it != list.end())
+//    {
+//        peerId = it->second;
+//        std::cerr << "we can find you sslId: " << peerId << ") is Friend of contact  ";
+//        std::cerr << std::endl;
+
+//    }
+//    else
+//    {
+//        std::cerr << "we CAN NOT find you is Friend of contact  ";
+//        std::cerr << std::endl;
+//    }
 
     //unseenp2p - set option of addFriend when user click on Make Friend button, do not broadcast this anymore
     rsPeers->setAddFriendOption(ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND);

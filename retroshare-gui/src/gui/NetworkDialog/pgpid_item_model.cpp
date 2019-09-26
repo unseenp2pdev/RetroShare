@@ -80,13 +80,13 @@ QVariant pgpid_item_model::headerData(int section, Qt::Orientation orientation, 
             {
             case COLUMN_CHECK:
                 return 25*font_height;
-                break;
+
             case COLUMN_PEERNAME: case COLUMN_I_AUTH_PEER: case COLUMN_PEER_AUTH_ME:
                 return 200*font_height;
-                break;
+
             case COLUMN_LAST_USED:
                 return 75*font_height;
-                break;
+
             }
 
         }
@@ -121,28 +121,52 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
     for(int i = 0; i < index.row(); i++)
         it++;
     RsPeerDetails detail;
+    bool hasInPublicKeyRing = true;
     if (!rsPeers->getGPGDetails(*it, detail))
+    {
+        hasInPublicKeyRing = false;
+        //return QVariant();
+    }
+
+
+    bool usingNetworkContact = true;
+    UnseenNetworkContactsItem contactDetail;
+    if (!rsPeers->getPeerDetailsFromNetworkContacts(*it, contactDetail))
+    {
+        usingNetworkContact = false;
         return QVariant();
+    }
     //shit code end
     if(role == Qt::EditRole) //some columns return raw data for editrole, used for proper filtering
     {
         switch(index.column())
         {
         case COLUMN_LAST_USED:
-            return detail.lastUsed;
+            return (hasInPublicKeyRing?detail.lastUsed:contactDetail.lastUsed);
             break;
         case COLUMN_I_AUTH_PEER:
         {
-            if (detail.ownsign)
-                return RS_TRUST_LVL_ULTIMATE;
-            return detail.trustLvl;
+            if (hasInPublicKeyRing)
+            {
+                if (detail.ownsign)
+                   return RS_TRUST_LVL_ULTIMATE;
+                return detail.trustLvl;
+            }
+            else
+            {
+                if (contactDetail.ownsign)
+                    return RS_TRUST_LVL_ULTIMATE;
+                return detail.trustLvl;
+            }
+
+
         }
             break;
         case COLUMN_PEER_AUTH_ME:
-            return detail.hasSignedMe;
+            return hasInPublicKeyRing?detail.hasSignedMe:contactDetail.hasSignedMe;
             break;
         case COLUMN_CHECK:
-            return detail.accept_connection;
+            return hasInPublicKeyRing?detail.accept_connection:contactDetail.accept_connection;
             break;
         default:
             break;
@@ -154,43 +178,75 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
     {
         switch(index.column())
         {
-        case COLUMN_PEERNAME:
-            return QString::fromUtf8(detail.name.c_str());
+        case COLUMN_PEERNAME:   
+            return hasInPublicKeyRing?QString::fromUtf8(detail.name.c_str()):QString::fromUtf8(contactDetail.name.c_str());
             break;
         case COLUMN_PEERID:
-            return QString::fromStdString(detail.gpg_id.toStdString());
+            return hasInPublicKeyRing?QString::fromStdString(detail.gpg_id.toStdString()):QString::fromStdString(contactDetail.gpg_id.toStdString());
             break;
         case COLUMN_I_AUTH_PEER:
         {
-            if (detail.ownsign)
-                return tr("Personal signature");
+            if (hasInPublicKeyRing)
+            {
+                if (detail.ownsign)
+                    return tr("Personal signature");
+                else
+                {
+                    switch(detail.trustLvl)
+                    {
+                        case RS_TRUST_LVL_MARGINAL: return tr("Marginally trusted peer") ; break;
+                        case RS_TRUST_LVL_FULL:
+                        case RS_TRUST_LVL_ULTIMATE: return tr("Fully trusted peer") ; break ;
+                        case RS_TRUST_LVL_UNKNOWN:
+                        case RS_TRUST_LVL_UNDEFINED:
+                        case RS_TRUST_LVL_NEVER:
+                        default: 							return tr("Untrusted peer") ; break ;
+                    }
+                }
+            }
             else
             {
-                switch(detail.trustLvl)
+                if (contactDetail.ownsign)
+                    return tr("Personal signature");
+                else
                 {
-                    case RS_TRUST_LVL_MARGINAL: return tr("Marginally trusted peer") ; break;
-                    case RS_TRUST_LVL_FULL:
-                    case RS_TRUST_LVL_ULTIMATE: return tr("Fully trusted peer") ; break ;
-                    case RS_TRUST_LVL_UNKNOWN:
-                    case RS_TRUST_LVL_UNDEFINED:
-                    case RS_TRUST_LVL_NEVER:
-                    default: 							return tr("Untrusted peer") ; break ;
+                    switch(contactDetail.trustLvl)
+                    {
+                        case RS_TRUST_LVL_MARGINAL: return tr("Marginally trusted peer") ; break;
+                        case RS_TRUST_LVL_FULL:
+                        case RS_TRUST_LVL_ULTIMATE: return tr("Fully trusted peer") ; break ;
+                        case RS_TRUST_LVL_UNKNOWN:
+                        case RS_TRUST_LVL_UNDEFINED:
+                        case RS_TRUST_LVL_NEVER:
+                        default: 							return tr("Untrusted peer") ; break ;
+                    }
                 }
             }
         }
             break;
         case COLUMN_PEER_AUTH_ME:
         {
-            if (detail.hasSignedMe)
-                return tr("Yes");
+            if (hasInPublicKeyRing)
+            {
+                if (detail.hasSignedMe)
+                    return tr("Yes");
+                else
+                    return tr("No");
+            }
             else
-                return tr("No");
+            {
+                if (contactDetail.hasSignedMe)
+                    return tr("Yes");
+                else
+                    return tr("No");
+            }
         }
             break;
         case COLUMN_LAST_USED:
         {
             time_t now = time(NULL);
-            uint64_t last_time_used = now - detail.lastUsed ;
+
+            uint64_t last_time_used =hasInPublicKeyRing? (now - detail.lastUsed): now - contactDetail.lastUsed;
             QString lst_used_str ;
 
             if(last_time_used < 3600)
@@ -206,20 +262,6 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
             return lst_used_str;
         }
             break;
-//        case COLUMN_CHECK:
-//        {
-//            if (detail.accept_connection)
-//            {
-//                return tr("Deny friend");
-//            }
-//            else
-//            {
-//                return tr("Add friend");
-//            }
-//        }
-//            break;
-
-
         }
     }
     else if(role == Qt::ToolTipRole)
@@ -228,15 +270,33 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
         {
         case COLUMN_I_AUTH_PEER:
         {
-            if (detail.ownsign)
-                return tr("PGP key signed by you");
+            if (hasInPublicKeyRing)
+            {
+                if (detail.ownsign)
+                    return tr("PGP key signed by you");
+            }
+            else
+            {
+                if (contactDetail.ownsign)
+                    return tr("PGP key signed by you");
+            }
         }
             break;
         default:
         {
-            if (!detail.accept_connection && detail.hasSignedMe)
+            if (hasInPublicKeyRing)
             {
-                return QString::fromUtf8(detail.name.c_str()) + tr(" has authenticated you. \nRight-click and select 'make friend' to be able to connect.");
+                if (!detail.accept_connection && detail.hasSignedMe)
+                {
+                    return QString::fromUtf8(detail.name.c_str()) + tr(" has authenticated you. \nRight-click and select 'make friend' to be able to connect.");
+                }
+            }
+            else
+            {
+                if (!contactDetail.accept_connection && contactDetail.hasSignedMe)
+                {
+                    return QString::fromUtf8(contactDetail.name.c_str()) + tr(" has authenticated you. \nRight-click and select 'make friend' to be able to connect.");
+                }
             }
         }
             break;
@@ -249,21 +309,37 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
         {
         case COLUMN_CHECK:
         {
-            if (detail.accept_connection)
+            if (hasInPublicKeyRing)
             {
-                    QImage image(IMAGE_DENY_FRIEND);
-                    QPixmap imageButton = QPixmap::fromImage(image);
+                if (detail.accept_connection)
+                {
+                        QImage image(IMAGE_DENY_FRIEND);
+                        QPixmap imageButton = QPixmap::fromImage(image);
 
-                    //imageButton = imageButton.scaled(100,25);
+                        //imageButton = imageButton.scaled(100,25);
+                        return imageButton;
+                }
+                else
+                {
+                    QImage image(IMAGE_ADD_FRIEND);
+                    QPixmap imageButton = QPixmap::fromImage(image);
                     return imageButton;
+                }
             }
             else
             {
-                QImage image(IMAGE_ADD_FRIEND);
-                QPixmap imageButton = QPixmap::fromImage(image);
-
-                //imageButton = imageButton.scaled(100,25);
-                return imageButton;
+                if (contactDetail.accept_connection)
+                {
+                        QImage image(IMAGE_DENY_FRIEND);
+                        QPixmap imageButton = QPixmap::fromImage(image);
+                        return imageButton;
+                }
+                else
+                {
+                    QImage image(IMAGE_ADD_FRIEND);
+                    QPixmap imageButton = QPixmap::fromImage(image);
+                    return imageButton;
+                }
             }
 
         }
@@ -272,26 +348,54 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
     }
     else if(role == Qt::BackgroundRole)
     {
-        if (detail.accept_connection)
+        if (hasInPublicKeyRing)
         {
-            if (detail.ownsign)
+            if (detail.accept_connection)
             {
-                return QBrush(mBackgroundColorOwnSign);
+                if (detail.ownsign)
+                {
+                    return QBrush(mBackgroundColorOwnSign);
+                }
+                else
+                {
+                    return QBrush(mBackgroundColorAcceptConnection);
+                }
             }
             else
             {
-                return QBrush(mBackgroundColorAcceptConnection);
+                if (detail.hasSignedMe)
+                {
+                    return QBrush(mBackgroundColorHasSignedMe);
+                }
+                else
+                {
+                    return QBrush(mBackgroundColorDenied);
+                }
             }
         }
         else
         {
-            if (detail.hasSignedMe)
+            if (contactDetail.accept_connection)
             {
-                return QBrush(mBackgroundColorHasSignedMe);
+                if (contactDetail.ownsign)
+                {
+                    return QBrush(mBackgroundColorOwnSign);
+                }
+                else
+                {
+                    return QBrush(mBackgroundColorAcceptConnection);
+                }
             }
             else
             {
-                return QBrush(mBackgroundColorDenied);
+                if (contactDetail.hasSignedMe)
+                {
+                    return QBrush(mBackgroundColorHasSignedMe);
+                }
+                else
+                {
+                    return QBrush(mBackgroundColorDenied);
+                }
             }
         }
     }

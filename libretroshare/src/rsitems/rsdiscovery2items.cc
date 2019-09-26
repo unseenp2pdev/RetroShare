@@ -153,6 +153,16 @@ void RsDiscContactItem::serial_process(RsGenericSerializer::SerializeJob j,RsGen
    //unseenp2p - add more certificate info when exchange between 2 peers
    RsTypeSerializer::serial_process           (j,ctx,  full_cert,"full_cert");
    RsTypeSerializer::serial_process           (j,ctx,  requestAboutCert,"requestAboutCert");
+
+   // for UnseenNetworkContactsItem
+   RsTypeSerializer::serial_process          (j,ctx,TLV_TYPE_STR_NAME,name,"name");
+   RsTypeSerializer::serial_process<uint32_t>(j,ctx,hiddenType,"hiddenType");
+   RsTypeSerializer::serial_process<uint32_t>(j,ctx,trustLvl,"trustLvl");
+   RsTypeSerializer::serial_process<bool>(j,ctx,ownsign,"ownsign");
+   RsTypeSerializer::serial_process<bool>(j,ctx,hasSignedMe,"hasSignedMe");
+   RsTypeSerializer::serial_process<bool>(j,ctx,accept_connection,"accept_connection");
+   RsTypeSerializer::serial_process<uint32_t>(j,ctx,lastConnect,"lastConnect");
+   RsTypeSerializer::serial_process<uint32_t>(j,ctx,lastUsed,"lastUsed");
 }
 
 void RsDiscIdentityListItem::serial_process(RsGenericSerializer::SerializeJob j,RsGenericSerializer::SerializeContext& ctx)

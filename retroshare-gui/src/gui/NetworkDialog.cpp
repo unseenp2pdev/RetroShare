@@ -525,12 +525,12 @@ void NetworkDialog::updateDisplay()
     std::list<RsPgpId> new_neighs;
 
     //get all PGPId from public key ring
-    rsPeers->getGPGAllList(new_neighs);
+    //rsPeers->getGPGAllList(new_neighs);
 
-    //unseenp2p - need to check all PGPId that we can get the cert or sslId
+    // Get all PgpId from UnseenP2P network contact maps
+    new_neighs = rsPeers->getNetworkContactsPgpIdList();
+
     PGPIdItemModel->data_updated(new_neighs);
-    filterGPGIdWithAvailableCert(new_neighs);
-
     //refresh model
     PGPIdItemModel->data_updated(new_neighs);
 }
