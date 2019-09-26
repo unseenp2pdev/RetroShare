@@ -524,14 +524,10 @@ void NetworkDialog::updateDisplay()
     //update ids list
     std::list<RsPgpId> new_neighs;
 
-    //get all PGPId from public key ring
-    //rsPeers->getGPGAllList(new_neighs);
-
     // Get all PgpId from UnseenP2P network contact maps
     new_neighs = rsPeers->getNetworkContactsPgpIdList();
 
-    PGPIdItemModel->data_updated(new_neighs);
-    //refresh model
+    //update to network contacts list
     PGPIdItemModel->data_updated(new_neighs);
 }
 
@@ -548,6 +544,10 @@ void NetworkDialog::click_Add_Or_Deny_Friend()
     if (rsPeers->getGPGDetails(rspgpId, details))
     {
         PGPKeyDialog::showIt(rspgpId, PGPKeyDialog::PageDetails);
+    }
+    else
+    {
+
     }
 
 }

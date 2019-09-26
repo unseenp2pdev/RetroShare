@@ -122,18 +122,50 @@ void PGPKeyDialog::loadAll()
     for(QMap<RsPgpId , PGPKeyDialog*>::iterator it = instances_pgp.begin(); it != instances_pgp.end(); ++it)  it.value()->load();
 }
 
+static void populateFromNetworkContactToRsPeerDetails(const UnseenNetworkContactsItem &contactItem,  RsPeerDetails *detail )
+{
+    detail->name = contactItem.name;
+    detail->gpg_id = contactItem.gpg_id;
+    detail->id = contactItem.id;
+
+    detail->accept_connection = contactItem.accept_connection;
+    detail->ownsign = contactItem.ownsign;
+    detail->hasSignedMe = contactItem.hasSignedMe;
+    detail->trustLvl = contactItem.trustLvl;
+
+    detail->hiddenType = contactItem.hiddenType;
+    detail->lastConnect = contactItem.lastConnect;
+    detail->lastUsed = contactItem.lastUsed;
+
+    detail->hiddenNodeAddress = contactItem.hiddenNodeAddress;
+    detail->hiddenNodePort = contactItem.hiddenNodePort;
+
+}
+
 void PGPKeyDialog::load()
 {
     RsPeerDetails detail;
 
     if(!rsPeers->getGPGDetails(pgpId, detail))
     {
-        QMessageBox::information(this,
-                                 tr("UnseenP2P"),
-                                 tr("Error : cannot get peer details."));
-        close();
-        return;
+
+        //here we can use the UnseenNetworkContactsItem and update back to detail
+        UnseenNetworkContactsItem contactItem;
+        if (rsPeers->getPeerDetailsFromNetworkContacts(pgpId, contactItem))
+        {
+            populateFromNetworkContactToRsPeerDetails(contactItem, &detail);
+            std::cerr << "We try to copy from network contact item to peer detail, now name is: " << detail.name << std::endl;
+        }
+        else
+        {
+            QMessageBox::information(this,
+                                     tr("UnseenP2P"),
+                                     tr("Error : cannot get peer details."));
+            close();
+            return;
+        }
     }
+
 
     if(!rsPeers->isKeySupported(pgpId))
     {

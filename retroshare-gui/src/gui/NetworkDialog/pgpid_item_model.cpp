@@ -156,7 +156,7 @@ QVariant pgpid_item_model::data(const QModelIndex &index, int role) const
             {
                 if (contactDetail.ownsign)
                     return RS_TRUST_LVL_ULTIMATE;
-                return detail.trustLvl;
+                return contactDetail.trustLvl;
             }
 
 
