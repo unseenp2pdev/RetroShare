@@ -108,20 +108,34 @@ public:
 	RsPgpId pgpId;
 	RsPeerId sslId;
 
-	// COMMON
-	std::string location;
-	std::string version;
+    // COMMON
+    std::string name;       //unseenp2p: add for work with UnseenNetworkContactItem
+    std::string location;
+    std::string version;
 
-	uint32_t    netMode;			/* Mandatory */
-	uint16_t    vs_disc;		    	/* Mandatory */
-	uint16_t    vs_dht;		    	/* Mandatory */
-	uint32_t    lastContact;
+    uint32_t    netMode;			/* Mandatory */
+    uint16_t    vs_disc;		    	/* Mandatory */
+    uint16_t    vs_dht;		    	/* Mandatory */
+    uint32_t    lastContact;
 
-	bool   isHidden;			/* not serialised */
+    bool   isHidden;			/* not serialised */
 
-	// HIDDEN.
-	std::string hiddenAddr;
-	uint16_t    hiddenPort;
+    // HIDDEN.
+    std::string hiddenAddr;
+    uint16_t    hiddenPort;
+    uint32_t hiddenType;    //unseenp2p: add for like RsPeerDetails
+
+    // for UnseenNetworkContactsItem
+    uint32_t trustLvl;
+
+    bool ownsign; /* we have signed the remote peer GPG key */
+    bool hasSignedMe; /* the remote peer has signed my GPG key */
+    bool accept_connection;
+
+    /* basic stats */
+    uint32_t lastConnect;           /* how long ago */
+    uint32_t lastUsed;              /* how long ago since last used: signature verif, connect attempt, etc */
+    // end for UnseenNetworkContactsItem
 
 	// STANDARD.
 

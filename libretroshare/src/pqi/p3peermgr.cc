@@ -3016,12 +3016,41 @@ std::map<RsPgpId, RsPeerId> p3PeerMgrIMPL::friendListOfContact()
     return mFriendOfContactList;
 }
 
+std::map<RsPgpId, UnseenNetworkContactsItem> p3PeerMgrIMPL::networkContacts()
+{
+    return mNetworkContacts;
+}
+
 std::map<RsPgpId, std::string> p3PeerMgrIMPL::certListOfContact()
 {
     return mCertList;
 }
 
-void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert)
+bool p3PeerMgrIMPL::getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d)
+{
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+    itDetails = mNetworkContacts.find(pgp_id);
+    if (itDetails == mNetworkContacts.end())
+    {
+        return false;
+    }
+    else
+    {
+        d = (*itDetails).second;
+        return true;
+    }
+
+}
+std::list<RsPgpId> p3PeerMgrIMPL::getNetworkContactsPgpIdList()
+{
+    std::list<RsPgpId> list;
+    list.clear() ;
+
+    for(std::map<RsPgpId,UnseenNetworkContactsItem>::const_iterator it(mNetworkContacts.begin());it!=mNetworkContacts.end();++it)
+            list.push_back(RsPgpId(it->first)) ;
+    return list;
+}
+void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem)
 {
 
     std::map<RsPgpId, std::string>::iterator itCert;
@@ -3034,15 +3063,23 @@ void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& 
         mCertList[rsPgpId] = cert;
     }
 
+    //Add the peer into network contacts by using RsPeerDetails get from cert string
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+    itDetails = mNetworkContacts.find(rsPgpId);
+    if (itDetails == mNetworkContacts.end())
+    {
+  #ifdef PEER_DEBUG
+            std::cerr << "Add this peer into network contacts: " << rsPgpId << " with name: " << dcItem.name << std::endl;
+#endif
+            mNetworkContacts[rsPgpId] = dcItem;
+    }
+
     std::map<RsPgpId, RsPeerId>::iterator it;
     it =  mFriendOfContactList.find(rsPgpId);
     if (it == mFriendOfContactList.end())
     {
         mFriendOfContactList[rsPgpId] = sslId;
     }
-#ifdef PEER_DEBUG
-            std::cerr << " This Peer already existed in Friend Of Contact PGP id: " << rsPgpId << " with sslId: " << sslId << std::endl;
-#endif
 
     return;
 }
@@ -3055,6 +3092,26 @@ bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
     else return false;
 }
 
+void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
+{
+    std::list<std::string>::iterator it;
+    it = std::find(mSupernodeCertList.begin(), mSupernodeCertList.end(), cert);
+    if(it != mSupernodeCertList.end())
+    {
+        //if it already exist so do nothing
+        return;
+    }
+    else
+    {
+        mSupernodeCertList.push_back(cert);
+    }
+    // TODO: Check more about max = 3 supernode certificates ?
+}
+
+ std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
+ {
+     return mSupernodeCertList;
+ }
 
  std::string p3PeerMgrIMPL::getAddFriendOption()
  {

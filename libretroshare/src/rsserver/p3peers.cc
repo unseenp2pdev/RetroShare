@@ -1504,6 +1504,17 @@ RsPeerDetails::RsPeerDetails()
 {
 }
 
+UnseenNetworkContactsItem::UnseenNetworkContactsItem()
+        : name(""),
+          trustLvl(0), ownsign(false),
+          hasSignedMe(false),accept_connection(false),
+          isHiddenNode(true),
+          hiddenNodePort(0),
+          hiddenType(RS_HIDDEN_TYPE_TOR),
+          lastConnect(0),lastUsed(0),full_cert("")
+{
+}
+
 std::ostream &operator<<(std::ostream &out, const RsPeerDetails &detail)
 {
 	out << "RsPeerDetail: " << detail.name << "  <" << detail.id << ">";
@@ -1576,13 +1587,27 @@ std::map<RsPgpId, RsPeerId> p3Peers::friendListOfContact()
     return	mPeerMgr->friendListOfContact() ;
 }
 
+std::map<RsPgpId, UnseenNetworkContactsItem> p3Peers::networkContacts()
+{
+    return mPeerMgr->networkContacts();
+}
+
 std::map<RsPgpId, std::string> p3Peers::certListOfContact()
 {
     return mPeerMgr->certListOfContact();
 }
-void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert)
+std::list<RsPgpId> p3Peers::getNetworkContactsPgpIdList()
 {
-    mPeerMgr->addFriendOfContact(rsPgpId, sslId, cert);
+    return mPeerMgr->getNetworkContactsPgpIdList();
+}
+bool p3Peers::getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d)
+{
+    return mPeerMgr->getPeerDetailsFromNetworkContacts(pgp_id,d);
+}
+
+void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem)
+{
+    mPeerMgr->addFriendOfContact(rsPgpId, sslId, cert, dcItem);
 }
 
 bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)

@@ -221,13 +221,21 @@ virtual bool 	getMaxRates(const RsPeerId& pid,uint32_t& maxUp,uint32_t& maxDn)=0
 virtual bool 	haveOnceConnected() = 0;
 
 virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage &addr, uint32_t &count)=0;
-    //unseenp2p
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
-    virtual std::map<RsPgpId, std::string> certListOfContact() = 0;
-    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) = 0;
+
+    //unseenp2p: for both client and supernode
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem) = 0;
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
     virtual std::string getAddFriendOption() =0;
     virtual void setAddFriendOption(const std::string&  option) = 0;
+    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
+    virtual std::map<RsPgpId, std::string> certListOfContact() =0;
+    virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts() =0;
+    virtual std::list<RsPgpId> getNetworkContactsPgpIdList() =0;
+    virtual bool getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d) =0;
+
+    //unseenp2p: only for client
+    virtual void saveSupernodeCert(const std::string& cert) =0;
+    virtual std::list<std::string> getSupernodeCertList() =0;
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
@@ -341,13 +349,17 @@ public:
     virtual bool 	getMaxRates(const RsPgpId&  pid,uint32_t& maxUp,uint32_t& maxDn);
     virtual bool 	getMaxRates(const RsPeerId& pid,uint32_t& maxUp,uint32_t& maxDn);
 
-    //unseenp2p
-    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert);
+    //unseenp2p - for both client and supernode
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem);
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
     virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
     virtual std::map<RsPgpId, std::string> certListOfContact();
+    virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts();
+    virtual std::list<RsPgpId> getNetworkContactsPgpIdList();
+    virtual bool getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d);
     virtual std::string getAddFriendOption();
     virtual void setAddFriendOption(const std::string& option);
+
     /************************************************************************************************/
     /* Extra IMPL Functions (used by p3LinkMgr, p3NetMgr + Setup) */
     /************************************************************************************************/
@@ -419,6 +431,7 @@ private:
     std::map<RsPgpId, RsPeerId> mFriendOfContactList;
     std::map<RsPgpId, std::string> mCertList;
     std::string mAddFriendOption;
+     std::map<RsPgpId, UnseenNetworkContactsItem> mNetworkContacts;
 
     std::list<RsItem *> saveCleanupList; /* TEMPORARY LIST WHEN SAVING */
 
