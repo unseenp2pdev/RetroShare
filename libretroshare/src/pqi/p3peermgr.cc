@@ -3092,27 +3092,6 @@ bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
     else return false;
 }
 
-void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
-{
-    std::list<std::string>::iterator it;
-    it = std::find(mSupernodeCertList.begin(), mSupernodeCertList.end(), cert);
-    if(it != mSupernodeCertList.end())
-    {
-        //if it already exist so do nothing
-        return;
-    }
-    else
-    {
-        mSupernodeCertList.push_back(cert);
-    }
-    // TODO: Check more about max = 3 supernode certificates ?
-}
-
- std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
- {
-     return mSupernodeCertList;
- }
-
  std::string p3PeerMgrIMPL::getAddFriendOption()
  {
      return mAddFriendOption;
