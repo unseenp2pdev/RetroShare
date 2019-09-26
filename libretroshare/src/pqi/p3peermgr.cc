@@ -3011,11 +3011,6 @@ bool p3PeerMgrIMPL::removeUnusedLocations()
 	return true;
 }
 
-std::map<RsPgpId, RsPeerId> p3PeerMgrIMPL::friendListOfContact()
-{
-    return mFriendOfContactList;
-}
-
 std::map<RsPgpId, UnseenNetworkContactsItem> p3PeerMgrIMPL::networkContacts()
 {
     return mNetworkContacts;
@@ -3072,13 +3067,6 @@ void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& 
             std::cerr << "Add this peer into network contacts: " << rsPgpId << " with name: " << dcItem.name << std::endl;
 #endif
             mNetworkContacts[rsPgpId] = dcItem;
-    }
-
-    std::map<RsPgpId, RsPeerId>::iterator it;
-    it =  mFriendOfContactList.find(rsPgpId);
-    if (it == mFriendOfContactList.end())
-    {
-        mFriendOfContactList[rsPgpId] = sslId;
     }
 
     return;

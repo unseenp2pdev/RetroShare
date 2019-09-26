@@ -171,7 +171,6 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
     virtual std::string getAddFriendOption();
     virtual void setAddFriendOption(const std::string& option);
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
     virtual std::map<RsPgpId, std::string> certListOfContact();
     virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts();
     virtual std::list<RsPgpId> getNetworkContactsPgpIdList();

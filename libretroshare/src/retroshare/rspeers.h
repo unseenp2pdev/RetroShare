@@ -807,7 +807,6 @@ public:
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
     virtual std::string getAddFriendOption() =0;
     virtual void setAddFriendOption(const std::string&  option) = 0;
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
     virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts() =0;
     virtual std::list<RsPgpId> getNetworkContactsPgpIdList() =0;

@@ -1582,11 +1582,6 @@ void p3Peers::setServicePermissionFlags(const RsPgpId& gpg_id,const ServicePermi
 	mPeerMgr->setServicePermissionFlags(gpg_id,flags) ;
 }
 
-std::map<RsPgpId, RsPeerId> p3Peers::friendListOfContact()
-{
-    return	mPeerMgr->friendListOfContact() ;
-}
-
 std::map<RsPgpId, UnseenNetworkContactsItem> p3Peers::networkContacts()
 {
     return mPeerMgr->networkContacts();

@@ -104,10 +104,13 @@ static bool populateContactInfoFromRsPeerDetails( const RsPeerDetails &detail,
     pkt->netMode = detail.netMode;
     pkt->vs_disc = detail.vs_disc;
     pkt->vs_dht = detail.vs_dht;
-    pkt->accept_connection = detail.accept_connection;
-    pkt->ownsign = detail.ownsign;
-    pkt->hasSignedMe = detail.hasSignedMe;
-    pkt->trustLvl = detail.trustLvl;
+
+    //when broadcasting, we do not know how its friendship: for both client and supernode
+    pkt->accept_connection = false;
+    pkt->ownsign = false;
+    pkt->hasSignedMe = false;
+    pkt->trustLvl = 0;
+
     pkt->hiddenType = detail.hiddenType;
     pkt->lastConnect = detail.lastConnect;
     pkt->lastUsed = detail.lastUsed;

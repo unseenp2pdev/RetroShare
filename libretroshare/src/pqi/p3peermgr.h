@@ -227,7 +227,6 @@ virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage 
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) =0;
     virtual std::string getAddFriendOption() =0;
     virtual void setAddFriendOption(const std::string&  option) = 0;
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
     virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts() =0;
     virtual std::list<RsPgpId> getNetworkContactsPgpIdList() =0;
@@ -349,7 +348,7 @@ public:
     //unseenp2p - for both client and supernode
     virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem);
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId);
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact();
+
     virtual std::map<RsPgpId, std::string> certListOfContact();
     virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts();
     virtual std::list<RsPgpId> getNetworkContactsPgpIdList();
