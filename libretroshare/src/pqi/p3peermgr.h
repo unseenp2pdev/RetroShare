@@ -233,9 +233,6 @@ virtual bool   locked_computeCurrentBestOwnExtAddressCandidate(sockaddr_storage 
     virtual std::list<RsPgpId> getNetworkContactsPgpIdList() =0;
     virtual bool getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d) =0;
 
-    //unseenp2p: only for client
-    virtual void saveSupernodeCert(const std::string& cert) =0;
-    virtual std::list<std::string> getSupernodeCertList() =0;
 /*************************************************************************************************/
 /*************************************************************************************************/
 /*************************************************************************************************/
