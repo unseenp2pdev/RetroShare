@@ -95,9 +95,9 @@
 #include "gui/gxschannels/GxsChannelDialog.h"
 #include "gui/gxsforums/GxsForumsDialog.h"
 #include "gui/Identity/IdDialog.h"
-//#ifdef RS_USE_CIRCLES
-//#include "gui/Circles/CirclesDialog.h"
-//#endif
+#ifdef RS_USE_CIRCLES
+#include "gui/Circles/CirclesDialog.h"
+#endif
 #ifdef RS_USE_WIKI
 #include "gui/WikiPoos/WikiDialog.h"
 #endif
@@ -416,10 +416,10 @@ void MainWindow::initStackedPage()
 
 
 
-//#ifdef RS_USE_CIRCLES
-//  CirclesDialog *circlesDialog = NULL;
-//  addPage(circlesDialog = new CirclesDialog(ui->stackPages), grp, &notify);
-//#endif
+#ifdef RS_USE_CIRCLES
+  CirclesDialog *circlesDialog = NULL;
+  addPage(circlesDialog = new CirclesDialog(ui->stackPages), grp, &notify);
+#endif
 
   //19 Sep 2018 - meiyousixin - change the order: Chat -> Contact -> Mail -> Files -> Channels -> Forums -> Profile
   addPage(chatLobbyDialog = new ChatLobbyWidget(ui->stackPages), grp, &notify);
@@ -432,15 +432,15 @@ void MainWindow::initStackedPage()
   addPage(gxsforumDialog = new GxsForumsDialog(ui->stackPages), grp, &notify);
   //meiyousixin - remove links
 
-  //addPage(postedDialog = new PostedDialog(ui->stackPages), grp, &notify);
+  addPage(postedDialog = new PostedDialog(ui->stackPages), grp, &notify);
 
   //meiyousixin - remove Identities dialogs for simplicity!!!
-  //addPage(idDialog = new IdDialog(ui->stackPages), grp, &notify);
+  addPage(idDialog = new IdDialog(ui->stackPages), grp, &notify);
 
-  #ifdef RS_USE_NEW_PEOPLE_DIALOG
+#ifdef RS_USE_NEW_PEOPLE_DIALOG
   PeopleDialog *peopleDialog = NULL;
   addPage(peopleDialog = new PeopleDialog(ui->stackPages), grp, &notify);
-  #endif
+#endif
   //meiyousixin - remove Logs tab for simplicity!!!
   addPage(newsFeed = new NewsFeed(ui->stackPages), grp, &notify);
 #ifdef RS_USE_WIKI
