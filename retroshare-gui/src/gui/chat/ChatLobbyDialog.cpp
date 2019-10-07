@@ -60,6 +60,7 @@
 #define COLUMN_COUNT     4
 
 #define ROLE_SORT            Qt::UserRole + 1
+#define ROLE_ID             Qt::UserRole + 2
 
 const static uint32_t timeToInactivity = 60 * 10;   // in seconds
 
@@ -565,8 +566,19 @@ void ChatLobbyDialog::updateParticipantsList()
 {
     ChatLobbyInfo linfo;
 
+    bool hasNewMemberJoin = false;
     if(rsMsgs->getChatLobbyInfo(lobbyId,linfo))
     {
+
+        //rsMsgs->locked_printDebugInfo();
+        rstime_t now = time(NULL) ;
+        std::cerr << "   Participating friends: " << std::endl;
+        std::cerr << "   groupchat name: " << linfo.lobby_name << std::endl;
+        std::cerr << "   Participating nick names (rsgxsId): " << std::endl;
+
+        for(std::map<RsGxsId,rstime_t>::const_iterator it2(linfo.gxs_ids.begin());it2!=linfo.gxs_ids.end();++it2)
+            std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
+
         ChatLobbyInfo cliInfo=linfo;
         QList<QTreeWidgetItem*>  qlOldParticipants=ui.participantsList->findItems("*",Qt::MatchWildcard,COLUMN_ID);
 
@@ -578,7 +590,8 @@ void ChatLobbyDialog::updateParticipantsList()
                 delete ui.participantsList->takeTopLevelItem(index);
             }
 
-		for (auto it2(linfo.gxs_ids.begin()); it2 != linfo.gxs_ids.end(); ++it2)
+
+        for (auto it2(linfo.gxs_ids.begin()); it2 != linfo.gxs_ids.end(); ++it2)
         {
             QString participant = QString::fromUtf8( (it2->first).toStdString().c_str() );
 
@@ -597,6 +610,7 @@ void ChatLobbyDialog::updateParticipantsList()
                 widgetitem->setText(COLUMN_ID,QString::fromStdString(it2->first.toStdString()));
 
                 ui.participantsList->addTopLevelItem(widgetitem);
+                hasNewMemberJoin = true;
             }
             else
                 widgetitem = dynamic_cast<GxsIdRSTreeWidgetItem*>(qlFoundParticipants.at(0));
@@ -625,7 +639,7 @@ void ChatLobbyDialog::updateParticipantsList()
 
             if (RsGxsId(participant.toStdString()) == gxs_id) widgetitem->setIcon(COLUMN_ICON, bullet_yellow_128);
 
-	    widgetitem->updateBannedState();
+            widgetitem->updateBannedState();
 
             QTime qtLastAct=QTime(0,0,0).addSecs(now-tLastAct);
             widgetitem->setToolTip(COLUMN_ICON,tr("Right click to mute/unmute participants<br/>Double click to address this person<br/>")
@@ -634,6 +648,11 @@ void ChatLobbyDialog::updateParticipantsList()
                                    +tr(" seconds")
                                    );
         }
+
+    }
+    if (hasNewMemberJoin)
+    {
+        rsMsgs->saveGroupChatInfo();
     }
     ui.participantsList->setSortingEnabled(true);
     sortParcipants();

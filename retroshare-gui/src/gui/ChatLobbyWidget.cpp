@@ -578,6 +578,11 @@ void ChatLobbyWidget::showLobby(QTreeWidgetItem *item)
     }
 	else
 		ui.stackedWidget->setCurrentWidget(_lobby_infos[id].dialog) ;
+
+    //unseenp2p
+    if (ChatLobbyDialog *cld = dynamic_cast<ChatLobbyDialog*>(ChatDialog::getExistingChat(ChatId(id)))) {
+        cld->updateParticipantsList();
+    }
 }
 // convert from RsPgpId to chatId
 void ChatLobbyWidget::fromGpgIdToChatId(const RsPgpId &gpgId, ChatId &chatId)

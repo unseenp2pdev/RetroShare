@@ -78,13 +78,17 @@ class DistributedChatService
 		void getListOfNearbyChatLobbies(std::vector<VisibleChatLobbyRecord>& public_lobbies) ;
         bool joinVisibleChatLobby(const ChatLobbyId& id, const RsGxsId &gxs_id) ;
 
+        //unseenp2p - move from private for call from outside
+        void locked_printDebugInfo() const ;
+
         void getGroupChatInfoList(std::map<ChatLobbyId, ChatLobbyInfo> &_groupchats);
+        void saveGroupChatInfo();
 protected:
 		bool handleRecvItem(RsChatItem *) ;
 
 		virtual void sendChatItem(RsChatItem *) =0 ;
 		virtual void locked_storeIncomingMsg(RsChatMsgItem *) =0 ;
-		virtual void triggerConfigSave() =0;
+        virtual void triggerConfigSave() =0;
 
 		void addToSaveList(std::list<RsItem*>& list) const ;
         bool processLoadListItem(const RsItem *item) ;
@@ -127,7 +131,7 @@ protected:
 		void sendLobbyStatusKeepAlive(const ChatLobbyId&) ;
 
 		bool locked_initLobbyBouncableObject(const ChatLobbyId& id,RsChatLobbyBouncingObject&) ;
-        void locked_printDebugInfo() const ;
+
         RsGxsId locked_getDefaultIdentity();
 
 		static ChatLobbyVirtualPeerId makeVirtualPeerId(ChatLobbyId) ;

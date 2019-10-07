@@ -490,10 +490,22 @@ ChatLobbyId p3Msgs::createChatLobby(const std::string& lobby_name,const RsGxsId&
     return mChatSrv->createChatLobby(lobby_name,lobby_identity,lobby_topic,invited_friends,privacy_type) ;
 }
 
+//unseenp2p
 void p3Msgs::getGroupChatInfoList(std::map<ChatLobbyId, ChatLobbyInfo> &_groupchats)
 {
     return mChatSrv->getGroupChatInfoList(_groupchats);
 }
+
+void p3Msgs::saveGroupChatInfo()
+{
+    return mChatSrv->saveGroupChatInfo();
+}
+
+void p3Msgs::locked_printDebugInfo() const
+{
+   return mChatSrv->locked_printDebugInfo();
+}
+//end of unseenp2p
 
 void p3Msgs::setLobbyAutoSubscribe(const ChatLobbyId& lobby_id, const bool autoSubscribe)
 {

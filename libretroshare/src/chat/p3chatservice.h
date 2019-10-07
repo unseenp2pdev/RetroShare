@@ -192,8 +192,8 @@ protected:
 	// accepts virtual peer id
 	bool isOnline(const RsPeerId &pid) ;
 
-	/// This is to be used by subclasses/parents to call IndicateConfigChanged()
-	virtual void triggerConfigSave()  { IndicateConfigChanged() ; }
+    /// This is to be used by subclasses/parents to call IndicateConfigChanged()
+    virtual void triggerConfigSave()  { IndicateConfigChanged() ; }
 
 	/// Same, for storing messages in incoming list
 	RS_DEPRECATED virtual void locked_storeIncomingMsg(RsChatMsgItem *) ;

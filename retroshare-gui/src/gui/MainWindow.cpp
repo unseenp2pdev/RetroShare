@@ -435,7 +435,11 @@ void MainWindow::initStackedPage()
   //addPage(postedDialog = new PostedDialog(ui->stackPages), grp, &notify);
 
   //meiyousixin - remove Identities dialogs for simplicity!!!
-  //addPage(idDialog = new IdDialog(ui->stackPages), grp, &notify);
+#ifdef RS_USE_CIRCLES
+    addPage(idDialog = new IdDialog(ui->stackPages), grp, &notify);
+#endif
+
+
 
   #ifdef RS_USE_NEW_PEOPLE_DIALOG
   PeopleDialog *peopleDialog = NULL;

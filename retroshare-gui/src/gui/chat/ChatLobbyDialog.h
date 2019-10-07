@@ -54,6 +54,9 @@ public:
 	ChatId	chatId() const {return cId;}
 	void sortParcipants();
 
+    //unseenp2p  - move from private to public
+    void updateParticipantsList();
+
 private slots:
 	void participantsTreeWidgetCustomPopupMenu( QPoint point );
 	void textBrowserAskContextMenu(QMenu* contextMnu, QString anchorForPosition, const QPoint point);
@@ -90,7 +93,7 @@ protected slots:
 	void voteParticipant();
 
 private:
-	void updateParticipantsList();
+
 	void initParticipantsContextMenu(QMenu* contextMnu, QList<RsGxsId> idList);
 	
 	void filterIds();
