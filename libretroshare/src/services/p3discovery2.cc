@@ -1784,7 +1784,6 @@ void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisI
               //peerState stateDetail;
               RsPeerDetails peerDetail;
               rsPeers->getPeerDetails(exceptThisId, peerDetail);
-              //fromPeerDetailToStateDetail(peerDetail, stateDetail);
               RsDiscContactItem *pkt = new RsDiscContactItem();
               //populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
               populateContactInfoFromRsPeerDetails(peerDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
