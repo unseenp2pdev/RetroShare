@@ -3019,11 +3019,6 @@ std::map<RsPgpId, UnseenNetworkContactsItem> p3PeerMgrIMPL::networkContacts()
     return mNetworkContacts;
 }
 
-std::map<RsPgpId, UnseenNetworkContactsItem> p3PeerMgrIMPL::networkContacts()
-{
-    return mNetworkContacts;
-}
-
 std::map<RsPgpId, std::string> p3PeerMgrIMPL::certListOfContact()
 {
     return mCertList;
