@@ -1193,13 +1193,13 @@ void ChatLobbyWidget::updateMessageChanged(bool incoming, ChatLobbyId id, QDateT
 
     if (incoming && item)
     {
-        //ChatId chatId(id);
-//        if (recentUnreadListOfChatId.count(chatId) == 0) recentUnreadListOfChatId.insert(chatId);
+        ChatId chatId(id);
+        if (recentUnreadListOfChatId.count(chatId) == 0) recentUnreadListOfChatId.insert(chatId);
 
         _lobby_infos[id].default_icon = QIcon(IMAGE_MESSAGE_PRIVATE) ;
-//        ChatLobbyFlags flags(current_item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
-//        QIcon icon = (flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_MESSAGE) : QIcon(IMAGE_MESSAGE_PRIVATE);
-//        item->setIcon(COLUMN_NAME,icon) ;
+        ChatLobbyFlags flags(current_item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
+        QIcon icon = (flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_MESSAGE) : QIcon(IMAGE_MESSAGE_PRIVATE);
+        item->setIcon(COLUMN_NAME,icon) ;
     }
 
 }
