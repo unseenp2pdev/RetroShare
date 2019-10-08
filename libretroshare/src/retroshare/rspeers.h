@@ -32,6 +32,9 @@
 #include "util/rsdeprecate.h"
 #include "util/rstime.h"
 
+////unseenp2p
+//#include "services/p3discovery2.h"
+
 class RsPeers;
 
 /**
