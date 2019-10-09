@@ -419,10 +419,11 @@ ChatLobbyDialog::~ChatLobbyDialog()
 {
 	// announce leaving of lobby
 
+    //unseenp2p - no need to leave group (unsubscribeChatLobby = leave group)
 	// check that the lobby still exists.
-    if (mChatId.isLobbyId()) {
-        rsMsgs->unsubscribeChatLobby(mChatId.toLobbyId());
-	}
+//    if (mChatId.isLobbyId()) {
+//        rsMsgs->unsubscribeChatLobby(mChatId.toLobbyId());
+//	}
 
 	// save settings
 	processSettings(false);

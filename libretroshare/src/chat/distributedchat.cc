@@ -739,33 +739,38 @@ void DistributedChatService::handleRecvChatLobbyEventItem(RsChatLobbyEventItem *
 	std::cerr << "  doing specific job for this status item." << std::endl;
 #endif
 
+    //unseenp2p - At first we comment this one, but now we keep and actually remove the member list on other side when member
+    // actually want to leave group chat.
 	if(item->event_type == RS_CHAT_LOBBY_EVENT_PEER_LEFT)		// if a peer left. Remove its nickname from the list.
     {
 #ifdef DEBUG_CHAT_LOBBIES
         std::cerr << "  removing nickname " << item->nick << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
 #endif
 
-        //unseenp2p - remove all cases that remove the member from member list
-//        RsStackMutex stack(mDistributedChatMtx); /********** STACK LOCKED MTX ******/
+        RsStackMutex stack(mDistributedChatMtx); /********** STACK LOCKED MTX ******/
 
-//        std::map<ChatLobbyId,ChatLobbyEntry>::iterator it = _chat_lobbys.find(item->lobby_id) ;
+        std::map<ChatLobbyId,ChatLobbyEntry>::iterator it = _chat_lobbys.find(item->lobby_id) ;
 
-//        if(it != _chat_lobbys.end())
-//        {
-//            std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.find(item->signature.keyId)) ;
+        bool leaveGroup = false;
+        if(it != _chat_lobbys.end())
+        {
+            std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.find(item->signature.keyId)) ;
 
-//            if(it2 != it->second.gxs_ids.end())
-//            {
-//                it->second.gxs_ids.erase(it2) ;
-//#ifdef DEBUG_CHAT_LOBBIES
-//                std::cerr << "  removed id " << item->signature.keyId << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
-//#endif
-//            }
-//#ifdef DEBUG_CHAT_LOBBIES
-//            else
-//                std::cerr << "  (EE) nickname " << item->nick << " not in participant nicknames list!" << std::endl;
-//#endif
-//        }
+            if(it2 != it->second.gxs_ids.end())
+            {
+                leaveGroup = true;
+                it->second.gxs_ids.erase(it2) ;
+#ifdef DEBUG_CHAT_LOBBIES
+                std::cerr << "  removed id " << item->signature.keyId << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+#endif
+            }
+#ifdef DEBUG_CHAT_LOBBIES
+            else
+                std::cerr << "  (EE) nickname " << item->nick << " not in participant nicknames list!" << std::endl;
+#endif
+        }
+        std::cerr << "  removed id " << item->signature.keyId << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+        if (leaveGroup) triggerConfigSave();
     }
 	else if(item->event_type == RS_CHAT_LOBBY_EVENT_PEER_JOINED)		// if a joined left. Add its nickname to the list.
 	{
@@ -1677,7 +1682,21 @@ void DistributedChatService::handleFriendUnsubscribeLobby(RsChatLobbyUnsubscribe
 				it->second.participating_friends.erase(it2) ;
 				break ;
 			}
+//        RsPgpId pgpId = rsPeers->getGPGId(item->PeerId());
+//        RsPeerId leaveMemberId = item->PeerId();
+//        RsGxsId gxsId = RsGxsId(leaveMemberId);
+//        for(std::map<RsGxsId, rstime_t>::iterator it3(it->second.gxs_ids.begin());it3!=it->second.gxs_ids.end();++it3)
+//            if((*it3).first == gxsId)
+//            {
+//#ifdef DEBUG_CHAT_LOBBIES
+//                std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+//#endif
+//                std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+//                it->second.gxs_ids.erase((*it3).first) ;
+//                break ;
+//            }
 	}
+
 
 	RsServer::notify()->notifyListChange(NOTIFY_LIST_CHAT_LOBBY_LIST, NOTIFY_TYPE_MOD) ;
 }

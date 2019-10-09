@@ -993,39 +993,42 @@ QTreeWidgetItem *ChatLobbyWidget::getTreeWidgetItem(ChatLobbyId id)
 }
 void ChatLobbyWidget::updateTypingStatus(ChatLobbyId id)
 {
-	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
+    //unseenp2p - meiyousixin - no need to show typing icon on group item on the left list
+//	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
 	
-	if(item != NULL)
-	{
-		item->setIcon(COLUMN_NAME,QIcon(IMAGE_TYPING)) ;
-		_lobby_infos[id].last_typing_event = time(NULL) ;
+//	if(item != NULL)
+//	{
+//		item->setIcon(COLUMN_NAME,QIcon(IMAGE_TYPING)) ;
+//		_lobby_infos[id].last_typing_event = time(NULL) ;
 
-		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
-	}
+//		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
+//	}
 }
 void ChatLobbyWidget::updatePeerLeaving(ChatLobbyId id)
 {
-	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
+     //unseenp2p - meiyousixin - no need to show leaving and joining icons on the icon of left list
+//	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
 	
-	if(item != NULL)
-	{
-		item->setIcon(COLUMN_NAME,QIcon(IMAGE_PEER_LEAVING)) ;
-		_lobby_infos[id].last_typing_event = time(NULL) ;
+//	if(item != NULL)
+//	{
+//		item->setIcon(COLUMN_NAME,QIcon(IMAGE_PEER_LEAVING)) ;
+//		_lobby_infos[id].last_typing_event = time(NULL) ;
 
-		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
-	}
+//		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
+//	}
 }
 void ChatLobbyWidget::updatePeerEntering(ChatLobbyId id)
 {
-	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
+    //unseenp2p - meiyousixin - no need to show leaving and joining icons on the icon of left list
+//	QTreeWidgetItem *item = getTreeWidgetItem(id) ;
 	
-	if(item != NULL)
-	{
-		item->setIcon(COLUMN_NAME,QIcon(IMAGE_PEER_ENTERING)) ;
-		_lobby_infos[id].last_typing_event = time(NULL) ;
+//	if(item != NULL)
+//	{
+//		item->setIcon(COLUMN_NAME,QIcon(IMAGE_PEER_ENTERING)) ;
+//		_lobby_infos[id].last_typing_event = time(NULL) ;
 
-		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
-	}
+//		QTimer::singleShot(5000,this,SLOT(resetLobbyTreeIcons())) ;
+//	}
 }
 void ChatLobbyWidget::resetLobbyTreeIcons()
 {
@@ -1196,9 +1199,9 @@ void ChatLobbyWidget::updateMessageChanged(bool incoming, ChatLobbyId id, QDateT
         ChatId chatId(id);
         if (recentUnreadListOfChatId.count(chatId) == 0) recentUnreadListOfChatId.insert(chatId);
 
-        _lobby_infos[id].default_icon = QIcon(IMAGE_MESSAGE_PRIVATE) ;
-        ChatLobbyFlags flags(current_item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
+        ChatLobbyFlags flags(item->data(COLUMN_DATA, ROLE_FLAGS).toUInt());
         QIcon icon = (flags & RS_CHAT_LOBBY_FLAGS_PUBLIC) ? QIcon(IMAGE_MESSAGE) : QIcon(IMAGE_MESSAGE_PRIVATE);
+        _lobby_infos[id].default_icon = icon;
         item->setIcon(COLUMN_NAME,icon) ;
     }
 
