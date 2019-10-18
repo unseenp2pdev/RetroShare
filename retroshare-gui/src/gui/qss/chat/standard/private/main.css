@@ -30,27 +30,10 @@ color: #9a9ab4;
   background-color: rgba(241,231,103,1);
 }
 .hincomingMsg, .incomingMsg{
-    background-color: #ededed;
-    border-color: red;
-    border-radius:30%;
-    box-shadow: 0 0 6px #540d0d;
+    background-color: #dbdbdb;
     display: inline-block;
-    padding: 10px 18px;
 }
-.houtgoingMsg2, .outgoingMsg2, .ooutgoingMsg2{
-    background-color: #bdedff;
-    border: 1px;
-    border-color: red;
-    border-radius:30%;
-    -moz-border-radius:50%;
-    -webkit-border-radius:50%;
-    border-color: #2c6861;
-    box-shadow: 0 0 6px #540d0d;
+.houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
+    background-color: #ade7ff;
     padding: 10px 18px;
-}
-.msgdsa {
-border: 2px;
-border-color: red;
-border-radius:30%;
-background-color: #bdedff;
 }

@@ -51,3 +51,17 @@
 .meName {
 	font-weight: bold;
 }
+.hincomingMsg, .incomingMsg{
+    background-color: #dbdbdb;
+    display: inline-block;
+}
+.houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
+    background-color: #ade7ff;
+    padding: 10px 18px;
+}
+.name {
+        font-weight: bold;
+}
+.time {
+color: #9a9ab4;
+}
