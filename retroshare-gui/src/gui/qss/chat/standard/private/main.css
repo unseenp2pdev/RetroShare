@@ -3,38 +3,37 @@
 }
 
 .time {
+color: #9a9ab4;
 }
 
 .incomingHeader {
-	background-color:#dfedff;
-	border-color:#fafafa #d1dfef #d1dfef #fafafa;
-	color: #91968f;
+
 }
 
 .outgoingHeader {
-	background-color:#f5f5f5;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #244578;
+
 }
 
 .hincomingHeader {
-	background-color:#dfedff;
-	border-color:#fafafa #d1dfef #d1dfef #fafafa;
-	color: #7F837D;
+
 }
 
 .houtgoingHeader {
-	background-color:#f5f5f5;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #6491d2;
+
 }
 
 .ooutgoingHeader {
-	background-color:#ffbebe;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #244578;
+
 }
 
 .systemHeader {
   background-color: rgba(241,231,103,1);
+}
+.hincomingMsg, .incomingMsg{
+    background-color: #dbdbdb;
+    display: inline-block;
+}
+.houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
+    background-color: #ade7ff;
+    padding: 10px 18px;
 }

@@ -38,7 +38,7 @@ class TransferPage: public ConfigPage
 		/** Loads the settings for this page */
 		virtual void load() ;
 
-        virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/file_x.svg") ; }
+        virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/file_x.png") ; }
         virtual QString pageName() const { return tr("Files") ; }
 		virtual QString helpText() const { return ""; }
 
