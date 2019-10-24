@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ui_ChatLobbyWidget.h"
-
 #include "RsAutoUpdatePage.h"
 #include "chat/ChatLobbyUserNotify.h"
 #include "gui/gxs/GxsIdChooser.h"
@@ -11,6 +9,9 @@
 #include <retroshare/rsmsgs.h>
 #include "chat/distributedchat.h"
 
+//unseenp2p
+#include "gui/smartlistmodel.h"
+#include "gui/models/conversationmodel.h"
 
 #include <QAbstractButton>
 #include <QTreeWidget>
@@ -20,6 +21,21 @@
 #define CHAT_LOBBY_PRIVACY_LEVEL_PUBLIC  1
 #define CHAT_LOBBY_PRIVACY_LEVEL_PRIVATE 2
 #define CHAT_LOBBY_ONE2ONE_LEVEL	 3
+
+#define IMAGE_CREATE          ""
+#define IMAGE_PUBLIC          ":/chat/img/groundchat.png"               //d: Update unseen icon
+#define IMAGE_PRIVATE         ":/chat/img/groundchat_private.png"       //d: Update unseen icon
+#define IMAGE_SUBSCRIBE       ":/images/edit_add24.png"
+#define IMAGE_UNSUBSCRIBE     ":/images/cancel.png"
+#define IMAGE_PEER_ENTERING   ":/chat/img/personal_add_64.png"          //d: Update unseen icon
+#define IMAGE_PEER_LEAVING    ":/chat/img/personal_remove_64.png"       //d: Update unseen icon
+#define IMAGE_TYPING		  ":/chat/img/typing.png"                   //d: Update unseen icon
+#define IMAGE_MESSAGE	      ":/chat/img/chat_32.png"                  //d: Update unseen icon
+#define IMAGE_MESSAGE_PRIVATE ":/chat/img/groundchat_private_unread.png"                //d: Notification icon for private group
+#define IMAGE_AUTOSUBSCRIBE   ":/images/accepted16.png"
+#define IMAGE_COPYRSLINK      ":/images/copyrslink.png"
+#define IMAGE_UNSEEN          ":/app/images/unseen32.png"
+#define IMAGE_UNREAD_ICON      ":/home/img/face_icon/un_chat_icon_d_128.png"
 
 class RSTreeWidgetItemCompareRole;
 class ChatTabWidget ;
@@ -42,6 +58,25 @@ struct ChatOne2OneInfoStruct
 	time_t last_typing_event;
 };
 
+struct ChatItemStruct
+{
+    QIcon icon ;
+    QString displayName;            //group name or contact name
+    QString nickInGroupChat;        // only in groupchat
+    QString onlineStatus;           // "online", "away", "idle", "offline"
+    int UnreadMessagesCount;
+    QDateTime LastInteractionDate;    // date for last message
+    QString lastMessage;
+    int contactType;                // 0 - groupchat, 1 - contact chat
+    int groupChatType;              // 0 - public, 1: private
+    ChatLobbyId groupId;            // for groupchat type
+    ChatId chatId;                  // for contact
+    QString uId;                    // unique Id: this will take groupId or chatId for Id for all list
+
+};
+namespace Ui {
+class ChatLobbyWidget;
+}
 class ChatLobbyWidget : public RsAutoUpdatePage
 {
 	Q_OBJECT
@@ -74,6 +109,20 @@ public:
     void updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &name, const ChatLobbyId& chatId,  uint current_time, bool unread, ChatLobbyFlags lobby_flags);
 	void fromGpgIdToChatId(const RsPgpId &gpgId,  ChatId &chatId);
     bool showContactAnchor(RsPeerId id, QString anchor);
+
+    //unseen p2p - try to work with Model-view (smartlistview, smarlistmodel)
+    std::map<ChatLobbyId,ChatLobbyInfoStruct> getGroupChatList();       // 17 Oct 2019 - meiyousixin
+    std::map<std::string,ChatOne2OneInfoStruct> getOne2OneChatList();   // 17 Oct 2019 - meiyousixin
+    std::list<ChatItemStruct> getChatItemsList();
+
+    QIcon lastIconForPeerId(RsPeerId peerId, bool unread);
+    QImage avatarImageForPeerId(RsPeerId peerId);
+
+    ConversationModel* getConversationModel();
+    std::vector<conversation::Info> getConversationList();
+    void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                      unsigned int UnreadMessagesCount, QDateTime LastInteractionDate, std::string lastMessage,
+                                      int contactType, int groupChatType, ChatId chatId);
 
 signals:
 	void unreadCountChanged(uint unreadCount);
@@ -119,6 +168,9 @@ private slots:
     void UpdateStatusForAllContacts();
     void UpdateStatusForContact(QTreeWidgetItem* gpgItem, const RsPeerId peerId);
     void ContactStatusChanged(QString, int);
+    //unseenp2p - using for new chat list
+    void smartListSelectionChanged(const QItemSelection  &selected, const QItemSelection  &deselected);
+
 private:
 	void autoSubscribeLobby(QTreeWidgetItem *item);
 	void subscribeChatLobby(ChatLobbyId id) ;
@@ -126,12 +178,19 @@ private:
     void joinGroupChatInBackground(ChatLobbyInfo lobbyInfo);
 	bool filterItem(QTreeWidgetItem *item, const QString &text, int filterColumn);
 
+    //unseenp2p
+    void selectConversation(const QModelIndex& index);
+   // bool selectConversation(const unseenp2p::api::conversation::Info& item,
+   //     unseenp2p::api::ConversationModel& convModel);
+
+    bool selectConversation(const conversation::Info& item,
+            ConversationModel& convModel);
 	RSTreeWidgetItemCompareRole *compareRole;
 	QTreeWidgetItem *privateLobbyItem;
 	QTreeWidgetItem *publicLobbyItem;
 	QTreeWidgetItem *privateSubLobbyItem;
 	QTreeWidgetItem *publicSubLobbyItem;
-	QTreeWidgetItem *chatContactItem; //21 Sep 2018 - meiyousixin - add this 'contact' tree for one2one chat
+    //QTreeWidgetItem *chatContactItem; //21 Sep 2018 - meiyousixin - add this 'contact' tree for one2one chat
     QTreeWidgetItem *commonItem; //27 Nov 2018 - meiyousixin  - using for all conversations
 	QTreeWidgetItem *getTreeWidgetItem(ChatLobbyId);
 	QTreeWidgetItem *getTreeWidgetItemForChatId(ChatId);
@@ -158,7 +217,7 @@ private:
 	GxsIdChooser* myInviteIdChooser;
 
 	/* UI - from Designer */
-	Ui::ChatLobbyWidget ui;
+    Ui::ChatLobbyWidget* ui;
 
 	void showContactChat(QTreeWidgetItem *item);
     void getHistoryForRecentList();
@@ -166,8 +225,18 @@ private:
 
     std::set<ChatId> recentUnreadListOfChatId;
     QPixmap currentStatusIcon(RsPeerId peerId, QFont& gpgFontOut);
-    QIcon lastIconForPeerId(RsPeerId peerId, bool unread);
+
 
     std::map<ChatLobbyId,ChatLobbyInfo> _groupchat_infos;
+
+    SmartListModel* smartListModel_;
+
+    std::list<ChatItemStruct> _chatItemsList; //for model-view
+    ConversationModel* convModel;
+
+    std::vector<conversation::Info> conversationListInWidget;
+
+    QMetaObject::Connection newConversationConnection_;
+    QMetaObject::Connection smartlistSelectionConnection_;
 };
 

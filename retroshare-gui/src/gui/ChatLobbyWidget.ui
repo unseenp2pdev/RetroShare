@@ -190,7 +190,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeWidget" name="lobbyTreeWidget">
+        <widget class="SmartListView" name="lobbyTreeWidget">
          <property name="styleSheet">
           <string notr="true"/>
          </property>
@@ -202,7 +202,7 @@
          </property>
          <column>
           <property name="text">
-           <string notr="true">1</string>
+           <string notr="true"/>
           </property>
          </column>
         </widget>
@@ -319,6 +319,11 @@
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
    <header location="global">gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SmartListView</class>
+   <extends>QWidget</extends>
+   <header>gui/smartlistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

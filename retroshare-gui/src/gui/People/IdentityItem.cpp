@@ -129,8 +129,8 @@ void IdentityItem::distantChat()
 {
 	uint32_t error_code ;
 
-	if(!rsMsgs->initiateDistantChatConnexion(RsGxsId(_group_info.mMeta.mGroupId), error_code))
-		QMessageBox::information(NULL,"Distant cannot work","Distant chat refused with this peer. Reason: "+QString::number(error_code)) ;
+//	if(!rsMsgs->initiateDistantChatConnexion(RsGxsId(_group_info.mMeta.mGroupId), error_code))
+//		QMessageBox::information(NULL,"Distant cannot work","Distant chat refused with this peer. Reason: "+QString::number(error_code)) ;
 }
 
 void IdentityItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
