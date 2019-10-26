@@ -1,7 +1,7 @@
 /****************************************************************
  *  RetroShare is distributed under the following license:
  *
- *  Copyright (C) 2008 Robert Fernie
+ *  Copyright (C) 2014 RetroShare Team
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,37 +15,31 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#ifndef _FEED_HOLDER_H
-#define _FEED_HOLDER_H
+#ifndef GXSCHATUSERNOTIFY_H
+#define GXSCHATUSERNOTIFY_H
 
-#include <string>
-#include <stdint.h>
 
-#include <retroshare/rsgxschannels.h> // WRONG ONE - BUT IT'LL DO FOR NOW.
-#include <retroshare/rsgxschats.h>
 
-class QScrollArea;
+#include "gui/gxs/GxsUserNotify.h"
 
-class FeedHolder
+class GxsChatUserNotify : public GxsUserNotify
 {
+    Q_OBJECT
+
 public:
-	FeedHolder();
+    GxsChatUserNotify(RsGxsIfaceHelper *ifaceImpl, QObject *parent = 0);
 
-	virtual QScrollArea *getScrollArea() = 0;
-	virtual void deleteFeedItem(QWidget *item, uint32_t type) = 0;
-    virtual	void openChat(const RsPeerId& peerId) = 0;
-	virtual void openComments(uint32_t type, const RsGxsGroupId &groupId, const QVector<RsGxsMessageId> &msg_versions, const RsGxsMessageId &msgId, const QString &title)=0;
+    virtual bool hasSetting(QString *name, QString *group);
 
-	// Workaround for QTBUG-3372
-	void lockLayout(QWidget *feedItem, bool lock);
-
-protected:
-	int mLockCount;
+private:
+    virtual QIcon getIcon();
+    virtual QIcon getMainIcon(bool hasNew);
+    virtual void iconClicked();
 };
 
-#endif
 
+#endif // GXSCHATUSERNOTIFY_H

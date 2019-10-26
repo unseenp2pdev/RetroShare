@@ -11,7 +11,16 @@
 #include <map>
 #include <string>
 
+class SSGxsChatGroup
+{
+    public:
+    SSGxsChatGroup(): mAutoDownload(false), mDownloadDirectory("") {}
+    bool load(const std::string &input);
+    std::string save() const;
 
+    bool mAutoDownload;
+    std::string mDownloadDirectory;
+};
 
 class p3GxsChats: public RsGenExchange, public RsGxsChats,
     public GxsTokenQueue, public p3Config,
@@ -38,6 +47,14 @@ protected:
     virtual bool retrieveDistantGroup(const RsGxsGroupId& group_id,RsGxsChatGroup& distant_group);
 
     // Overloaded to cache new groups.
+    // no tokens... should be cached.
+    virtual bool setChannelAutoDownload(const RsGxsGroupId &groupId, bool enabled);
+    virtual	bool getChannelAutoDownload(const RsGxsGroupId &groupid, bool& enabled);
+    virtual bool setChannelDownloadDirectory(const RsGxsGroupId &groupId, const std::string& directory);
+    virtual bool getChannelDownloadDirectory(const RsGxsGroupId &groupId, std::string& directory);
+
+
+
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);
@@ -132,6 +149,8 @@ static uint32_t chatsAuthenPolicy();
     void updateSubscribedGroup(const RsGroupMetaData &group);
     void clearUnsubscribedGroup(const RsGxsGroupId &id);
 
+    bool setAutoDownload(const RsGxsGroupId &groupId, bool enabled);
+    bool autoDownloadEnabled(const RsGxsGroupId &groupId, bool &enabled);
 
 
 

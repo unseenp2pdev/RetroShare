@@ -164,7 +164,8 @@ HEADERS += plugins/pluginmanager.h \
     util/rsinitedptr.h \
     retroshare/rsgxschats.h \
     rsitems/rsgxschatitems.h \
-    services/p3gxschats.h
+    services/p3gxschats.h \
+    chat/p3gxschatservice.h
 
 HEADERS += $$PUBLIC_HEADERS
 
@@ -530,7 +531,8 @@ SOURCES +=	ft/ftchunkmap.cc \
 			ft/fttransfermodule.cc \
             ft/ftturtlefiletransferitem.cc \
     rsitems/rsgxschatitems.cc \
-    services/p3gxschats.cc
+    services/p3gxschats.cc \
+    chat/p3gxschatservice.cc
 
 SOURCES += crypto/chacha20.cpp \
 			crypto/rsaes.cc \

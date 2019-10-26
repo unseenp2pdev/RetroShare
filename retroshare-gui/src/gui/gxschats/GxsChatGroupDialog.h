@@ -1,7 +1,7 @@
 /****************************************************************
  *  RetroShare is distributed under the following license:
  *
- *  Copyright (C) 2008 Robert Fernie
+ *  Copyright (C) 2013 Robert Fernie
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,37 +15,35 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#ifndef _FEED_HOLDER_H
-#define _FEED_HOLDER_H
+#ifndef GXSCHATGROUPDIALOG_H
+#define GXSCHATGROUPDIALOG_H
 
-#include <string>
-#include <stdint.h>
 
-#include <retroshare/rsgxschannels.h> // WRONG ONE - BUT IT'LL DO FOR NOW.
+#include "gui/gxs/GxsGroupDialog.h"
 #include <retroshare/rsgxschats.h>
 
-class QScrollArea;
-
-class FeedHolder
+class GxsChatGroupDialog : public GxsGroupDialog
 {
+    Q_OBJECT
+
 public:
-	FeedHolder();
-
-	virtual QScrollArea *getScrollArea() = 0;
-	virtual void deleteFeedItem(QWidget *item, uint32_t type) = 0;
-    virtual	void openChat(const RsPeerId& peerId) = 0;
-	virtual void openComments(uint32_t type, const RsGxsGroupId &groupId, const QVector<RsGxsMessageId> &msg_versions, const RsGxsMessageId &msgId, const QString &title)=0;
-
-	// Workaround for QTBUG-3372
-	void lockLayout(QWidget *feedItem, bool lock);
+    GxsChatGroupDialog(TokenQueue *tokenQueue, QWidget *parent);
+    GxsChatGroupDialog(TokenQueue *tokenExternalQueue, RsTokenService *tokenService, Mode mode, RsGxsGroupId groupId, QWidget *parent = NULL);
 
 protected:
-	int mLockCount;
+    virtual void initUi();
+    virtual QPixmap serviceImage();
+    virtual bool service_CreateGroup(uint32_t &token, const RsGroupMetaData &meta);
+    virtual bool service_loadGroup(uint32_t token, Mode mode, RsGroupMetaData& groupMetaData, QString &description);
+    virtual bool service_EditGroup(uint32_t &token, RsGroupMetaData &editedMeta);
+
+private:
+    void prepareChannelGroup(RsGxsChatGroup &group, const RsGroupMetaData &meta);
 };
 
-#endif
 
+#endif // GXSCHATGROUPDIALOG_H

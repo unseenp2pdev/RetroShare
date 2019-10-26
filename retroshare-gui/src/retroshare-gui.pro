@@ -20,8 +20,11 @@ libresapihttpserver {
 !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 
 FORMS   += TorControl/TorControlWindow.ui
+
 SOURCES += TorControl/TorControlWindow.cpp
+
 HEADERS += TorControl/TorControlWindow.h
+
 
 
 #QMAKE_CFLAGS += -fmudflap 
@@ -41,6 +44,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 CONFIG += identities
 CONFIG += gxsforums
 CONFIG += gxschannels
+CONFIG += gxschats
 CONFIG += posted
 CONFIG += gxsgui
 CONFIG += gxscircles
@@ -1277,7 +1281,39 @@ gxschannels {
 		gui/feeds/GxsChannelPostItem.cpp \
 		gui/gxschannels/GxsChannelUserNotify.cpp
 }
-	
+
+gxschats {
+
+        HEADERS += gui/gxschats/GxsChatDialog.h \
+                gui/gxschats/GxsChatGroupDialog.h \
+                gui/gxschats/CreateGxsChatMsg.h \
+                gui/gxschats/GxsChatWidget.h \
+                gui/gxschats/GxsChatPostsWidget.h \
+                gui/gxschats/GxsChatFilesWidget.h \
+                gui/gxschats/GxsChatFilesStatusWidget.h \
+                gui/feeds/GxsChatGroupItem.h \
+                gui/feeds/GxsChatPostItem.h \
+                gui/gxschats/GxsChatUserNotify.h
+
+        FORMS += gui/gxschats/GxsChatWidget.ui \
+                gui/gxschats/GxsChatPostsWidget.ui \
+                gui/gxschats/GxsChatFilesWidget.ui \
+                gui/gxschats/GxsChatFilesStatusWidget.ui \
+                gui/gxschats/CreateGxsChatMsg.ui \
+                gui/feeds/GxsChatGroupItem.ui \
+                gui/feeds/GxsChatPostItem.ui
+
+        SOURCES += gui/gxschats/GxsChatDialog.cpp \
+                gui/gxschats/GxsChatWidget.cpp \
+                gui/gxschats/GxsChatPostsWidget.cpp \
+                gui/gxschats/GxsChatFilesWidget.cpp \
+                gui/gxschats/GxsChatFilesStatusWidget.cpp \
+                gui/gxschats/GxsChatGroupDialog.cpp \
+                gui/gxschats/CreateGxsChatMsg.cpp \
+                gui/feeds/GxsChatGroupItem.cpp \
+                gui/feeds/GxsChatPostItem.cpp \
+                gui/gxschats/GxsChatUserNotify.cpp
+}
 	
 posted {
 	

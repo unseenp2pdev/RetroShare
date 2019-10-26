@@ -93,6 +93,7 @@
 #include "retroshare/rsinit.h"
 
 #include "gui/gxschannels/GxsChannelDialog.h"
+#include "gui/gxschats/GxsChatDialog.h"
 #include "gui/gxsforums/GxsForumsDialog.h"
 #include "gui/Identity/IdDialog.h"
 #ifdef RS_USE_CIRCLES
@@ -429,6 +430,7 @@ void MainWindow::initStackedPage()
   addPage(transfersDialog = new TransfersDialog(ui->stackPages), grp, &notify);
 
   addPage(gxschannelDialog = new GxsChannelDialog(ui->stackPages), grp, &notify);
+  addPage(gxschatDialog = new GxsChatDialog(ui->stackPages), grp, &notify);
   addPage(gxsforumDialog = new GxsForumsDialog(ui->stackPages), grp, &notify);
   //meiyousixin - remove links
 
@@ -1024,6 +1026,9 @@ void SetForegroundWindowInternal(HWND hWnd)
 		 case Channels:
                          _instance->ui->stackPages->setCurrentPage( _instance->gxschannelDialog );
 			 return true ;
+         case Messengers:
+                     _instance->ui->stackPages->setCurrentPage( _instance->gxschatDialog );
+         return true ;
 		 case Forums:
                          _instance->ui->stackPages->setCurrentPage( _instance->gxsforumDialog );
                          return true ;
@@ -1108,6 +1113,8 @@ void SetForegroundWindowInternal(HWND hWnd)
 			return _instance->messagesDialog;
 		case Channels:
 			return _instance->gxschannelDialog;
+        case Messengers:
+            return _instance->gxschatDialog;
 		case Forums:
 			return _instance->gxsforumDialog;
 		case Posted:

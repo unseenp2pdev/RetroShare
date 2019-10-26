@@ -1,7 +1,7 @@
 /****************************************************************
  *  RetroShare is distributed under the following license:
  *
- *  Copyright (C) 2008 Robert Fernie
+ *  Copyright (C) 2014 RetroShare Team
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -15,37 +15,37 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor,
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#ifndef _FEED_HOLDER_H
-#define _FEED_HOLDER_H
+#include "GxsChatUserNotify.h"
+#include "gui/MainWindow.h"
 
-#include <string>
-#include <stdint.h>
-
-#include <retroshare/rsgxschannels.h> // WRONG ONE - BUT IT'LL DO FOR NOW.
-#include <retroshare/rsgxschats.h>
-
-class QScrollArea;
-
-class FeedHolder
+GxsChatUserNotify::GxsChatUserNotify(RsGxsIfaceHelper *ifaceImpl, QObject *parent) :
+    GxsUserNotify(ifaceImpl, parent)
 {
-public:
-	FeedHolder();
+}
 
-	virtual QScrollArea *getScrollArea() = 0;
-	virtual void deleteFeedItem(QWidget *item, uint32_t type) = 0;
-    virtual	void openChat(const RsPeerId& peerId) = 0;
-	virtual void openComments(uint32_t type, const RsGxsGroupId &groupId, const QVector<RsGxsMessageId> &msg_versions, const RsGxsMessageId &msgId, const QString &title)=0;
+bool GxsChatUserNotify::hasSetting(QString *name, QString *group)
+{
+    if (name) *name = tr("Channel Post");
+    if (group) *group = "Channel";
 
-	// Workaround for QTBUG-3372
-	void lockLayout(QWidget *feedItem, bool lock);
+    return true;
+}
 
-protected:
-	int mLockCount;
-};
+QIcon GxsChatUserNotify::getIcon()
+{
+    return QIcon(":/home/img/face_icon/youtube-play-button_128.png");
+}
 
-#endif
+QIcon GxsChatUserNotify::getMainIcon(bool hasNew)
+{
+    return hasNew ? QIcon(":/home/img/face_icon/youtube-play-button_v_128.png") : QIcon(":/home/img/face_icon/youtube-play-button_128.png");
+}
 
+void GxsChatUserNotify::iconClicked()
+{
+    MainWindow::showWindow(MainWindow::Channels);
+}

@@ -57,6 +57,8 @@ public:
 	p3ChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm,
 	               p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService );
 
+
+
 	virtual RsServiceInfo getServiceInfo();
 
 	/***** overloaded from p3Service *****/

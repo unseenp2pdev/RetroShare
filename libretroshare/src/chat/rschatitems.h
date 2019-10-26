@@ -79,6 +79,12 @@ const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_SIGNED_EVENT      = 0x18 ;
 const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_LIST              = 0x19 ;
 const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_INFO              = 0x1D ; //meiyousixin - for lobbyInfo saving
 
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_ACCEPT                 = 0x30 ; //unseenp2pdev - for lobby Inviation/Accept
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_INVITE                 = 0x31 ; //unseenp2pdev - for lobby Inviation/Accept
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_MSG                    = 0x32 ; //unseenp2pdev - gxschat message
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_LOBBY_PUBLISH_KEY      = 0x33 ; //unseenp2pdev - gxschat shared publish key
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_GROUP_MSG              = 0x34 ; //unseenp2pdev - gxschat shared publish key
+
 RS_DEPRECATED_FOR(RS_PKT_SUBTYPE_CHAT_LOBBY_INVITE) \
 const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_INVITE_DEPRECATED = 0x1A ;	// to be removed (deprecated since May 2017)
 
@@ -103,6 +109,93 @@ class RsChatItem: public RsItem
 
         virtual void clear() {}
 };
+
+/*!
+ * Contains serialised GxsGroup items
+ * Each item corresponds to a group which needs to be
+ * deserialised
+ */
+class GxsNxsChatGroupItem : public RsChatItem
+{
+
+public:
+
+    explicit GxsNxsChatGroupItem(uint16_t servtype=RS_PKT_SUBTYPE_GXSCHAT_GROUP_MSG): RsChatItem(servtype),
+      meta(servtype), metaData(NULL), pos(0), count(0)
+    { clear(); }
+    virtual ~GxsNxsChatGroupItem() { delete metaData; }
+
+    //GxsNxsChatGroupItem* clone() const;
+
+    virtual void clear();
+
+    virtual void serial_process( RsGenericSerializer::SerializeJob j,
+                                 RsGenericSerializer::SerializeContext& ctx );
+
+    RsGxsGroupId grpId; /// group Id, needed to complete version Id (ncvi)
+    static int refcount;
+    RsTlvBinaryData grp; /// actual group data
+    uint8_t pos; /// used for splitting up grp
+    uint8_t count; /// number of split up messages
+    uint32_t transactionNumber; // set to zero if this is not a transaction item
+
+
+    /*!
+     * This should contains all data
+     * which is not specific to the Gxs service data
+     */
+    // This is the binary data for the group meta that is sent to friends. It *should not* contain any private
+    // key parts. This is ensured in RsGenExchange
+
+    RsTlvBinaryData meta;
+
+    // Deserialised metaData, this is not serialised by the serialize() method. So it may contain private key parts in some cases.
+    RsGxsGrpMetaData* metaData;
+};
+
+/*!
+ * Used to respond to a RsGxsChatMsg
+ * with message items satisfying request
+ */
+class GxsNxsChatMsgItem : public RsChatItem
+{
+
+public:
+
+    explicit GxsNxsChatMsgItem(uint16_t servtype=RS_PKT_SUBTYPE_GXSCHAT_MSG): RsChatItem(servtype),
+        pos(0), count(0), meta(servtype), msg(servtype), metaData(NULL)
+    { clear(); }
+    virtual ~GxsNxsChatMsgItem() { delete metaData; }
+
+    virtual void serial_process( RsGenericSerializer::SerializeJob j,
+                                 RsGenericSerializer::SerializeContext& ctx );
+
+    virtual void clear();
+    virtual std::ostream &print(std::ostream& out, uint16_t indent);
+
+    uint8_t pos; /// used for splitting up msg
+    uint8_t count; /// number of split up messages
+    uint32_t transactionNumber; // set to zero if this is not a transaction item
+
+    RsGxsGroupId grpId; /// group id, forms part of version id
+    RsGxsMessageId msgId; /// msg id
+    static int refcount;
+
+    /*!
+     * This should contains all the data
+     * which is not specific to the Gxs service data
+     */
+    RsTlvBinaryData meta;
+
+    /*!
+     * This contains Gxs specific data
+     * only client of API knows how to decode this
+     */
+    RsTlvBinaryData msg;
+
+    RsGxsMsgMetaData* metaData;
+};
+
 
 /*!
  * For sending chat msgs

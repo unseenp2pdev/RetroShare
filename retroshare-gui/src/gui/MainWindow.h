@@ -49,6 +49,7 @@ class SysTrayStatus;
 class TorStatus ;
 //class ForumsDialog;
 class GxsChannelDialog ;
+class GxsChatDialog ;
 class GxsForumsDialog ;
 class PostedDialog;
 class FriendsDialog;
@@ -88,6 +89,7 @@ public:
         SharedDirectories  = 4,  /** Shared Directories page. */
         Messages           = 5,  /** Messages page. */
         Channels           = 6,  /** Channels page. */
+        Messengers         = 26,  /** Channels page. */
         Forums             = 7,  /** Forums page. */
         Search             = 8,  /** Search page. */
         Posted             = 11,  /** Posted links */
@@ -150,6 +152,7 @@ public:
 	 MessagesDialog    *messagesDialog;
 	 SettingsPage      *settingsDialog;
 	 GxsChannelDialog  *gxschannelDialog ;
+     GxsChatDialog     *gxschatDialog ;
 	 GxsForumsDialog   *gxsforumDialog ;
 	 PostedDialog      *postedDialog;
 

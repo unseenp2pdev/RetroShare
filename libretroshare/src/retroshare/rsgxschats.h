@@ -43,12 +43,28 @@ class RsGxsChats;
  */
 extern RsGxsChats *rsGxsChats;
 
+//class RsGxsChatMember : RsSerializable
+//{
+//   public:
+//    // a friend can be direct(peerid) and distant (gxsid)
+//    RsPeerId    peerId; //RsPeerId for direct communication
+//    RsGxsId     gxsId;  //gxsId is for distant communication, each user should have one set of unique peerId and gsxId. but not limit to.
+//    /// @see RsSerializable
+//    virtual void serial_process( RsGenericSerializer::SerializeJob j,
+//                             RsGenericSerializer::SerializeContext& ctx )
+//    {
+//        RS_SERIAL_PROCESS(peerId);
+//        RS_SERIAL_PROCESS(gxsId);
+//    }
+//};
+
 class RsGxsChatGroup : RsSerializable
 {
     public:
         RsGroupMetaData mMeta;
         std::string mDescription;   //conversation display name or groupname
-        RsGxsImage  mImage;         //conversation avatar image
+        RsGxsImage  mImage; //conversation avatar image
+        std::map<RsPeerId,RsGxsId> members;
         /// @see RsSerializable
         virtual void serial_process( RsGenericSerializer::SerializeJob j,
                                  RsGenericSerializer::SerializeContext& ctx )
@@ -56,6 +72,8 @@ class RsGxsChatGroup : RsSerializable
             RS_SERIAL_PROCESS(mMeta);
             RS_SERIAL_PROCESS(mImage);
             RS_SERIAL_PROCESS(mDescription);
+
+            RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
         }
 };
 
@@ -88,6 +106,8 @@ public:
 
     explicit RsGxsChats(RsGxsIface& gxs) : RsGxsIfaceHelper(gxs) {}
     virtual ~RsGxsChats() {}
+
+
 
     /**
      * @brief Get chats summaries list. Blocking API.
@@ -130,6 +150,7 @@ public:
     virtual bool getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &posts, std::vector<RsGxsComment> &cmts) = 0;
     virtual bool getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &posts) = 0;
 
+
     /**
      * @brief toggle message read status
      * @jsonapi{development}
@@ -139,6 +160,46 @@ public:
      */
     virtual void setMessageReadStatus(
             uint32_t& token, const RsGxsGrpMsgIdPair& msgId, bool read) = 0;
+
+    /**
+     * @brief Enable or disable auto-download for given channel
+     * @jsonapi{development}
+     * @param[in] groupId channel id
+     * @param[in] enable true to enable, false to disable
+     * @return false if something failed, true otherwhise
+     */
+    virtual bool setChannelAutoDownload(
+            const RsGxsGroupId &groupId, bool enable) = 0;
+
+    /**
+     * @brief Get auto-download option value for given channel
+     * @jsonapi{development}
+     * @param[in] groupId channel id
+     * @param[in] enabled storage for the auto-download option value
+     * @return false if something failed, true otherwhise
+     */
+    virtual bool getChannelAutoDownload(
+            const RsGxsGroupId &groupId, bool& enabled) = 0;
+
+    /**
+     * @brief Set download directory for the given channel
+     * @jsonapi{development}
+     * @param[in] channelId id of the channel
+     * @param[in] directory path
+     * @return false on error, true otherwise
+     */
+    virtual bool setChannelDownloadDirectory(
+            const RsGxsGroupId& channelId, const std::string& directory) = 0;
+
+    /**
+     * @brief Get download directory for the given channel
+     * @jsonapi{development}
+     * @param[in] channelId id of the channel
+     * @param[out] directory reference to string where to store the path
+     * @return false on error, true otherwise
+     */
+    virtual bool getChannelDownloadDirectory( const RsGxsGroupId& channelId,
+                                              std::string& directory ) = 0;
 
 
     /**
