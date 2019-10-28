@@ -164,6 +164,7 @@ int GxsChatDialog::shareKeyType()
 
 GxsMessageFrameWidget *GxsChatDialog::createMessageFrameWidget(const RsGxsGroupId &groupId)
 {
+    rsGxsChats->setSyncPeriod(groupId,1.0);   //reset sync message in 1 second for this group
     return new GxsChatPostsWidget(groupId);
     //return new GxsChatWidget(groupId);
 }
