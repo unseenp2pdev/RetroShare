@@ -159,7 +159,7 @@ GxsGroupDialog *GxsChatDialog::createGroupDialog(TokenQueue *tokenQueue, RsToken
 
 int GxsChatDialog::shareKeyType()
 {
-    return CHANNEL_KEY_SHARE;
+    return CHAT_KEY_SHARE;
 }
 
 GxsMessageFrameWidget *GxsChatDialog::createMessageFrameWidget(const RsGxsGroupId &groupId)
