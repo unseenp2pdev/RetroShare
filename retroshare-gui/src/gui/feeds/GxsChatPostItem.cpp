@@ -216,7 +216,6 @@ void GxsChatPostItem::setup()
     ui->mainFrame->style()->polish(  ui->mainFrame);
 
     ui->expandFrame->hide();
-    //ui->expandFrame->show();
 
 }
 
@@ -524,6 +523,7 @@ void GxsChatPostItem::fill()
 //    } else {
 //        ui->filelabel->setVisible(false);
 //    }
+    ui->filelabel->setVisible(false);
 
     if (mFileItems.empty() == false) {
         std::list<SubFileItem *>::iterator it;
