@@ -140,7 +140,7 @@ bool GxsChatGroupDialog::service_EditGroup(uint32_t &token, RsGroupMetaData &edi
     RsGxsChatGroup grp;
     prepareChannelGroup(grp, editedMeta);
 
-    std::cerr << "GxsChannelGroupDialog::service_EditGroup() submitting changes";
+    std::cerr << "GxsChatGroupDialog::service_EditGroup() submitting changes";
     std::cerr << std::endl;
 
     rsGxsChats->updateGroup(token, grp);
@@ -149,25 +149,25 @@ bool GxsChatGroupDialog::service_EditGroup(uint32_t &token, RsGroupMetaData &edi
 
 bool GxsChatGroupDialog::service_loadGroup(uint32_t token, Mode /*mode*/, RsGroupMetaData& groupMetaData, QString &description)
 {
-    std::cerr << "GxsChannelGroupDialog::service_loadGroup(" << token << ")";
+    std::cerr << "GxsChatGroupDialog::service_loadGroup(" << token << ")";
     std::cerr << std::endl;
 
     std::vector<RsGxsChatGroup> groups;
     if (!rsGxsChats->getGroupData(token, groups))
     {
-        std::cerr << "GxsChannelGroupDialog::service_loadGroup() Error getting GroupData";
+        std::cerr << "GxsChatGroupDialog::service_loadGroup() Error getting GroupData";
         std::cerr << std::endl;
         return false;
     }
 
     if (groups.size() != 1)
     {
-        std::cerr << "GxsChannelGroupDialog::service_loadGroup() Error Group.size() != 1";
+        std::cerr << "GxsChatGroupDialog::service_loadGroup() Error Group.size() != 1";
         std::cerr << std::endl;
         return false;
     }
 
-    std::cerr << "GxsChannelsGroupDialog::service_loadGroup() Unfinished Loading";
+    std::cerr << "GxsChatsGroupDialog::service_loadGroup() Unfinished Loading";
     std::cerr << std::endl;
 
     const RsGxsChatGroup &group = groups[0];
