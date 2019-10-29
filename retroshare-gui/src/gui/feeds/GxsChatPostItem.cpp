@@ -80,11 +80,11 @@ void GxsChatPostItem::init(const RsGxsMessageId& messageId,const std::set<RsGxsM
 // It was used to load a channel post where the post item is already known.
 
 #ifdef SUSPENDED
-GxsChannelPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChatGroup &group, const RsGxsChatMsg &post, bool isHome, bool autoUpdate) :
+GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChatGroup &group, const RsGxsChatMsg &post, bool isHome, bool autoUpdate) :
     GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChats, autoUpdate)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::GxsChannelPostItem() Direct Load";
+    std::cerr << "GxsChatPostItem::GxsChatPostItem() Direct Load";
     std::cerr << std::endl;
 #endif
 
@@ -115,7 +115,7 @@ GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const 
     GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChats, autoUpdate)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::GxsChannelPostItem() Direct Load";
+    std::cerr << "GxsChatPostItem::GxsChatPostItem() Direct Load";
     std::cerr << std::endl;
 #endif
 
@@ -222,7 +222,7 @@ void GxsChatPostItem::setup()
 bool GxsChatPostItem::setGroup(const RsGxsChatGroup &group, bool doFill)
 {
     if (groupId() != group.mMeta.mGroupId) {
-        std::cerr << "GxsChannelPostItem::setGroup() - Wrong id, cannot set post";
+        std::cerr << "GxsChatPostItem::setGroup() - Wrong id, cannot set post";
         std::cerr << std::endl;
         return false;
     }
@@ -246,7 +246,7 @@ bool GxsChatPostItem::setGroup(const RsGxsChatGroup &group, bool doFill)
 bool GxsChatPostItem::setPost(const RsGxsChatMsg &post, bool doFill)
 {
     if (groupId() != post.mMeta.mGroupId || messageId() != post.mMeta.mMsgId) {
-        std::cerr << "GxsChannelPostItem::setPost() - Wrong id, cannot set post";
+        std::cerr << "GxsChatPostItem::setPost() - Wrong id, cannot set post";
         std::cerr << std::endl;
         return false;
     }
@@ -288,21 +288,21 @@ void GxsChatPostItem::loadComments()
 void GxsChatPostItem::loadGroup(const uint32_t &token)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelGroupItem::loadGroup()";
+    std::cerr << "GxsChatGroupItem::loadGroup()";
     std::cerr << std::endl;
 #endif
 
     std::vector<RsGxsChatGroup> groups;
     if (!rsGxsChats->getGroupData(token, groups))
     {
-        std::cerr << "GxsChannelGroupItem::loadGroup() ERROR getting data";
+        std::cerr << "GxsChatGroupItem::loadGroup() ERROR getting data";
         std::cerr << std::endl;
         return;
     }
 
     if (groups.size() != 1)
     {
-        std::cerr << "GxsChannelGroupItem::loadGroup() Wrong number of Items";
+        std::cerr << "GxsChatGroupItem::loadGroup() Wrong number of Items";
         std::cerr << std::endl;
         return;
     }
@@ -313,7 +313,7 @@ void GxsChatPostItem::loadGroup(const uint32_t &token)
 void GxsChatPostItem::loadMessage(const uint32_t &token)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::loadMessage()";
+    std::cerr << "GxsChatPostItem::loadMessage()";
     std::cerr << std::endl;
 #endif
 
@@ -321,7 +321,7 @@ void GxsChatPostItem::loadMessage(const uint32_t &token)
     std::vector<RsGxsComment> cmts;
     if (!rsGxsChats->getPostData(token, posts, cmts))
     {
-        std::cerr << "GxsChannelPostItem::loadMessage() ERROR getting data";
+        std::cerr << "GxsChatPostItem::loadMessage() ERROR getting data";
         std::cerr << std::endl;
         return;
     }
@@ -344,7 +344,7 @@ void GxsChatPostItem::loadMessage(const uint32_t &token)
     }
     else
     {
-        std::cerr << "GxsChannelPostItem::loadMessage() Wrong number of Items. Remove It.";
+        std::cerr << "GxsChatPostItem::loadMessage() Wrong number of Items. Remove It.";
         std::cerr << std::endl;
         removeItem();
         return;
@@ -354,14 +354,14 @@ void GxsChatPostItem::loadMessage(const uint32_t &token)
 void GxsChatPostItem::loadComment(const uint32_t &token)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::loadComment()";
+    std::cerr << "GxsChatPostItem::loadComment()";
     std::cerr << std::endl;
 #endif
 
 //    std::vector<RsGxsComment> cmts;
 //    if (!rsGxsChats->getRelatedComments(token, cmts))
 //    {
-//        std::cerr << "GxsChannelPostItem::loadComment() ERROR getting data";
+//        std::cerr << "GxsChatPostItem::loadComment() ERROR getting data";
 //        std::cerr << std::endl;
 //        return;
 //    }
@@ -386,7 +386,7 @@ void GxsChatPostItem::fill()
     }
 
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::fill()";
+    std::cerr << "GxsChatPostItem::fill()";
     std::cerr << std::endl;
 #endif
 
@@ -613,7 +613,7 @@ void GxsChatPostItem::updateItem()
     /* fill in */
 
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::updateItem()";
+    std::cerr << "GxsChatPostItem::updateItem()";
     std::cerr << std::endl;
 #endif
 
@@ -734,7 +734,7 @@ void GxsChatPostItem::toggle()
 void GxsChatPostItem::readAndClearItem()
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::readAndClearItem()";
+    std::cerr << "GxsChatPostItem::readAndClearItem()";
     std::cerr << std::endl;
 #endif
 
@@ -745,7 +745,7 @@ void GxsChatPostItem::readAndClearItem()
 void GxsChatPostItem::unsubscribeChannel()
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChannelPostItem::unsubscribeChannel()";
+    std::cerr << "GxsChatPostItem::unsubscribeChannel()";
     std::cerr << std::endl;
 #endif
 

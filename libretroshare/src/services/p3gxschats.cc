@@ -308,7 +308,7 @@ void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
                             std::list<RsGxsGroupId>::iterator git;
                             for (git = grpList.begin(); git != grpList.end(); ++git)
                             {
-                                notify->AddFeedItem(RS_FEED_ITEM_CHATS_OFFLINE_PUBLISHKEY, git->toStdString());
+                                notify->AddFeedItem(RS_FEED_ITEM_CHATS_PUBLISHKEY, git->toStdString());
                             }
                             break;
                         }

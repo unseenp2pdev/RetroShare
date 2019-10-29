@@ -48,6 +48,8 @@ const uint32_t NEWSFEED_POSTEDNEWLIST =    0x000b;
 const uint32_t NEWSFEED_POSTEDMSGLIST =    0x000c;
 const uint32_t NEWSFEED_CIRCLELIST    =    0x000d;
 const uint32_t NEWSFEED_CHANNELPUBKEYLIST= 0x000e;
+const uint32_t NEWSFEED_CHATPUBKEYLIST   = 0x000f;
+
 
 namespace Ui {
 class NewsFeed;
@@ -122,6 +124,8 @@ private:
 //	void addFeedItemChannelUpdate(const RsFeedItem &fi);
 	void addFeedItemChannelMsg(const RsFeedItem &fi);
 	void addFeedItemChannelPublishKey(const RsFeedItem &fi);
+    void addFeedItemChatPublishKey(const RsFeedItem &fi);
+
 
 	void addFeedItemForumNew(const RsFeedItem &fi);
 //	void addFeedItemForumUpdate(const RsFeedItem &fi);
@@ -163,6 +167,7 @@ private:
 	TokenQueue *mTokenQueueCircle;
 	TokenQueue *mTokenQueueForum;
 	TokenQueue *mTokenQueuePosted;
+    TokenQueue *mTokenQueueChat;
 
 	/* UI - from Designer */
 	Ui::NewsFeed *ui;
