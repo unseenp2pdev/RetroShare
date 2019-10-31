@@ -183,7 +183,7 @@ void GxsChatDialog::specifyDownloadDirectory()
     if (grpId.isNull())
         return ;
 
-    QString dir = QFileDialog::getExistingDirectory(NULL,tr("Select channel download directory")) ;
+    QString dir = QFileDialog::getExistingDirectory(NULL,tr("Select chat download directory")) ;
 
     if(dir.isNull())
         return ;
@@ -288,7 +288,7 @@ void GxsChatDialog::toggleAutoDownload()
 
         if(!rsGxsChats->getChannelAutoDownload(grpId,autoDownload) || !rsGxsChats->setChannelAutoDownload(grpId, !autoDownload))
     {
-        std::cerr << "GxsChannelDialog::toggleAutoDownload() Auto Download failed to set";
+        std::cerr << "GxsChatDialog::toggleAutoDownload() Auto Download failed to set";
         std::cerr << std::endl;
     }
 }

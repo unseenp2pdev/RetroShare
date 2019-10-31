@@ -1349,6 +1349,27 @@ void NewsFeed::addFeedItemChannelNew(const RsFeedItem &fi)
 #endif
 }
 
+
+void NewsFeed::addFeedItemChatNew(const RsFeedItem &fi)
+{
+    RsGxsGroupId grpId(fi.mId1);
+
+    if (grpId.isNull()) {
+        return;
+    }
+
+    /* make new widget */
+    GxsChatGroupItem *item = new GxsChatGroupItem(this, NEWSFEED_CHATNEWLIST, grpId, false, true);
+
+    /* add to layout */
+    addFeedItem(item);
+
+#ifdef NEWS_DEBUG
+    std::cerr << "NewsFeed::addFeedItemChanNew()";
+    std::cerr << std::endl;
+#endif
+}
+
 //void NewsFeed::addFeedItemChannelUpdate(const RsFeedItem &fi)
 //{
 //	/* make new widget */
@@ -1381,6 +1402,27 @@ void NewsFeed::addFeedItemChannelMsg(const RsFeedItem &fi)
 #ifdef NEWS_DEBUG
 	std::cerr << "NewsFeed::addFeedItemChanMsg()";
 	std::cerr << std::endl;
+#endif
+}
+
+void NewsFeed::addFeedItemChatMsg(const RsFeedItem &fi)
+{
+    RsGxsGroupId grpId(fi.mId1);
+    RsGxsMessageId msgId(fi.mId2);
+
+    if (grpId.isNull() || msgId.isNull()) {
+        return;
+    }
+
+    /* make new widget */
+    GxsChatPostItem *item = new GxsChatPostItem(this, NEWSFEED_CHATNEWLIST, grpId, msgId, false, true);
+
+    /* add to layout */
+    addFeedItem(item);
+
+#ifdef NEWS_DEBUG
+    std::cerr << "NewsFeed::addFeedItemChanMsg()";
+    std::cerr << std::endl;
 #endif
 }
 void NewsFeed::addFeedItemChannelPublishKey(const RsFeedItem &fi)

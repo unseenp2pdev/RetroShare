@@ -35,7 +35,7 @@ const uint32_t NEWSFEED_PEERLIST =       0x0001;
 const uint32_t NEWSFEED_FORUMNEWLIST =   0x0002;
 const uint32_t NEWSFEED_FORUMMSGLIST =   0x0003;
 const uint32_t NEWSFEED_CHANNELNEWLIST = 0x0004;
-//const uint32_t NEWSFEED_CHANNELMSGLIST = 0x0005;
+const uint32_t NEWSFEED_CHATNEWLIST     = 0x0005;
 #if 0
 const uint32_t NEWSFEED_BLOGNEWLIST =    0x0006;
 const uint32_t NEWSFEED_BLOGMSGLIST =    0x0007;
@@ -124,7 +124,10 @@ private:
 //	void addFeedItemChannelUpdate(const RsFeedItem &fi);
 	void addFeedItemChannelMsg(const RsFeedItem &fi);
 	void addFeedItemChannelPublishKey(const RsFeedItem &fi);
+
     void addFeedItemChatPublishKey(const RsFeedItem &fi);
+    void addFeedItemChatNew(const RsFeedItem &fi);
+    void addFeedItemChatMsg(const RsFeedItem &fi);
 
 
 	void addFeedItemForumNew(const RsFeedItem &fi);

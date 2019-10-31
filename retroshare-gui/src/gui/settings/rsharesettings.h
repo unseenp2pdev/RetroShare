@@ -317,6 +317,7 @@ public:
 	bool getChannelLoadThread();
 	void setChannelLoadThread(bool value);
 
+
 	/* GroupFrame settings */
 	bool getGroupFrameSettings(GroupFrameSettings::Type type, GroupFrameSettings &groupFrameSettings);
 	void setGroupFrameSettings(GroupFrameSettings::Type type, const GroupFrameSettings &groupFrameSettings);

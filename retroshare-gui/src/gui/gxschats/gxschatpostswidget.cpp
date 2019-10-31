@@ -451,7 +451,7 @@ void GxsChatPostsWidget::fillThreadCreatePost(const QVariant &post, bool related
 void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, GxsMessageFramePostThread *thread, bool related)
 {
     if (related && thread) {
-        std::cerr << "GxsChannelPostsWidget::insertChannelPosts fill only related posts as thread is not possible" << std::endl;
+        std::cerr << "GxsChatPostsWidget::insertChannelPosts fill only related posts as thread is not possible" << std::endl;
         return;
     }
 
@@ -465,7 +465,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
     // collect new versions of posts if any
 
 #ifdef DEBUG_CHANNEL
-    std::cerr << "Inserting channel posts" << std::endl;
+    std::cerr << "Inserting chat posts" << std::endl;
 #endif
 
     std::vector<uint32_t> new_versions ;
@@ -648,7 +648,7 @@ void GxsChatPostsWidget::toggleAutoDownload()
     bool autoDownload ;
         if(!rsGxsChats->getChannelAutoDownload(grpId,autoDownload) || !rsGxsChats->setChannelAutoDownload(grpId, !autoDownload))
     {
-        std::cerr << "GxsChannelDialog::toggleAutoDownload() Auto Download failed to set";
+        std::cerr << "GxsChatDialog::toggleAutoDownload() Auto Download failed to set";
         std::cerr << std::endl;
     }
 }
@@ -694,10 +694,10 @@ void GxsChatPostsWidget::insertPosts(const uint32_t &token)
     insertChannelPosts(posts, NULL, true);
 }
 
-class GxsChannelPostsReadData
+class GxsChatPostsReadData
 {
 public:
-    GxsChannelPostsReadData(bool read)
+    GxsChatPostsReadData(bool read)
     {
         mRead = read;
         mLastToken = 0;
@@ -710,18 +710,18 @@ public:
 
 static void setAllMessagesReadCallback(FeedItem *feedItem, void *data)
 {
-    GxsChatPostItem *channelPostItem = dynamic_cast<GxsChatPostItem*>(feedItem);
-    if (!channelPostItem) {
+    GxsChatPostItem *chatPostItem = dynamic_cast<GxsChatPostItem*>(feedItem);
+    if (!chatPostItem) {
         return;
     }
 
-    GxsChannelPostsReadData *readData = (GxsChannelPostsReadData*) data;
-    bool is_not_new = !channelPostItem->isUnread() ;
+    GxsChatPostsReadData *readData = (GxsChatPostsReadData*) data;
+    bool is_not_new = !chatPostItem->isUnread() ;
 
     if(is_not_new == readData->mRead)
         return ;
 
-    RsGxsGrpMsgIdPair msgPair = std::make_pair(channelPostItem->groupId(), channelPostItem->messageId());
+    RsGxsGrpMsgIdPair msgPair = std::make_pair(chatPostItem->groupId(), chatPostItem->messageId());
     rsGxsChats->setMessageReadStatus(readData->mLastToken, msgPair, readData->mRead);
 }
 
@@ -731,7 +731,7 @@ void GxsChatPostsWidget::setAllMessagesReadDo(bool read, uint32_t &token)
         return;
     }
 
-    GxsChannelPostsReadData data(read);
+    GxsChatPostsReadData data(read);
     ui->feedWidget->withAll(setAllMessagesReadCallback, &data);
 
     token = data.mLastToken;

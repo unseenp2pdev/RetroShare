@@ -147,10 +147,10 @@ void GxsChatGroupItem::fill()
 
     switch(mFeedId)
     {
-    case NEWSFEED_CHANNELPUBKEYLIST:	ui->titleLabel->setText(tr("Publish permission received for channel: "));
+    case NEWSFEED_CHATPUBKEYLIST:	ui->titleLabel->setText(tr("Publish permission received for chat: "));
                                         break ;
 
-    case NEWSFEED_CHANNELNEWLIST:	 	ui->titleLabel->setText(tr("New Chat Conversation: "));
+    case NEWSFEED_CHATNEWLIST:	 	ui->titleLabel->setText(tr("New Chat Conversation: "));
                                         break ;
     }
 

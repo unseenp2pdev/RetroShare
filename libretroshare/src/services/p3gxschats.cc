@@ -40,9 +40,8 @@
 #include "util/rsrandom.h"
 #include "util/rsstring.h"
 
-/****
- * #define GXSCHATS_DEBUG 1
- ****/
+
+#define GXSCHATS_DEBUG 1
 
 
 
@@ -1264,7 +1263,7 @@ void p3GxsChats::cleanTimedOutSearches()
 #if 0
 bool p3GxsChats::setChannelAutoDownload(uint32_t &token, const RsGxsGroupId &groupId, bool autoDownload)
 {
-    std::cerr << "p3GxsChannels::setChannelAutoDownload()";
+    std::cerr << "p3GxsChats::setChannelAutoDownload()";
     std::cerr << std::endl;
 
     // we don't actually use the token at this point....
@@ -1280,7 +1279,7 @@ bool SSGxsChatGroup::load(const std::string &input)
 {
     if(input.empty())
     {
-#ifdef GXSCHANNELS_DEBUG
+#ifdef GXSCHATS_DEBUG
         std::cerr << "SSGxsChatGroup::load() asked to load a null string." << std::endl;
 #endif
         return true ;
@@ -1312,13 +1311,13 @@ bool SSGxsChatGroup::load(const std::string &input)
     }
     else
     {
-#ifdef GXSCHANNELS_DEBUG
+#ifdef GXSCHATS_DEBUG
         std::cerr << "SSGxsChatGroup::load(): could not parse string \"" << input << "\"" << std::endl;
 #endif
         return false ;
     }
 
-#ifdef GXSCHANNELS_DEBUG
+#ifdef GXSCHATS_DEBUG
     std::cerr << "DECODED STRING: autoDL=" << mAutoDownload << ", directory=\"" << mDownloadDirectory << "\"" << std::endl;
 #endif
 
@@ -1342,7 +1341,7 @@ std::string SSGxsChatGroup::save() const
         output += " {P:" + encoded_str + "}";
     }
 
-#ifdef GXSCHANNELS_DEBUG
+#ifdef GXSCHATS_DEBUG
     std::cerr << "ENCODED STRING: " << output << std::endl;
 #endif
 
@@ -1351,8 +1350,8 @@ std::string SSGxsChatGroup::save() const
 
 bool p3GxsChats::autoDownloadEnabled(const RsGxsGroupId &groupId,bool& enabled)
 {
-#ifdef GXSCHANNELS_DEBUG
-    std::cerr << "p3GxsChannels::autoDownloadEnabled(" << id << ")";
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::autoDownloadEnabled(" << groupId << ")";
     std::cerr << std::endl;
 #endif
 
@@ -1361,8 +1360,8 @@ bool p3GxsChats::autoDownloadEnabled(const RsGxsGroupId &groupId,bool& enabled)
     it = mSubscribedGroups.find(groupId);
     if (it == mSubscribedGroups.end())
     {
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::autoDownloadEnabled() No Entry";
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::autoDownloadEnabled() No Entry";
         std::cerr << std::endl;
 #endif
 
@@ -1379,8 +1378,8 @@ bool p3GxsChats::autoDownloadEnabled(const RsGxsGroupId &groupId,bool& enabled)
 
 bool p3GxsChats::setAutoDownload(const RsGxsGroupId &groupId, bool enabled)
 {
-#ifdef GXSCHANNELS_DEBUG
-    std::cerr << "p3GxsChannels::setAutoDownload() id: " << groupId << " enabled: " << enabled;
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::setAutoDownload() id: " << groupId << " enabled: " << enabled;
     std::cerr << std::endl;
 #endif
 
@@ -1389,8 +1388,8 @@ bool p3GxsChats::setAutoDownload(const RsGxsGroupId &groupId, bool enabled)
     it = mSubscribedGroups.find(groupId);
     if (it == mSubscribedGroups.end())
     {
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::setAutoDownload() Missing Group";
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::setAutoDownload() Missing Group";
         std::cerr << std::endl;
 #endif
 
@@ -1403,8 +1402,8 @@ bool p3GxsChats::setAutoDownload(const RsGxsGroupId &groupId, bool enabled)
     if (enabled == ss.mAutoDownload)
     {
         /* it should be okay! */
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::setAutoDownload() WARNING setting looks okay already";
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::setAutoDownload() WARNING setting looks okay already";
         std::cerr << std::endl;
 #endif
 
@@ -1440,8 +1439,8 @@ bool p3GxsChats::getChannelAutoDownload(const RsGxsGroupId &groupId, bool& enabl
 
 bool p3GxsChats::setChannelDownloadDirectory(const RsGxsGroupId &groupId, const std::string& directory)
 {
-#ifdef GXSCHANNELS_DEBUG
-    std::cerr << "p3GxsChannels::setDownloadDirectory() id: " << groupId << " to: " << directory << std::endl;
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::setDownloadDirectory() id: " << groupId << " to: " << directory << std::endl;
 #endif
 
     std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
@@ -1449,8 +1448,8 @@ bool p3GxsChats::setChannelDownloadDirectory(const RsGxsGroupId &groupId, const 
     it = mSubscribedGroups.find(groupId);
     if (it == mSubscribedGroups.end())
     {
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::setAutoDownload() Missing Group" << std::endl;
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::setAutoDownload() Missing Group" << std::endl;
 #endif
         return false;
     }
@@ -1461,8 +1460,8 @@ bool p3GxsChats::setChannelDownloadDirectory(const RsGxsGroupId &groupId, const 
 
     if (directory == ss.mDownloadDirectory)
     {
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::setDownloadDirectory() WARNING setting looks okay already" << std::endl;
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::setDownloadDirectory() WARNING setting looks okay already" << std::endl;
 #endif
 
     }
@@ -1486,8 +1485,8 @@ bool p3GxsChats::setChannelDownloadDirectory(const RsGxsGroupId &groupId, const 
 
 bool p3GxsChats::getChannelDownloadDirectory(const RsGxsGroupId & groupId,std::string& directory)
 {
-#ifdef GXSCHANNELS_DEBUG
-    std::cerr << "p3GxsChannels::getChannelDownloadDirectory(" << id << ")" << std::endl;
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::getChannelDownloadDirectory(" << groupId << ")" << std::endl;
 #endif
 
     std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
@@ -1496,8 +1495,8 @@ bool p3GxsChats::getChannelDownloadDirectory(const RsGxsGroupId & groupId,std::s
 
     if (it == mSubscribedGroups.end())
     {
-#ifdef GXSCHANNELS_DEBUG
-        std::cerr << "p3GxsChannels::getChannelDownloadDirectory() No Entry" << std::endl;
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::getChannelDownloadDirectory() No Entry" << std::endl;
 #endif
 
         return false;
