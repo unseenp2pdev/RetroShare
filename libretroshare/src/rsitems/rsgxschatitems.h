@@ -16,8 +16,8 @@
 
 #include "util/rsdir.h"
 
-const uint8_t RS_PKT_SUBTYPE_GXSCHAT_GROUP_ITEM = 0x02;
-const uint8_t RS_PKT_SUBTYPE_GXSCHAT_POST_ITEM  = 0x03;
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_GROUP_ITEM = 0x04;
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_POST_ITEM  = 0x05;
 
 class RsGxsChatGroupItem : public RsGxsGrpItem
 {

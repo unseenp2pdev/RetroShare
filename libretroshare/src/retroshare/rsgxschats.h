@@ -43,21 +43,6 @@ class RsGxsChats;
  */
 extern RsGxsChats *rsGxsChats;
 
-//class RsGxsChatMember : RsSerializable
-//{
-//   public:
-//    // a friend can be direct(peerid) and distant (gxsid)
-//    RsPeerId    peerId; //RsPeerId for direct communication
-//    RsGxsId     gxsId;  //gxsId is for distant communication, each user should have one set of unique peerId and gsxId. but not limit to.
-//    /// @see RsSerializable
-//    virtual void serial_process( RsGenericSerializer::SerializeJob j,
-//                             RsGenericSerializer::SerializeContext& ctx )
-//    {
-//        RS_SERIAL_PROCESS(peerId);
-//        RS_SERIAL_PROCESS(gxsId);
-//    }
-//};
-
 class RsGxsChatGroup : RsSerializable
 {
     public:
@@ -66,13 +51,14 @@ class RsGxsChatGroup : RsSerializable
         RsGxsImage  mImage; //conversation avatar image
         std::map<RsPeerId,RsGxsId> members;
         /// @see RsSerializable
+        bool mAutoDownload;
         virtual void serial_process( RsGenericSerializer::SerializeJob j,
                                  RsGenericSerializer::SerializeContext& ctx )
         {
             RS_SERIAL_PROCESS(mMeta);
             RS_SERIAL_PROCESS(mImage);
             RS_SERIAL_PROCESS(mDescription);
-
+            RS_SERIAL_PROCESS(mAutoDownload);
             RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
         }
 };
@@ -83,9 +69,16 @@ class RsGxsChatMsg : RsSerializable
 {
     public:
     RsMsgMetaData mMeta;
-    std::string mMsg;               //text message
-    std::list<RsGxsFile> mFiles;    //file attachment
-    RsGxsImage mThumbnail;          //photo sharing
+
+    std::set<RsGxsMessageId> mOlderVersions;
+    std::string mMsg;  // UTF8 encoded.
+
+    std::list<RsGxsFile> mFiles;
+    uint32_t mCount;   // auto calced.
+    uint64_t mSize;    // auto calced.
+
+    RsGxsImage mThumbnail;
+
 
     /// @see RsSerializable
     virtual void serial_process( RsGenericSerializer::SerializeJob j,
@@ -94,7 +87,11 @@ class RsGxsChatMsg : RsSerializable
         RS_SERIAL_PROCESS(mMeta);
         RS_SERIAL_PROCESS(mMsg);
         RS_SERIAL_PROCESS(mFiles);
+        RS_SERIAL_PROCESS(mCount);
+        RS_SERIAL_PROCESS(mSize);
         RS_SERIAL_PROCESS(mThumbnail);
+        RS_SERIAL_PROCESS(mOlderVersions);
+
     }
 };
 

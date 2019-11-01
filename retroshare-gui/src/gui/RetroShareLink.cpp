@@ -30,6 +30,7 @@
 #include "connect/PGPKeyDialog.h"
 #include "FileTransfer/SearchDialog.h"
 #include "gxschannels/GxsChannelDialog.h"
+#include "gxschats/GxsChatDialog.h"
 #include "gxsforums/GxsForumsDialog.h"
 #include "msgs/MessageComposer.h"
 #include "Posted/PostedDialog.h"
@@ -64,6 +65,7 @@
 #define HOST_PERSON      "person"
 #define HOST_FORUM       "forum"
 #define HOST_CHANNEL     "channel"
+#define HOST_CHATS       "chats"
 #define HOST_SEARCH      "search"
 #define HOST_MESSAGE     "message"
 #define HOST_CERTIFICATE "certificate"
@@ -74,7 +76,7 @@
 #define HOST_IDENTITY    "identity"
 #define HOST_FILE_TREE   "collection"
 #define HOST_CHAT_ROOM   "chat_room"
-#define HOST_REGEXP      "file|person|forum|channel|search|message|certificate|extra|private_chat|public_msg|posted|identity|collection|chat_room"
+#define HOST_REGEXP      "file|person|forum|channel|chats|search|message|certificate|extra|private_chat|public_msg|posted|identity|collection|chat_room"
 
 #define FILE_NAME       "name"
 #define FILE_SIZE       "size"
@@ -91,6 +93,10 @@
 #define CHANNEL_NAME    "name"
 #define CHANNEL_ID      "id"
 #define CHANNEL_MSGID   "msgid"
+
+#define CHATS_NAME      "name"
+#define CHATS_ID        "id"
+#define CHATS_MSGID     "msgid"
 
 #define SEARCH_KEYWORDS "keywords"
 
@@ -288,6 +294,18 @@ void RetroShareLink::fromUrl(const QUrl& url)
 		check();
 		return;
 	}
+    if (url.host() == HOST_CHATS) {
+        _type = TYPE_CHATS;
+        _name = decodedQueryItemValue(urlQuery, CHATS_NAME);
+        _hash = urlQuery.queryItemValue(CHATS_ID);
+        _msgId = urlQuery.queryItemValue(CHATS_MSGID);
+
+#ifdef DEBUG_RSLINK
+        std::cerr << "Got a chats link!!" << std::endl;
+#endif
+        check();
+        return;
+    }
 
 	if (url.host() == HOST_SEARCH) {
 		_type = TYPE_SEARCH;
@@ -468,7 +486,7 @@ RetroShareLink RetroShareLink::createPerson(const RsPgpId& id)
 	return link;
 }
 
-//For Forum, Channel & Posted
+//For Forum, Channel, chats & Posted
 RetroShareLink RetroShareLink::createGxsGroupLink(const RetroShareLink::enumType &linkType, const RsGxsGroupId &groupId, const QString &groupName)
 {
 	RetroShareLink link;
@@ -776,6 +794,17 @@ void RetroShareLink::check()
 				_valid = false;
 		break;
 
+        case TYPE_CHATS:
+            if(_size != 0)
+                _valid = false;
+
+            if(_name.isEmpty())
+                _valid = false;
+
+            if(_hash.isEmpty())
+                _valid = false;
+        break;
+
 		case TYPE_SEARCH:
 			if(_size != 0)
 				_valid = false;
@@ -869,6 +898,8 @@ QString RetroShareLink::title() const
 			return QString("Forum id: %1").arg(hash());
 		case TYPE_CHANNEL:
 			return QString("Channel id: %1").arg(hash());
+        case TYPE_CHATS:
+            return QString("Chats id: %1").arg(hash());
 		case TYPE_SEARCH:
 			return QString("Search files");
 
@@ -971,6 +1002,16 @@ QString RetroShareLink::toString() const
 			if (!_msgId.isEmpty()) {
 				urlQuery.addQueryItem(CHANNEL_MSGID, _msgId);
 			}
+        break;
+
+        case TYPE_CHATS:
+            url.setScheme(RSLINK_SCHEME);
+            url.setHost(HOST_CHATS);
+            urlQuery.addQueryItem(CHATS_NAME, encodeItem(_name));
+            urlQuery.addQueryItem(CHATS_ID, _hash);
+            if (!_msgId.isEmpty()) {
+                urlQuery.addQueryItem(CHATS_MSGID, _msgId);
+            }
 
 		break;
 
@@ -1288,6 +1329,7 @@ static void processList(const QStringList &list, const QString &textSingular, co
 				case TYPE_FILE:
 				case TYPE_FORUM:
 				case TYPE_CHANNEL:
+                case TYPE_CHATS:
 				case TYPE_SEARCH:
 				case TYPE_MESSAGE:
 				case TYPE_CERTIFICATE:
@@ -1336,6 +1378,11 @@ static void processList(const QStringList &list, const QString &textSingular, co
 	QStringList channelUnknown;
 	QStringList channelMsgUnknown;
 
+    // chatsl
+    QStringList chatsFound;
+    QStringList chatsMsgFound;
+    QStringList chatsUnknown;
+    QStringList chatsMsgUnknown;
 	// search
 	QStringList searchStarted;
 
@@ -1362,8 +1409,8 @@ static void processList(const QStringList &list, const QString &textSingular, co
 	QList<QStringList*> processedList;
 	QList<QStringList*> errorList;
 
-	processedList << &fileAdded << &personAdded << &forumFound << &channelFound << &searchStarted << &messageStarted << &postedFound << &chatroomFound;
-	errorList << &fileExist << &personExist << &personFailed << &personNotFound << &forumUnknown << &forumMsgUnknown << &channelUnknown << &channelMsgUnknown << &messageReceipientNotAccepted << &messageReceipientUnknown << &postedUnknown << &postedMsgUnknown << &chatroomUnknown;
+    processedList << &fileAdded << &personAdded << &forumFound << &channelFound <<&chatsFound << &searchStarted << &messageStarted << &postedFound << &chatroomFound;
+    errorList << &fileExist << &personExist << &personFailed << &personNotFound << &forumUnknown << &forumMsgUnknown << &channelUnknown << &channelMsgUnknown <<&forumMsgUnknown << &chatsUnknown << &chatsMsgUnknown <<&messageReceipientNotAccepted << &messageReceipientUnknown << &postedUnknown << &postedMsgUnknown << &chatroomUnknown;
 	// not needed: forumFound, channelFound, messageStarted
 
 	// we want to merge all single file links into one collection
@@ -1456,6 +1503,33 @@ static void processList(const QStringList &list, const QString &textSingular, co
 			}
 			break;
 
+            case TYPE_CHATS:
+            {
+#ifdef DEBUG_RSLINK
+            std::cerr << " RetroShareLink::process ChatsRequest : name : " << link.name().toStdString() << ". id : " << link.hash().toStdString() << ". msgId : " << link.msgId().toStdString() << std::endl;
+#endif
+
+            MainWindow::showWindow(MainWindow::Chats);
+            GxsChatDialog *chatDialog = dynamic_cast<GxsChatDialog*>(MainWindow::getPage(MainWindow::Chats));
+            if (!chatDialog) {
+                return false;
+            }
+
+            if (chatDialog->navigate(RsGxsGroupId(link.id().toStdString()), RsGxsMessageId(link.msgId().toStdString()))) {
+                if (link.msgId().isEmpty()) {
+                    chatsFound.append(link.name());
+                } else {
+                    chatsMsgFound.append(link.name());
+                }
+            } else {
+                if (link.msgId().isEmpty()) {
+                    chatsUnknown.append(link.name());
+                } else {
+                    chatsMsgUnknown.append(link.name());
+                }
+            }
+        }
+        break;
 			case TYPE_SEARCH:
 			{
 #ifdef DEBUG_RSLINK
@@ -1835,6 +1909,15 @@ static void processList(const QStringList &list, const QString &textSingular, co
 		}
 	}
 
+    // chats
+    if (flag & RSLINK_PROCESS_NOTIFY_ERROR) {
+        if (!chatsUnknown.isEmpty()) {
+            processList(chatsUnknown, QObject::tr("Chats not found"), QObject::tr("Chats not found"), result);
+        }
+        if (!chatsMsgUnknown.isEmpty()) {
+            processList(chatsMsgUnknown, QObject::tr("Chats message not found"), QObject::tr("Chats messages not found"), result);
+        }
+    }
 	// message
 	if (flag & RSLINK_PROCESS_NOTIFY_ERROR) {
 		if (!messageReceipientNotAccepted.isEmpty()) {

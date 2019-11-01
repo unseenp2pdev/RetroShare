@@ -1080,6 +1080,19 @@ void RshareSettings::setChannelLoadThread(bool value)
 	setValueToGroup("Channel", "LoadThread", value);
 }
 
+/* Chat */
+bool RshareSettings::getChatsLoadThread()
+{
+    return valueFromGroup("Chats", "LoadThread", false).toBool();
+}
+
+void RshareSettings::setChatsLoadThread(bool value)
+{
+    setValueToGroup("Chats", "LoadThread", value);
+}
+
+
+
 /* GroupFrame settings */
 static QString groupFrameSettingsTypeToString(GroupFrameSettings::Type type)
 {
@@ -1090,6 +1103,8 @@ static QString groupFrameSettingsTypeToString(GroupFrameSettings::Type type)
 		return "Forum";
 	case GroupFrameSettings::Channel:
 		return "Channel";
+    case GroupFrameSettings::Chats:
+        return "Chats";
 	case GroupFrameSettings::Posted:
 		return "Posted";
 	}

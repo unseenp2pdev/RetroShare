@@ -265,6 +265,14 @@ void NewsFeed::updateDisplay()
 				if (flags & RS_FEED_TYPE_CHANNEL)
 					addFeedItemChannelMsg(fi);
 				break;
+            case RS_FEED_ITEM_CHATS_NEW:
+                if (flags & RS_FEED_TYPE_GXSCHAT)
+                    addFeedItemChatNew(fi);
+                break;
+            case RS_FEED_ITEM_CHATS_MSG:
+                if (flags & RS_FEED_TYPE_GXSCHAT)
+                    addFeedItemChatMsg(fi);
+                break;
 			case RS_FEED_ITEM_CHANNEL_PUBLISHKEY:
 				{
 					if (!mTokenQueueChannel) {

@@ -41,9 +41,8 @@
 #include <iostream>
 #include <cmath>
 
-/****
- * #define DEBUG_ITEM 1
- ****/
+#define DEBUG_ITEM 1
+
 
 GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsGroupId &groupId, const RsGxsMessageId &messageId, bool isHome, bool autoUpdate,const std::set<RsGxsMessageId>& older_versions) :
     GxsFeedItem(feedHolder, feedId, groupId, messageId, isHome, rsGxsChats, autoUpdate)
@@ -408,12 +407,12 @@ void GxsChatPostItem::fill()
             removeItem();
         }
 
-        title = tr("Channel Feed") + ": ";
-        RetroShareLink link = RetroShareLink::createGxsGroupLink(RetroShareLink::TYPE_CHANNEL, mPost.mMeta.mGroupId, groupName());
+        title = tr("Chats Feed") + ": ";
+        RetroShareLink link = RetroShareLink::createGxsGroupLink(RetroShareLink::TYPE_CHATS, mPost.mMeta.mGroupId, groupName());
         title += link.toHtml();
         ui->titleLabel->setText(title);
 
-        RetroShareLink msgLink = RetroShareLink::createGxsMessageLink(RetroShareLink::TYPE_CHANNEL, mPost.mMeta.mGroupId, mPost.mMeta.mMsgId, messageName());
+        RetroShareLink msgLink = RetroShareLink::createGxsMessageLink(RetroShareLink::TYPE_CHATS, mPost.mMeta.mGroupId, mPost.mMeta.mMsgId, messageName());
         ui->subjectLabel->setText(msgLink.toHtml());
 
         if (IS_GROUP_SUBSCRIBED(mGroup.mMeta.mSubscribeFlags) || IS_GROUP_ADMIN(mGroup.mMeta.mSubscribeFlags))
@@ -517,12 +516,12 @@ void GxsChatPostItem::fill()
 
     ui->datetimelabel->setText(DateTime::formatLongDateTime(mPost.mMeta.mPublishTs));
 
-//    if ( (mPost.mCount != 0) || (mPost.mSize != 0) ) {
-//        ui->filelabel->setVisible(true);
-//        ui->filelabel->setText(QString("(%1 %2) %3").arg(mPost.mCount).arg(tr("Files")).arg(misc::friendlyUnit(mPost.mSize)));
-//    } else {
-//        ui->filelabel->setVisible(false);
-//    }
+    if ( (mPost.mCount != 0) || (mPost.mSize != 0) ) {
+        ui->filelabel->setVisible(true);
+        ui->filelabel->setText(QString("(%1 %2) %3").arg(mPost.mCount).arg(tr("Files")).arg(misc::friendlyUnit(mPost.mSize)));
+    } else {
+        ui->filelabel->setVisible(false);
+    }
     ui->filelabel->setVisible(false);
 
     if (mFileItems.empty() == false) {
@@ -539,7 +538,7 @@ void GxsChatPostItem::fill()
     {
         /* add file */
         std::string path;
-        SubFileItem *fi = new SubFileItem(it->mHash, it->mName, path, it->mSize, SFI_STATE_REMOTE | SFI_TYPE_CHANNEL, RsPeerId());
+        SubFileItem *fi = new SubFileItem(it->mHash, it->mName, path, it->mSize, SFI_STATE_REMOTE | SFI_TYPE_CHATS, RsPeerId());
         mFileItems.push_back(fi);
 
         /* check if the file is a media file */

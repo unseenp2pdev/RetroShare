@@ -40,7 +40,7 @@
 #define ROLE_PUBLISH FEED_TREEWIDGET_SORTROLE
 
 
-#define DEBUG_CHANNEL
+#define DEBUG_CHAT
 
 
 /* View mode */
@@ -464,7 +464,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 
     // collect new versions of posts if any
 
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
     std::cerr << "Inserting chat posts" << std::endl;
 #endif
 
@@ -474,7 +474,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
         if(posts[i].mMeta.mOrigMsgId == posts[i].mMeta.mMsgId)
             posts[i].mMeta.mOrigMsgId.clear();
 
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
         std::cerr << "  " << i << ": msg_id=" << posts[i].mMeta.mMsgId << ": orig msg id = " << posts[i].mMeta.mOrigMsgId << std::endl;
 #endif
 
@@ -482,13 +482,13 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
             new_versions.push_back(i) ;
     }
 
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
     std::cerr << "New versions: " << new_versions.size() << std::endl;
 #endif
 
     if(!new_versions.empty())
     {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
         std::cerr << "  New versions present. Replacing them..." << std::endl;
         std::cerr << "  Creating search map."  << std::endl;
 #endif
@@ -500,13 +500,13 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 
         for(uint32_t i=0;i<new_versions.size();++i)
         {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
             std::cerr << "  Taking care of new version  at index " << new_versions[i] << std::endl;
 #endif
 
             uint32_t current_index = new_versions[i] ;
             uint32_t source_index  = new_versions[i] ;
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
             RsGxsMessageId source_msg_id = posts[source_index].mMeta.mMsgId ;
 #endif
 
@@ -519,7 +519,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 
             while(search_map.end() != (vit=search_map.find(posts[current_index].mMeta.mOrigMsgId)))
             {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
                 std::cerr << "    post at index " << current_index << " replaces a post at position " << vit->second ;
 #endif
 
@@ -531,7 +531,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 
                 if(posts[current_index].mMeta.mMsgId.isNull())	// This handles the branching situation where this post has been already erased. No need to go down further.
                 {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
                     std::cerr << "  already erased. Stopping." << std::endl;
 #endif
                     break ;
@@ -539,7 +539,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 
                 if(posts[current_index].mMeta.mPublishTs < posts[source_index].mMeta.mPublishTs)
                 {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
                     std::cerr << " and is more recent => following" << std::endl;
 #endif
 //                    for(std::set<RsGxsMessageId>::const_iterator itt(posts[current_index].mOlderVersions.begin());itt!=posts[current_index].mOlderVersions.end();++itt)
@@ -548,7 +548,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 //                    //posts[source_index].mOlderVersions.insert(posts[current_index].mMeta.mMsgId);
                     posts[current_index].mMeta.mMsgId.clear();	    // clear the msg Id so the post will be ignored
                 }
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
                 else
                     std::cerr << " but is older -> Stopping" << std::endl;
 #endif
@@ -556,19 +556,19 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
         }
     }
 
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
     std::cerr << "Now adding posts..." << std::endl;
 #endif
 
     for (std::vector<RsGxsChatMsg>::const_reverse_iterator it = posts.rbegin(); it != posts.rend(); ++it)
     {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
         std::cerr << "  adding post: " << (*it).mMeta.mMsgId ;
 #endif
 
         if(!(*it).mMeta.mMsgId.isNull())
         {
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
             std::cerr << " added" << std::endl;
 #endif
 
@@ -580,7 +580,7 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
             else
                 createPostItem(*it, related);
         }
-#ifdef DEBUG_CHANNEL
+#ifdef DEBUG_CHAT
         else
             std::cerr << " skipped" << std::endl;
 #endif

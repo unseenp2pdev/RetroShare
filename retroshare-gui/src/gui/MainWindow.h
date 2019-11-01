@@ -94,7 +94,8 @@ public:
         Search             = 8,  /** Search page. */
         Posted             = 11,  /** Posted links */
         People             = 12,   /** People page. */
-        Options            = 13   /** People page. */
+        Options            = 13,   /** People page. */
+        Chats              = 36  /** Channels page. */
     };
 
 

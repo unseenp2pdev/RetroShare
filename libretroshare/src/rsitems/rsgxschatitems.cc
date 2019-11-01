@@ -123,30 +123,35 @@ bool RsGxsChatMsgItem::fromChatPost(RsGxsChatMsg &post, bool moveImage)
 
 bool RsGxsChatMsgItem::toChatPost(RsGxsChatMsg &post, bool moveImage)
 {
-    post.mMeta = meta;
-    post.mMsg = mMsg;
-    if (moveImage)
-    {
-        post.mThumbnail.take((uint8_t *) mThumbnail.binData.bin_data, mThumbnail.binData.bin_len);
-        // mThumbnail doesn't have a ShallowClear at the moment!
-        mThumbnail.binData.TlvShallowClear();
-    }
-    else
-    {
-        post.mThumbnail.copy((uint8_t *) mThumbnail.binData.bin_data, mThumbnail.binData.bin_len);
-    }
+        post.mMeta = meta;
+        post.mMsg = mMsg;
+        if (moveImage)
+        {
+            post.mThumbnail.take((uint8_t *) mThumbnail.binData.bin_data, mThumbnail.binData.bin_len);
+            // mThumbnail doesn't have a ShallowClear at the moment!
+            mThumbnail.binData.TlvShallowClear();
+        }
+        else
+        {
+            post.mThumbnail.copy((uint8_t *) mThumbnail.binData.bin_data, mThumbnail.binData.bin_len);
+        }
 
-    std::list<RsTlvFileItem>::iterator fit;
-    for(fit = mAttachment.items.begin(); fit != mAttachment.items.end(); ++fit)
-    {
-        RsGxsFile fi;
-        fi.mName = RsDirUtil::getTopDir(fit->name);
-        fi.mSize  = fit->filesize;
-        fi.mHash  = fit->hash;
+        post.mCount = 0;
+        post.mSize = 0;
+        std::list<RsTlvFileItem>::iterator fit;
+        for(fit = mAttachment.items.begin(); fit != mAttachment.items.end(); ++fit)
+        {
+            RsGxsFile fi;
+            fi.mName = RsDirUtil::getTopDir(fit->name);
+            fi.mSize  = fit->filesize;
+            fi.mHash  = fit->hash;
 
-        post.mFiles.push_back(fi);
-    }
-    return true;
+            post.mFiles.push_back(fi);
+            post.mCount++;
+            post.mSize += fi.mSize;
+        }
+        return true;
+
 }
 
 void RsGxsChatMsgItem::clear()

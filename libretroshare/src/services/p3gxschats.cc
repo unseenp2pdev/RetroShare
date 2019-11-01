@@ -217,7 +217,7 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem
 void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
 {
 #ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::notifyChanges() : " << changes.size() << "changes to notify" << std::endl;
+    std::cerr << "p3GxsChats::notifyChanges() : " << changes.size() << " changes to notify" << std::endl;
 #endif
 
     p3Notify *notify = NULL;
@@ -244,7 +244,7 @@ void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
                     for (auto mit = msgChangeMap.begin(); mit != msgChangeMap.end(); ++mit)
                         for (auto mit1 = mit->second.begin(); mit1 != mit->second.end(); ++mit1)
                         {
-                            notify->AddFeedItem(RS_FEED_ITEM_CHATS_OFFLINE_MSG, mit->first.toStdString(), mit1->toStdString());
+                            notify->AddFeedItem(RS_FEED_ITEM_CHATS_MSG, mit->first.toStdString(), mit1->toStdString());
                         }
                 }
             }
@@ -291,7 +291,7 @@ void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
                             {
                                 if(mKnownChats.find(*git) == mKnownChats.end())
                                 {
-                                    notify->AddFeedItem(RS_FEED_ITEM_CHATS_OFFLINE_NEW, git->toStdString());
+                                    notify->AddFeedItem(RS_FEED_ITEM_CHATS_NEW, git->toStdString());
                                     mKnownChats.insert(std::make_pair(*git,time(NULL))) ;
                                 }
                                 else
@@ -437,9 +437,9 @@ bool p3GxsChats::getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &m
                     else
                     {
                         RsGxsMsgItem* msg = (*vit);
-                        //const uint16_t RS_SERVICE_GXS_TYPE_chatS    = 0x0217;
-                        //const uint8_t RS_PKT_SUBTYPE_GXSchat_POST_ITEM = 0x03;
-                        //const uint8_t RS_PKT_SUBTYPE_GXSCOMMENT_COMMENT_ITEM = 0xf1;
+                        //const uint16_t RS_SERVICE_GXS_TYPE_CHATS    = 0x0231;
+                        //const uint8_t  RS_PKT_SUBTYPE_GXSCHATS_POST_ITEM = 0x03;
+                        //const uint8_t  RS_PKT_SUBTYPE_GXSCOMMENT_COMMENT_ITEM = 0xf1;
                         std::cerr << "Not a GxschatPostItem neither a RsGxsCommentItem"
                                             << " PacketService=" << std::hex << (int)msg->PacketService() << std::dec
                                             << " PacketSubType=" << std::hex << (int)msg->PacketSubType() << std::dec

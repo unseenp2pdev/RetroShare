@@ -44,7 +44,7 @@ class QMainWindow;
 class GroupFrameSettings
 {
 public:
-	enum Type { Nothing, Forum, Channel, Posted };
+    enum Type { Nothing, Forum, Channel, Posted, Chats };
 
 public:
 	GroupFrameSettings()
@@ -316,6 +316,11 @@ public:
 	/* Channel */
 	bool getChannelLoadThread();
 	void setChannelLoadThread(bool value);
+
+    /* Chat */
+    bool getChatsLoadThread();
+    void setChatsLoadThread(bool value);
+
 
 
 	/* GroupFrame settings */

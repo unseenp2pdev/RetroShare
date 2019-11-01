@@ -294,6 +294,7 @@ void SubFileItem::updateItemStatic()
 	switch(mType)
 	{
 		case SFI_TYPE_CHANNEL:
+        case SFI_TYPE_CHATS:
 		{
 			saveButton->show();
 			if (mMode == SFI_STATE_LOCAL)
@@ -558,7 +559,7 @@ void SubFileItem::cancel()
 	mMode = SFI_STATE_ERROR;
 
 	/* Only occurs - if it is downloading */
-	if (((mType == SFI_TYPE_ATTACH) || (mType == SFI_TYPE_CHANNEL)) && (mFlag & SFI_FLAG_CREATE))
+    if (((mType == SFI_TYPE_ATTACH) || (mType == SFI_TYPE_CHANNEL || mType == SFI_TYPE_CHATS)) && (mFlag & SFI_FLAG_CREATE))
 	{
 		hide();
 		rsFiles->ExtraFileRemove(FileHash());//, RS_FILE_REQ_ANONYMOUS_ROUTING | RS_FILE_REQ_EXTRA);
@@ -687,9 +688,39 @@ void SubFileItem::save()
 			}
 		}
 	}
-	else
+    else if (mType == SFI_TYPE_CHATS)
 	{
+        /* only enable these function for Channels. */
+
+        /* find out where they want to save it */
+        QString startpath = "";
+        QString dir = QFileDialog::getExistingDirectory(this, tr("Save Chats File"),
+                         startpath,
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+
+        std::string destpath = dir.toStdString();
+
+        if (destpath != "")
+        {
+            bool copied = rsFiles->ExtraFileMove(mFileName, mFileHash, mFileSize, destpath);
+
+            // may be manually downloaded chats file
+            if(!copied){
+                rsFiles->FileDetails(mFileHash, RS_FILE_HINTS_NETWORK_WIDE | RS_FILE_HINTS_EXTRA, fInfo);
+
+                if(fInfo.path != "")
+                {
+
+                    destpath += "/" + fInfo.fname;
+                    rsFiles->copyFile(fInfo.path, destpath);
+                }
+            }
+        }
 	}
+    else {
+
+    }
 }
 
 uint32_t SubFileItem::getState() {
