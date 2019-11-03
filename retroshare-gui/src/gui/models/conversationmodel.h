@@ -66,29 +66,12 @@ public:
     ~ConversationModel();
 
 
-    /** unseenp2p
-     * try to save all conversations when read history for every conversation
-     */
-    void saveContactOrGroupChatToModelData(const std::string displayName, const std::string nickInGroupChat,
-                                      const unsigned int UnreadMessagesCount, const QDateTime LastInteractionDate,const std::string lastMessage,
-                                      const int contactType, const int groupChatType, const ChatId chatId);
-
-
-    /** unseenp2p
-     * get number of conversations
-     */
-    int countOfConversations();
-
-    /** unseenp2p
-     * add new conversation to list (vector)
-     */
-    void addConversation(conversation::Info entry);
     /**
      * Get conversations which should be shown client side
      * @return conversations filtered with the current filter
      */
     //const std::vector<conversation::Info>& allFilteredConversations() const;
-     std::vector<conversation::Info> allFilteredConversations();
+     //std::vector<conversation::Info> allFilteredConversations();
     /**
      * Get a custom filtered set of conversations
      * @return conversations filtered

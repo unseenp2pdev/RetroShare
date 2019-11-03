@@ -57,6 +57,7 @@ public:
 
     // hack for context menu highlight retention
     bool isContextMenuOpen{ false };
+    //const QString readMsgFromXml(const QString &historyMsg);
 
 private:
     std::string accId_;

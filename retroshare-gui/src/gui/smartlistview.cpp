@@ -38,8 +38,11 @@ SmartListView::SmartListView(QWidget *parent) :
     setAcceptDrops(true);
     setDropIndicatorShown(true);
     setSelectionMode(QAbstractItemView::SingleSelection);
-    setMouseTracking(true);
+    //setMouseTracking(true);
     installEventFilter(this);
+
+    horizontalScrollBar()->setEnabled(false);
+    horizontalScrollBar()->hide();
 }
 
 SmartListView::~SmartListView()
@@ -57,7 +60,7 @@ void
 SmartListView::leaveEvent(QEvent* event)
 {
     Q_UNUSED(event);
-    hoveredRow_ = QModelIndex();
+    //hoveredRow_ = QModelIndex();
 }
 
 void

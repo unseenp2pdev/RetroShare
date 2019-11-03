@@ -53,118 +53,109 @@ ConversationItemDelegate::paint(QPainter* painter
     QStyleOptionViewItem opt(option);
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    // Not having focus removes dotted lines around the item
-    if (opt.state & QStyle::State_HasFocus)
-        opt.state ^= QStyle::State_HasFocus;
+//    // Not having focus removes dotted lines around the item
+//    if (opt.state & QStyle::State_HasFocus)
+//        opt.state ^= QStyle::State_HasFocus;
 
     auto isContextMenuOpen = index.data(static_cast<int>(SmartListModel::Role::ContextMenuOpen)).value<bool>();
     bool selected = false;
     if (option.state & QStyle::State_Selected) {
         selected = true;
         opt.state ^= QStyle::State_Selected;
-    } else if (!isContextMenuOpen) {
-        highlightMap_[index.row()] = option.state & QStyle::State_MouseOver;
+    }
+//    else if (!isContextMenuOpen) {
+//        highlightMap_[index.row()] = option.state & QStyle::State_MouseOver;
+//    }
+
+    QString uriStr = index.data(static_cast<int>(SmartListModel::Role::URI)).value<QString>();
+
+    QRect rect_(opt.rect.left() - 2*dx_,opt.rect.top(), opt.rect.width() + 2*dx_, opt.rect.height());
+    auto rowHighlight = highlightMap_.find(index.row());
+    if (selected)
+    {
+        //painter->fillRect(option.rect, RingTheme::smartlistSelection_);
+        painter->fillRect(rect_, RingTheme::smartlistSelection_);
     }
 
- //   using namespace unseenp2p::api;
-//    auto type = Utils::toEnum<profile::Type>(
-//            index.data(static_cast<int>(SmartListModel::Role::ContactType)).value<int>()
-//        );
-
-//    // One does not simply keep the highlighted state drawn when the context
-//    // menu is open
-    QString uriStr = index.data(static_cast<int>(SmartListModel::Role::URI)).value<QString>();
-    //if (not (type == profile::Type::TEMPORARY and uriStr.isEmpty()))
-    //if (uriStr.isEmpty())
-    //{
-        auto rowHighlight = highlightMap_.find(index.row());
-        if (selected) {
-            painter->fillRect(option.rect, RingTheme::smartlistSelection_);
-        } else if (rowHighlight != highlightMap_.end() && (*rowHighlight).second) {
-            painter->fillRect(option.rect, RingTheme::smartlistHighlight_);
-        }
-//        auto convUid = index.data(static_cast<int>(SmartListModel::Role::UID)).value<QString>().toStdString();
-//        auto conversation = Utils::getConversationFromUid(convUid, *LRCInstance::getCurrentConversationModel());
-//        if (LRCInstance::getCurrentCallModel()->hasCall(conversation->callId)) {
-//            auto color = QColor(RingTheme::blue_.lighter(180));
-//            color.setAlpha(128);
-//            painter->fillRect(option.rect, color);
-//        }
-    //}
+    //unseenp2p - try to draw a line at bottom of every item:
+    if (!selected)
+    {
+        QRect rect_line(opt.rect.left() + sizeImage_, opt.rect.top() + opt.rect.height(), opt.rect.width() + 2*dx_ - sizeImage_, 1);
+        painter->fillRect(rect_line, RingTheme::smartlistSelection_);
+    }
 
     QRect &rect = opt.rect;
 
     opt.decorationSize = QSize(sizeImage_, sizeImage_);
     opt.decorationPosition = QStyleOptionViewItem::Left;
     opt.decorationAlignment = Qt::AlignCenter;
-    QRect rectAvatar(dx_ + rect.left(), rect.top() + dy_, sizeImage_, sizeImage_);
-//    if (type == profile::Type::TEMPORARY and uriStr.isEmpty()) {
-//        // Search icon
-//        drawDecoration(painter, opt, rectAvatar, *searchIcon_);
-//    } else
-//    {
-        // Avatar drawing
-        drawDecoration(painter, opt, rectAvatar,
-            QPixmap::fromImage(index.data(Qt::DecorationRole).value<QImage>())
-            .scaled(sizeImage_, sizeImage_, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-//    }
+    //QRect rectAvatar(dx_ + rect.left(), rect.top() + dy_, sizeImage_, sizeImage_);
+    QRect rectAvatar(rect.left() - dx_, rect.top() + dy_, sizeImage_, sizeImage_);
+
+    // Avatar drawing
+    drawDecoration(painter, opt, rectAvatar,
+                   QPixmap::fromImage(index.data(Qt::DecorationRole).value<QImage>())
+                   .scaled(sizeImage_, sizeImage_, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     QFont font(painter->font());
 
-    //if (type != profile::Type::TEMPORARY)
-    //{
-        // If there's unread messages, a message count is displayed
-        if (auto messageCount = index.data(static_cast<int>(SmartListModel::Role::UnreadMessagesCount)).toInt()) {
-            QString messageCountText = (messageCount > 9) ? "9+" : QString::number(messageCount);
-            qreal fontSize = messageCountText.count() > 1 ? 7 : 8;
-            font.setPointSize(fontSize);
+    // If there's unread messages, a message count is displayed
+    if (auto messageCount = index.data(static_cast<int>(SmartListModel::Role::UnreadMessagesCount)).toInt())
+    {
+        QString messageCountText = (messageCount > 20) ? "20+" : QString::number(messageCount);
+        qreal fontSize = messageCountText.count() > 1 ? 10 : 12;
+        font.setPointSize(fontSize);
 
-            // ellipse
-            QPainterPath ellipse;
-            qreal ellipseHeight = sizeImage_ / 6;
-            qreal ellipseWidth = ellipseHeight;
-            QPointF ellipseCenter(rectAvatar.right() - ellipseWidth + 1, rectAvatar.top() + ellipseHeight + 1);
-            QRect ellipseRect(ellipseCenter.x() - ellipseWidth, ellipseCenter.y() - ellipseHeight,
-                ellipseWidth * 2, ellipseHeight * 2);
-            ellipse.addRoundedRect(ellipseRect, ellipseWidth, ellipseHeight);
-            painter->fillPath(ellipse, RingTheme::notificationRed_);
+        // ellipse
+        QPainterPath ellipse;
+        qreal ellipseHeight = sizeImage_ / 5;
+        qreal ellipseWidth = ellipseHeight;
+        QPointF ellipseCenter(rectAvatar.right() - ellipseWidth + 1, rectAvatar.top() + ellipseHeight + 1);
+        QRect ellipseRect(ellipseCenter.x() - ellipseWidth, ellipseCenter.y() - ellipseHeight,
+                          ellipseWidth * 2, ellipseHeight * 2);
+        ellipse.addRoundedRect(ellipseRect, ellipseWidth, ellipseHeight);
+        painter->fillPath(ellipse, RingTheme::notificationRed_);
 
-            // text
-            painter->setPen(Qt::white);
-            painter->setOpacity(1);
-            painter->setFont(font);
-            ellipseRect.setTop(ellipseRect.top() - 2);
-            painter->drawText(ellipseRect, Qt::AlignCenter, messageCountText);
+        // text
+        painter->setPen(Qt::white);
+        painter->setOpacity(1);
+        painter->setFont(font);
+        ellipseRect.setTop(ellipseRect.top() - 2);
+        painter->drawText(ellipseRect, Qt::AlignCenter, messageCountText);
+    }
+
+    // Presence indicator
+    QString statusStr =  index.data(static_cast<int>(SmartListModel::Role::Presence)).value<QString>();
+    if (statusStr != "no-status")
+    {
+        qreal radius = sizeImage_ / 6;
+        QPainterPath outerCircle, innerCircle;
+        QPointF center(rectAvatar.right() - radius + 2, (rectAvatar.bottom() - radius) + 1 + 2);
+        qreal outerCRadius = radius;
+        qreal innerCRadius = outerCRadius * 0.75;
+        outerCircle.addEllipse(center, outerCRadius, outerCRadius);
+        innerCircle.addEllipse(center, innerCRadius, innerCRadius);
+        painter->fillPath(outerCircle, Qt::white);
+        if (statusStr == "offline")
+        {
+            painter->fillPath(innerCircle, RingTheme::grey_);
         }
-
-        // Presence indicator
-        if (index.data(static_cast<int>(SmartListModel::Role::Presence)).value<bool>()) {
-            qreal radius = sizeImage_ / 6;
-            QPainterPath outerCircle, innerCircle;
-            QPointF center(rectAvatar.right() - radius + 2, (rectAvatar.bottom() - radius) + 1 + 2);
-            qreal outerCRadius = radius;
-            qreal innerCRadius = outerCRadius * 0.75;
-            outerCircle.addEllipse(center, outerCRadius, outerCRadius);
-            innerCircle.addEllipse(center, innerCRadius, innerCRadius);
-            painter->fillPath(outerCircle, Qt::white);
+        else if (statusStr == "online")
+        {
             painter->fillPath(innerCircle, RingTheme::presenceGreen_);
         }
-    //}
+        else if (statusStr == "away")
+        {
+            painter->fillPath(innerCircle, RingTheme::urgentOrange_);
+        }
+        else if (statusStr == "busy")
+        {
+            painter->fillPath(innerCircle, RingTheme::red_);
+        }
+    }
 
-//    switch (type) {
-//    case profile::Type::TEMPORARY:
-//    case profile::Type::RING:
-//    case profile::Type::SIP:
-        paintConversationItem(painter, option, rect, index,
-                              false);
-//        break;
-//    case profile::Type::PENDING:
-//        paintInvitationItem(painter, option, rect, index);
-//        break;
-//    default:
-//        paintConversationItem(painter, option, rect, index, true);
-//        break;
-//    }
+    paintConversationItem(painter, option, rect, index,
+                          false);
 }
 
 QSize
@@ -183,7 +174,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
                                                 const QModelIndex& index,
                                                 const bool isTemporary) const
 {
-    Q_UNUSED(option);
+    //Q_UNUSED(option);
     QFont font(painter->font());
     QPen pen(painter->pen());
     painter->setPen(pen);
@@ -201,8 +192,10 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
         infoTextWidthModifier = 10;
     }
 
-    auto leftMargin = dx_ + sizeImage_ + dx_;
+    //auto leftMargin = dx_ + sizeImage_ + dx_;
+    auto leftMargin = sizeImage_;
     auto rightMargin = dx_;
+
     auto topMargin = 4;
     auto bottomMargin = 8;
 
@@ -214,8 +207,8 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
     }
 
     QRect rectName1(rect.left() + leftMargin,
-                    rect.top() + topMargin,
-                    rect1Width,
+                    rect.top()   + topMargin,
+                    rect1Width - 2*dx_,
                     rect.height() / 2 - 2);
 
     QRect rectName2(rectName1.left(),
@@ -229,7 +222,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
     QString nameStr = index.data(static_cast<int>(SmartListModel::Role::DisplayName)).value<QString>();
     if (!nameStr.isNull()) {
         font.setItalic(false);
-        font.setBold(false);
+        font.setBold(true);
         pen.setColor(RingTheme::lightBlack_);
         painter->setPen(pen);
         painter->setFont(font);
@@ -255,7 +248,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     QRect rectInfo1(rectName1.left() + rectName1.width(),
                     rect.top() + topMargin,
-                    infoTextWidth_ - rightMargin + infoTextWidthModifier + 2,
+                    infoTextWidth_ - rightMargin + infoTextWidthModifier + 9 + 2* dx_,
                     rect.height() / 2 - 2);
 
     QRect rectInfo2(rectInfo1.left(),
@@ -277,39 +270,26 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     // bottom-right: last interaction snippet
     QString interactionStr = index.data(static_cast<int>(SmartListModel::Role::LastInteraction)).value<QString>();
-    if (!interactionStr.isNull()) {
+    if (!interactionStr.isNull() && interactionStr.length() > 0)
+    {
         painter->save();
         font.setWeight(QFont::ExtraLight);
         interactionStr = interactionStr.simplified();
-//        auto type = Utils::toEnum<lrc::api::interaction::Type>(index
-//            .data(static_cast<int>(SmartListModel::Role::LastInteractionType))
-//            .value<int>());
-//        if (type == lrc::api::interaction::Type::CALL ||
-//            type == lrc::api::interaction::Type::CONTACT)
-//        {
-            font.setItalic(false);
-            font.setBold(false);
-            pen.setColor(RingTheme::grey_.darker(140));
-            painter->setPen(pen);
-            painter->setFont(font);
-            // strip emojis if it's a call/contact type message
-            VectorUInt emojiless;
-            for (auto unicode : interactionStr.toUcs4()) {
-                if (!(unicode >= 0x1F000 && unicode <= 0x1FFFF)) {
-                    emojiless.push_back(unicode);
-                }
+
+        font.setItalic(false);
+        font.setBold(false);
+        pen.setColor(RingTheme::grey_.darker(140));
+        painter->setPen(pen);
+        painter->setFont(font);
+        // strip emojis if it's a call/contact type message
+        VectorUInt emojiless;
+        for (auto unicode : interactionStr.toUcs4()) {
+            if (!(unicode >= 0x1F000 && unicode <= 0x1FFFF)) {
+                emojiless.push_back(unicode);
             }
-            interactionStr = QString::fromUcs4(&emojiless.at(0), emojiless.size());
- //       }
-//        else {
-//            QFont emojiMsgFont(QStringLiteral("Segoe UI Emoji"));
-//            emojiMsgFont.setItalic(false);
-//            emojiMsgFont.setBold(false);
-//            emojiMsgFont.setPointSize(scalingRatio > 1.0 ? fontSize_ - 2 : fontSize_);
-//            rectInfo2.setTop(rectInfo2.top() - 6);
-//            painter->setOpacity(0.7);
-//            painter->setFont(emojiMsgFont);
-//        }
+        }
+        interactionStr = QString::fromUcs4(&emojiless.at(0), emojiless.size());
+
         interactionStr = fontMetrics.elidedText(interactionStr, Qt::ElideRight, rectInfo2.width());
         painter->drawText(rectInfo2, Qt::AlignVCenter | Qt::AlignRight, interactionStr);
         painter->restore();

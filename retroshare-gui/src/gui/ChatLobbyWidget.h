@@ -12,6 +12,7 @@
 //unseenp2p
 #include "gui/smartlistmodel.h"
 #include "gui/models/conversationmodel.h"
+#include <vector>
 
 #include <QAbstractButton>
 #include <QTreeWidget>
@@ -58,22 +59,6 @@ struct ChatOne2OneInfoStruct
 	time_t last_typing_event;
 };
 
-struct ChatItemStruct
-{
-    QIcon icon ;
-    QString displayName;            //group name or contact name
-    QString nickInGroupChat;        // only in groupchat
-    QString onlineStatus;           // "online", "away", "idle", "offline"
-    int UnreadMessagesCount;
-    QDateTime LastInteractionDate;    // date for last message
-    QString lastMessage;
-    int contactType;                // 0 - groupchat, 1 - contact chat
-    int groupChatType;              // 0 - public, 1: private
-    ChatLobbyId groupId;            // for groupchat type
-    ChatId chatId;                  // for contact
-    QString uId;                    // unique Id: this will take groupId or chatId for Id for all list
-
-};
 namespace Ui {
 class ChatLobbyWidget;
 }
@@ -113,16 +98,14 @@ public:
     //unseen p2p - try to work with Model-view (smartlistview, smarlistmodel)
     std::map<ChatLobbyId,ChatLobbyInfoStruct> getGroupChatList();       // 17 Oct 2019 - meiyousixin
     std::map<std::string,ChatOne2OneInfoStruct> getOne2OneChatList();   // 17 Oct 2019 - meiyousixin
-    std::list<ChatItemStruct> getChatItemsList();
+
+    unsigned int getUnreadMsgNumberForChat(ChatId chatId);  //01 Nov 2019, Unseenp2p - for new MVC GUI
+    void openLastChatWindow();
 
     QIcon lastIconForPeerId(RsPeerId peerId, bool unread);
     QImage avatarImageForPeerId(RsPeerId peerId);
 
-    ConversationModel* getConversationModel();
-    std::vector<conversation::Info> getConversationList();
-    void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
-                                      unsigned int UnreadMessagesCount, QDateTime LastInteractionDate, std::string lastMessage,
-                                      int contactType, int groupChatType, ChatId chatId);
+    void processSettings(bool bLoad);
 
 signals:
 	void unreadCountChanged(uint unreadCount);
@@ -149,7 +132,7 @@ protected slots:
 	void updatePeerLeaving(ChatLobbyId);
 	void autoSubscribeItem();
 	void copyItemLink();
-    void updateRecentTime(const ChatId&, uint);
+    void updateRecentTime(const ChatId&, std::string, uint, std::string, bool);
     //void updateP2PMessageChanged(bool incoming, const ChatId& chatId, QDateTime time, QString senderName, QString msg);
     void updateP2PMessageChanged(ChatMessage);
     void on_addContactButton_clicked();
@@ -180,16 +163,8 @@ private:
 
     //unseenp2p
     void selectConversation(const QModelIndex& index);
-   // bool selectConversation(const unseenp2p::api::conversation::Info& item,
-   //     unseenp2p::api::ConversationModel& convModel);
 
-    bool selectConversation(const conversation::Info& item,
-            ConversationModel& convModel);
-	RSTreeWidgetItemCompareRole *compareRole;
-	QTreeWidgetItem *privateLobbyItem;
-	QTreeWidgetItem *publicLobbyItem;
-	QTreeWidgetItem *privateSubLobbyItem;
-	QTreeWidgetItem *publicSubLobbyItem;
+    RSTreeWidgetItemCompareRole *compareRole;
     //QTreeWidgetItem *chatContactItem; //21 Sep 2018 - meiyousixin - add this 'contact' tree for one2one chat
     QTreeWidgetItem *commonItem; //27 Nov 2018 - meiyousixin  - using for all conversations
 	QTreeWidgetItem *getTreeWidgetItem(ChatLobbyId);
@@ -203,7 +178,7 @@ private:
 	std::map<QTreeWidgetItem*,time_t> _icon_changed_map ;
 
     bool m_bProcessSettings;
-    void processSettings(bool bLoad);
+
 
     /** Defines the actions for the header context menu */
     QAction* showUserCountAct;
@@ -220,6 +195,8 @@ private:
     Ui::ChatLobbyWidget* ui;
 
 	void showContactChat(QTreeWidgetItem *item);
+    void showContactChatMVC(std::string chatIdStr);     //for MVC GUI
+    void showGroupChatMVC(ChatLobbyId lobbyId);       //for MVC GUI
     void getHistoryForRecentList();
     void resetAvatarForContactItem(const ChatId &chatId);
 
@@ -231,12 +208,8 @@ private:
 
     SmartListModel* smartListModel_;
 
-    std::list<ChatItemStruct> _chatItemsList; //for model-view
-    ConversationModel* convModel;
+    ChatId lastChatId;      //unseenp2p - for saving the current/last chat when user close the app
+    bool alreadyOpenLastChatWindow;
 
-    std::vector<conversation::Info> conversationListInWidget;
-
-    QMetaObject::Connection newConversationConnection_;
-    QMetaObject::Connection smartlistSelectionConnection_;
 };
 

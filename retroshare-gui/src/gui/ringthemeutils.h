@@ -36,7 +36,7 @@ static const QColor notificationRed_{ 255, 59, 48 };
 static const QColor urgentOrange_{ 255, 165, 0 };
 static const QColor green_ {127, 255, 0};
 static const QColor presenceGreen_{ 76, 217, 100 };
-static const QColor smartlistSelection_ { 240, 240, 240 };
+static const QColor smartlistSelection_ { 220, 220, 220 };
 static const QColor smartlistHighlight_ { 245, 245, 245 };
 
 static const QColor defaultAvatarColor_ = { "#ff9e9e9e" }; //Grey

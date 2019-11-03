@@ -70,43 +70,6 @@ ConversationModel::~ConversationModel()
 
 }
 
-using namespace conversation;
-
-void ConversationModel::addConversation(conversation::Info entry)
-{
-    Conversations.emplace_back(entry);
-}
-void ConversationModel::saveContactOrGroupChatToModelData(const std::string displayName, const std::string nickInGroupChat,
-                                                          const unsigned int UnreadMessagesCount, const QDateTime LastInteractionDate,const std::string lastMessage,
-                                                          const int contactType, const int groupChatType, const ChatId chatId)
-{
-
-    QString uId;
-    if (contactType == 1)
-    {
-        uId = QString::fromStdString((chatId.toPeerId().toStdString()));
-    }
-    else  {
-        uId  = QString::fromStdString((chatId.toStdString()));
-    }
-    //conv.uId = uId;
-    conversation::Info newEntry(displayName, nickInGroupChat,
-                                                   UnreadMessagesCount, LastInteractionDate,lastMessage,
-                                                   contactType,  groupChatType, chatId, uId);
-    //addConversation(newEntry);
-    //Conversations.emplace_back(newEntry);
-    Conversations.push_back(newEntry);
-}
-int ConversationModel::countOfConversations()
-{
-    return static_cast<int>(Conversations.size());
-}
-
- std::vector<conversation::Info>
-ConversationModel::allFilteredConversations()
-{
-    return Conversations;
-}
 
 
 //conversation::Info

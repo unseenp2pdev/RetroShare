@@ -393,6 +393,9 @@ struct RsPeerCryptoParams
 	std::string cipher_name;
 };
 
+
+
+
 struct RsGroupInfo : RsSerializable
 {
     RsGroupInfo();
@@ -765,7 +768,6 @@ public:
     //unseenp2p - only for client
     virtual void saveSupernodeCert(const std::string& cert) =0;
     virtual std::list<std::string> getSupernodeCertList() =0;
-
 
 };
 

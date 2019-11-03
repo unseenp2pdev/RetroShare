@@ -376,7 +376,7 @@ rs_autologin {
 }
 
 rs_onlyhiddennode {
-    DEFINES *= RS_ONLYHIDDENNODE
+#    DEFINES *= RS_ONLYHIDDENNODE
 #   CONFIG -= bitdht
 #   CONFIG *= no_bitdht
     message("QMAKE: You have enabled only hidden node.")

@@ -47,6 +47,7 @@ public:
 	uint32_t    sendTime;
 	uint32_t    recvTime;
 	std::string message;
+    std::string nickInGroupChat;    //unseenp2p - add this for show on the MVC conversation list
 
 	/* not serialised */
 	uint32_t     msgId;

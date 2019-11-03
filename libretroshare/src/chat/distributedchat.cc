@@ -1088,6 +1088,9 @@ bool DistributedChatService::sendLobbyChat(const ChatLobbyId& lobby_id, const st
     message.incoming = false;
     message.online = true;
     message.unread = false;
+
+    //Unseenp2p - for showing on the MVC conversation list in chat tab
+    message.peer_alternate_nickname = "You";
     RsServer::notify()->notifyChatMessage(message);
     mHistMgr->addMessage(message);
 

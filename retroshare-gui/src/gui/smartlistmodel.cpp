@@ -23,18 +23,18 @@
 #include <QDateTime>
 #include <QImage>
 #include <QSize>
-//#include <QMetaType>
-//#include <QIODevice>
-//#include <QByteArray>
-//#include <QBuffer>
 #include <QPainter>
+#include <QtXml>
+#include <QDomComment>
 
 #include "ChatLobbyWidget.h"
 #include "MainWindow.h"
 #include "retroshare/rspeers.h"
 #include "retroshare/rsstatus.h"
+#include "gui/common/AvatarDefs.h"
 
 #include "models/conversationmodel.h"
+#include "util/HandleRichText.h"
 
 #define IMAGE_PUBLIC          ":/chat/img/groundchat.png"               //copy from ChatLobbyWidget
 #define IMAGE_PRIVATE         ":/chat/img/groundchat_private.png"       //copy from ChatLobbyWidget
@@ -48,25 +48,50 @@ SmartListModel::SmartListModel(const std::string& accId, QObject *parent, bool c
 {
     setAccount(accId_);
 }
+/*
+ * <body>
+ *      <style type="text/css" RSOptimized="v2">.S1{font-size:13pt;}.S0{color:#000000;}.S1{font-weight:400;}.
+ *                  S1{font-family:'';}.S1{font-style:normal;}
+ *      </style>
+ *      <span>
+ *              <span class="S1">
+ *                       <span class="S0">hihi</span>
+ *              </span>
+ *      </span>
+ * </body>
+ */
+/*
+ * <rates>
+      <rate>
+            <from>AUD</from>
+            <to>CAD</to>
+            <conversion>1.0079</conversion>
+      </rate>
+      <rate>...</rate>
+      ...
+  </rates>
+ */
 
+static QString readMsgFromXml(const QString &historyMsg)
+{
+    QDomDocument doc;
+    if (!doc.setContent(historyMsg)) return "Media";
+
+    //QDomNodeList rates = doc.elementsByTagName("body");
+    QDomElement body = doc.firstChildElement("body");
+    QDomElement span1 = body.firstChildElement("span");
+    QDomElement span2 = span1.firstChildElement("span");
+    QDomElement span3 = span2.firstChildElement("span");
+
+    return span3.text();
+}
 
 int SmartListModel::rowCount(const QModelIndex &parent) const
 {
-    //int count = MainWindow::getInstance()->getConversationModel()->countOfConversations();
 
-    ChatLobbyWidget* chatWidget = MainWindow::getInstance()->chatLobbyDialog;
     int count = 0;
-    if (chatWidget)
-    {
-        //try to get item in index.row() from gui
-        //std::list<ChatItemStruct> _chatItemsList = chatWidget->getChatItemsList();
-        ConversationModel* convModel = chatWidget->getConversationModel();
-        std::vector<conversation::Info> list =  convModel->allFilteredConversations(); //->getConversationList();
-        if (!list.empty())
-        {
-            count = static_cast<int> (list.size());
-        }
-    }
+    std::vector<conversationInfo> list = rsMsgs->getConversationItemList();
+    count = static_cast<int>(list.size());
     return count; // A valid QModelIndex returns 0 as no entry has sub-elements
 }
 
@@ -103,39 +128,49 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    ChatLobbyWidget* chatWidget = MainWindow::getInstance()->chatLobbyDialog;
-    if (chatWidget)
+    if (rsMsgs)
     {
-        //try to get item in index.row() from gui
-        //std::list<ChatItemStruct> _chatItemsList = chatWidget->getChatItemsList();
-        ConversationModel* convModel = chatWidget->getConversationModel();
-
-        //conversation::Info chatItem = chatWidget->getConversationList().at(index.row());
-
-        conversation::Info chatItem = convModel->allFilteredConversations().at(index.row());
-
         //Get avatar for groupchat or contact item
-        RsPeerId peerId = chatItem.chatId.toPeerId();
-        bool presenceForChat;
-        if (chatItem.contactType == 0) presenceForChat = false;
-        else
+        uint32_t conversationMode = rsMsgs->getConversationListMode();
+        std::vector<conversationInfo> list; // = rsMsgs->getConversationItemList();
+        if (conversationMode == CONVERSATION_MODE_WITHOUT_FILTER)
+        {
+            list = rsMsgs->getConversationItemList();
+        }
+        else if (conversationMode == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+        {
+            list = rsMsgs->getSearchFilteredConversationItemList();
+        }
+
+        if (index.row() >= static_cast<int>(list.size())) return QVariant();
+        conversationInfo chatItem = list.at(index.row());
+
+        //STATUS FOR CONTACT
+        RsPeerId peerId(chatItem.rsPeerIdStr);
+        QString presenceForChat = "no-status"; //for groupchat
+        if (chatItem.contactType != 0)
         {
             StatusInfo statusContactInfo;
+
             rsStatus->getStatus(peerId,statusContactInfo);
             switch (statusContactInfo.status)
             {
+                case RS_STATUS_OFFLINE:
                 case RS_STATUS_INACTIVE:
-                    presenceForChat = false;
+                    presenceForChat = "offline";
                     break;
-
                 case RS_STATUS_ONLINE:
+                    presenceForChat = "online";
+                    break;
                 case RS_STATUS_AWAY:
+                    presenceForChat = "away";
+                    break;
                 case RS_STATUS_BUSY:
-                    presenceForChat = true;
-                break;
-
+                    presenceForChat = "busy";
+                    break;
             }
         }
+
         QImage avatar(IMAGE_UNSEEN);    //default avatar for UnseenP2P
         if (chatItem.contactType == 0)      //if this is a group chat
         {
@@ -150,8 +185,82 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
         }
         else
         {
-            avatar = chatWidget->avatarImageForPeerId(peerId);
+            QPixmap bestAvatar;
+            AvatarDefs::getAvatarFromSslId(peerId, bestAvatar);
+            avatar = bestAvatar.toImage();
         }
+
+        ////////////////////////////////////////////
+        /////// GET DATETIME for last msg //////////
+        ////////////////////////////////////////////
+        //date time format for msg: Mon Jan 21 12:39:35 1970 or Sat Oct 26 10:13:09 2019
+        // if msg in the day, choose the "12:39"
+        // if msg in the 7 days, choose the 3 first character like "Mon"
+        // if msg older than 7 days, choose "Jan 21"
+        QString timedateForMsgResult;
+        QDateTime dateTime =  QDateTime::fromTime_t(chatItem.lastMsgDatetime);
+        QString timedateForMsg = dateTime.toString();
+        qint64 secondsOfDatetime = dateTime.toSecsSinceEpoch();
+
+        qint64 now = QDateTime::currentDateTime().toSecsSinceEpoch();
+        // if msg in the day, choose the "12:39"
+        if (now - secondsOfDatetime <  86400)       //secondsIn1Day  =  86400;
+        {
+            timedateForMsgResult = timedateForMsg.mid(11,5);
+            int hour = timedateForMsgResult.mid(0,2).toInt();
+            if (hour >= 12) {
+               QString timehour;
+               if (hour > 12)
+               {
+                   timehour = QString::number(hour - 12);
+                   timehour.append(timedateForMsgResult.mid(2,3));
+                   timehour.append(" PM");
+                   timedateForMsgResult = timehour;
+               }
+               else timedateForMsgResult.append(" PM");
+            }
+            else timedateForMsgResult.append(" AM");
+        }
+        // if msg in the 7 days, choose the 3 first character like "Mon"
+        else if (now - secondsOfDatetime < 604800)      //secondsIn7Days = 604800;
+        {
+            timedateForMsgResult = timedateForMsg.mid(0,3);
+        }
+        // if msg older than 7 days, choose "Jan 21"
+        else
+        {
+            timedateForMsgResult = timedateForMsg.mid(4,6);
+            timedateForMsgResult.append(timedateForMsg.mid(19,4));
+        }
+
+        //GET LAST MSG from html format
+        QString lastMsgQstr = QString::fromStdString(chatItem.lastMessage);
+        QDomDocument docCheck;
+        QString temp = lastMsgQstr;
+        QString lastMsg;
+        if (chatItem.contactType == 0)
+        {
+            if (docCheck.setContent(temp))
+                lastMsg =QString::fromStdString(chatItem.nickInGroupChat) + ": " + readMsgFromXml(temp);
+            else
+            {
+                lastMsg =QString::fromStdString(chatItem.nickInGroupChat) + ": " + lastMsgQstr;
+            }
+        }
+        else
+        {
+             if (docCheck.setContent(temp))
+                lastMsg = readMsgFromXml(temp);
+            else lastMsg = lastMsgQstr;
+        }
+
+        //GET status of last msg
+        QString lastMsgStatus =  (chatItem.isOtherLastMsg? "": "sent");
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////// BEGIN TO CHOOSE value after PREPARING ALLs.                          ////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         try {
             switch (role) {
@@ -162,12 +271,11 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
             case Role::DisplayName:
             case Qt::DisplayRole:
             {
-
                 return QVariant(QString::fromStdString(chatItem.displayName));
             }
             case Role::DisplayID:
             {
-                return  QVariant(QString::fromStdString(chatItem.nickInGroupChat));
+                return  QVariant(lastMsg);
             }
             case Role::Presence:
             {
@@ -178,14 +286,13 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
                 return QVariant(QString::fromStdString("unseenp2p.com"));
             }
             case Role::UnreadMessagesCount:
-                return QVariant(4);
+                return QVariant(chatItem.UnreadMessagesCount);
             case Role::LastInteractionDate:
             {
-                //return QVariant("10:4");
-                return QVariant(chatItem.LastInteractionDate);
+                return QVariant(timedateForMsgResult);
             }
             case Role::LastInteraction:
-                return QVariant(QString::fromStdString(chatItem.lastMessage));
+                return QVariant(lastMsgStatus);
             case Role::LastInteractionType:
                 return QVariant(0);
             case Role::ContactType:
