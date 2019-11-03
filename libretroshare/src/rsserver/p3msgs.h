@@ -138,12 +138,12 @@ class p3Msgs: public RsMsgs
 
           //unseenp2p - for MVC
           virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
-                                                         unsigned int UnreadMessagesCount, uint lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                                         unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                          int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId);
           virtual std::vector<conversationInfo> getConversationItemList();
-          virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, uint lastMsgDatetime, std::string textmsg, bool isOtherMsg );
+          virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg );
           virtual void sortConversationItemListByRecentTime();
-          virtual void updateUnreadNumberOfItemInConversationList(std::string uId, uint unreadNumber, bool isReset);
+          virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset);
           virtual std::string getSeletedUIdBeforeSorting(int row);
           virtual int getIndexFromUId(std::string uId);
           virtual bool isChatIdInConversationList(std::string uId);

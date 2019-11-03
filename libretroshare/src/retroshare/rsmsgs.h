@@ -289,7 +289,7 @@ struct conversationInfo
     std::string nickInGroupChat;        // only in groupchat
     unsigned int UnreadMessagesCount = 0;
     std::string LastInteractionDate;    // date for last message
-    uint lastMsgDatetime;               // QDateTime::currentDateTime().toTime_t()
+    unsigned int lastMsgDatetime;               // QDateTime::currentDateTime().toTime_t()
     std::string lastMessage;
     bool isOtherLastMsg;            // true if receiving msg, false if sending msg
     int contactType;                // 0 - groupchat, 1 - contact chat
@@ -299,7 +299,7 @@ struct conversationInfo
     std::string uId;                    // unique Id: this will take groupId or chatId for Id for all list
 
     conversationInfo(std::string displayName, std::string nickInGroupChat,
-         unsigned int UnreadMessagesCount, uint lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+         unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
          int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId): displayName(displayName),nickInGroupChat(nickInGroupChat),
            UnreadMessagesCount(UnreadMessagesCount), lastMsgDatetime(lastMsgDatetime),
             lastMessage(lastMessage), isOtherLastMsg(isOtherLastMsg), contactType(contactType), groupChatType(groupChatType), rsPeerIdStr(rsPeerIdStr), chatLobbyId(chatLobbyId), uId(uId) {}
@@ -555,12 +555,12 @@ virtual bool resetMessageStandardTagTypes(Rs::Msgs::MsgTagType& tags) = 0;
 
     //unseenp2p - for MVC
     virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
-                                                   unsigned int UnreadMessagesCount, uint lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                                   unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                    int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId) = 0;
     virtual std::vector<conversationInfo> getConversationItemList() = 0;
-    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, uint lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
+    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
     virtual void sortConversationItemListByRecentTime() = 0;
-    virtual void updateUnreadNumberOfItemInConversationList(std::string uId, uint unreadNumber, bool isReset) = 0;
+    virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset) = 0;
     virtual std::string getSeletedUIdBeforeSorting(int row) = 0;
     virtual int getIndexFromUId(std::string uId) = 0;
     virtual bool isChatIdInConversationList(std::string uId) = 0;

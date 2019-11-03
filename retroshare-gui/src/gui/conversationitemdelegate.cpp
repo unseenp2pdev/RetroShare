@@ -25,7 +25,7 @@
 //#include <QSvgRenderer>
 #include <QItemDelegate>
 
-typedef QVector<uint>                                       VectorUInt                    ;
+typedef QVector<unsigned int>                                       VectorUInt                    ;
 // Client
 #include "smartlistmodel.h"
 #include "ringthemeutils.h"

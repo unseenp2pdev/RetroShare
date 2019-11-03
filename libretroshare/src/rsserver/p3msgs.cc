@@ -556,7 +556,7 @@ uint32_t p3Msgs::getDistantChatPermissionFlags()
 
 //unseenp2p - for MVC
 void p3Msgs::saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
-                                               unsigned int UnreadMessagesCount, uint lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                               unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId)
 {
     mChatSrv->saveContactOrGroupChatToModelData(displayName, nickInGroupChat,
@@ -569,7 +569,7 @@ std::vector<conversationInfo> p3Msgs::getConversationItemList()
     return mChatSrv->getConversationItemList();
 }
 
-void p3Msgs::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, uint lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+void p3Msgs::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg )
 {
     mChatSrv->updateRecentTimeOfItemInConversationList(uId, nickInGroupChat, lastMsgDatetime, textmsg, isOtherMsg);
 }
@@ -579,7 +579,7 @@ void p3Msgs::sortConversationItemListByRecentTime()
     mChatSrv->sortConversationItemListByRecentTime();
 }
 
-void p3Msgs::updateUnreadNumberOfItemInConversationList(std::string uId, uint unreadNumber, bool isReset)
+void p3Msgs::updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset)
 {
     mChatSrv->updateUnreadNumberOfItemInConversationList(uId,unreadNumber, isReset);
 }

@@ -219,7 +219,17 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
                }
                else timedateForMsgResult.append(" PM");
             }
-            else timedateForMsgResult.append(" AM");
+            else
+            {
+                //check if the timedate is AM, it will take: "8:56:", need to remove the last ":"
+                int lastIndex = timedateForMsgResult.length()-1;
+                if (timedateForMsgResult[lastIndex] == ":")
+                {
+                    timedateForMsgResult.chop(1);
+                }
+
+                timedateForMsgResult.append(" AM");
+            }
         }
         // if msg in the 7 days, choose the 3 first character like "Mon"
         else if (now - secondsOfDatetime < 604800)      //secondsIn7Days = 604800;

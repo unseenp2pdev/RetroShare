@@ -1028,7 +1028,7 @@ void ChatLobbyWidget::copyItemLink()
 }
 
 //update recent time for every chat item and sort by recent time
-void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickInGroupChat, uint current_time, std::string textmsg, bool isSend)
+void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickInGroupChat, unsigned int current_time, std::string textmsg, bool isSend)
 {
 
         //Need to update the Conversation list in rsMsg, then update the GUI of chat item list in ChatLobbyWIdget
@@ -1766,7 +1766,7 @@ QPixmap ChatLobbyWidget::currentStatusIcon(RsPeerId peerId, QFont& gpgFontOut)
     return gpgOverlayIcon;
 }
 
-void ChatLobbyWidget::updateContactItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &nickname, const ChatId& chatId, const std::string &rsId, uint current_time, bool unread)
+void ChatLobbyWidget::updateContactItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &nickname, const ChatId& chatId, const std::string &rsId, unsigned int current_time, bool unread)
 {
 //      item->setText(COLUMN_NAME, QString::fromUtf8(nickname.c_str()));
 
@@ -1785,7 +1785,7 @@ void ChatLobbyWidget::updateContactItem(QTreeWidget *treeWidget, QTreeWidgetItem
 //      item->setData(COLUMN_RECENT_TIME, ROLE_SORT,current_time);
 }
 
-void ChatLobbyWidget::updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &name, const ChatLobbyId& id, uint current_time, bool unread, ChatLobbyFlags lobby_flags)
+void ChatLobbyWidget::updateGroupChatItem(QTreeWidget *treeWidget, QTreeWidgetItem *item, const std::string &name, const ChatLobbyId& id, unsigned int current_time, bool unread, ChatLobbyFlags lobby_flags)
 {
 
 //    std::cerr << " Add group chat item to the common item when get history, group name: " << name << std::endl;

@@ -1278,7 +1278,7 @@ void ChatWidget::sendChat()
     /* meiyousixin - update recent time when user send msg, need to sort the contact list by recent time */
     if (this->chatType() == CHATTYPE_PRIVATE || this->chatType() == CHATTYPE_LOBBY )
     {
-        uint current_time = QDateTime::currentDateTime().toTime_t();
+        unsigned int current_time = QDateTime::currentDateTime().toTime_t();
         std::string nickInGroupChat = "You";
         emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
     }
