@@ -1373,6 +1373,10 @@ bool p3GxsChats::autoDownloadEnabled(const RsGxsGroupId &groupId,bool& enabled)
     ss.load(it->second.mServiceString);
     enabled = ss.mAutoDownload;
 
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::autoDownloadEnabled.mServiceString =" << it->second.mServiceString << " and enabled="<<enabled;
+    std::cerr << std::endl;
+#endif
     return true;
 }
 

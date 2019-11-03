@@ -36,10 +36,10 @@
 #include "gui/notifyqt.h"
 #include "gui/common/GroupTreeWidget.h"
 
-class GxsChannelGroupInfoData : public RsUserdata
+class GxsChatGroupInfoData : public RsUserdata
 {
 public:
-    GxsChannelGroupInfoData() : RsUserdata() {}
+    GxsChatGroupInfoData() : RsUserdata() {}
 
 public:
     QMap<RsGxsGroupId, QIcon> mIcon;
@@ -59,7 +59,7 @@ GxsChatDialog::~GxsChatDialog()
 QString GxsChatDialog::getHelpString() const
 {
     QString hlp_str = tr("<h1><img width=\"32\" src=\":/home/img/question-64.png\">&nbsp;&nbsp;Channels</h1>    \
-    <p>Channels allow you to post data (e.g. movies, music) that will spread in the network</p>            \
+    <p>Chats allow you to post data (e.g. movies, music) that will spread in the network</p>            \
     <p>You can see the channels your friends are subscribed to, and you automatically forward subscribed channels to \
     your friends. This promotes good channels in the network.</p>\
     <p>Only the channel's creator can post on that channel. Other peers                       \
@@ -299,7 +299,7 @@ void GxsChatDialog::loadGroupSummaryToken(const uint32_t &token, std::list<RsGro
     rsGxsChats->getGroupData(token, groups);
 
     /* Save groups to fill icons and description */
-    GxsChannelGroupInfoData *channelData = new GxsChannelGroupInfoData;
+    GxsChatGroupInfoData *channelData = new GxsChatGroupInfoData;
     userdata = channelData;
 
     std::vector<RsGxsChatGroup>::iterator groupIt;
@@ -323,9 +323,9 @@ void GxsChatDialog::groupInfoToGroupItemInfo(const RsGroupMetaData &groupInfo, G
 {
     GxsGroupFrameDialog::groupInfoToGroupItemInfo(groupInfo, groupItemInfo, userdata);
 
-    const GxsChannelGroupInfoData *channelData = dynamic_cast<const GxsChannelGroupInfoData*>(userdata);
+    const GxsChatGroupInfoData *channelData = dynamic_cast<const GxsChatGroupInfoData*>(userdata);
     if (!channelData) {
-        std::cerr << "GxsChannelDialog::groupInfoToGroupItemInfo() Failed to cast data to GxsChannelGroupInfoData";
+        std::cerr << "GxsChatDialog::groupInfoToGroupItemInfo() Failed to cast data to GxsChatGroupInfoData";
         std::cerr << std::endl;
         return;
     }
@@ -357,7 +357,7 @@ void GxsChatDialog::checkRequestGroup(const RsGxsGroupId& grpId)
 
     if( rsGxsChats->retrieveDistantGroup(grpId,distant_group)) // normally we should also check that the group meta is not already here.
     {
-        std::cerr << "GxsChannelDialog::checkRequestGroup() sending turtle request for group data for group " << grpId << std::endl;
+        std::cerr << "GxsChatDialog::checkRequestGroup() sending turtle request for group data for group " << grpId << std::endl;
         rsGxsChats->turtleGroupRequest(grpId);
     }
 }

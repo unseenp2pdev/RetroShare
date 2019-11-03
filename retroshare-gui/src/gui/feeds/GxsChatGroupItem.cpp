@@ -26,9 +26,9 @@
 #include "gui/NewsFeed.h"
 #include "gui/RetroShareLink.h"
 
-/****
- * #define DEBUG_ITEM 1
- ****/
+
+#define DEBUG_ITEM 1
+
 
 GxsChatGroupItem::GxsChatGroupItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsGroupId &groupId, bool isHome, bool autoUpdate) :
     GxsGroupFeedItem(feedHolder, feedId, groupId, isHome, rsGxsChats, autoUpdate)

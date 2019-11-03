@@ -39,8 +39,8 @@
 
 //#define ENABLE_GENERATE
 
-#define CREATEMSG_CHANNELINFO       0x002
-#define CREATEMSG_CHANNEL_POST_INFO 0x003
+#define CREATEMSG_CHATINFO       0x002
+#define CREATEMSG_CHAT_POST_INFO 0x003
 
 #define DEBUG_CREATE_GXS_MSG
 
@@ -215,7 +215,7 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
         return;
     }
 
-    std::cerr << "CreateGxsChannelMsg::dropEvent() Formats" << std::endl;
+    std::cerr << "CreateGxsChatMsg::dropEvent() Formats" << std::endl;
     QStringList formats = event->mimeData()->formats();
     QStringList::iterator it;
     for(it = formats.begin(); it != formats.end(); ++it)
@@ -226,7 +226,7 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
 
     if (event->mimeData()->hasText())
     {
-        std::cerr << "CreateGxsChannelMsg::dropEvent() Plain Text:";
+        std::cerr << "CreateGxsChatMsg::dropEvent() Plain Text:";
         std::cerr << std::endl;
         std::cerr << event->mimeData()->text().toStdString();
         std::cerr << std::endl;
@@ -234,7 +234,7 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
 
     if (event->mimeData()->hasUrls())
     {
-        std::cerr << "CreateGxsChannelMsg::dropEvent() Urls:" << std::endl;
+        std::cerr << "CreateGxsChatMsg::dropEvent() Urls:" << std::endl;
 
         QList<QUrl> urls = event->mimeData()->urls();
         QList<QUrl>::iterator uit;
@@ -249,13 +249,13 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
                 // Check that the file does exist and is not a directory
                 QDir dir(localpath);
                 if (dir.exists()) {
-                    std::cerr << "CreateGxsChannelMsg::dropEvent() directory not accepted."<< std::endl;
+                    std::cerr << "CreateGxsChatMsg::dropEvent() directory not accepted."<< std::endl;
                     QMessageBox mb(tr("Drop file error."), tr("Directory can't be dropped, only files are accepted."),QMessageBox::Information,QMessageBox::Ok,0,0,this);
                     mb.exec();
                 } else if (QFile::exists(localpath)) {
                     addAttachment(localpath.toUtf8().constData());
                 } else {
-                    std::cerr << "CreateGxsChannelMsg::dropEvent() file does not exists."<< std::endl;
+                    std::cerr << "CreateGxsChatMsg::dropEvent() file does not exists."<< std::endl;
                     QMessageBox mb(tr("Drop file error."), tr("File not found or file name not accepted."),QMessageBox::Information,QMessageBox::Ok,0,0,this);
                     mb.exec();
                 }
@@ -264,7 +264,7 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
     }
     else if (event->mimeData()->hasFormat("application/x-rsfilelist"))
     {
-        std::cerr << "CreateGxsChannelMsg::dropEvent() Application/x-rsfilelist";
+        std::cerr << "CreateGxsChatMsg::dropEvent() Application/x-rsfilelist";
         std::cerr << std::endl;
 
         QByteArray data = event->mimeData()->data("application/x-rsfilelist");
@@ -292,7 +292,7 @@ void CreateGxsChatMsg::parseRsFileListAttachments(const std::string &attachList)
 
     for(it = attachItems.begin(); it != attachItems.end(); ++it)
     {
-        std::cerr << "CreateGxsChannelMsg::parseRsFileListAttachments() Entry: ";
+        std::cerr << "CreateGxsChatMsg::parseRsFileListAttachments() Entry: ";
 
         QStringList parts = (*it).split("/");
 
@@ -351,13 +351,13 @@ void CreateGxsChatMsg::addAttachment(const RsFileHash &hash, const std::string &
 {
     /* add a SubFileItem to the attachment section */
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::addAttachment()";
+    std::cerr << "CreateGxsChatMsg::addAttachment()";
     std::cerr << std::endl;
 #endif
 
     /* add widget in for new destination */
 
-    uint32_t flags = SFI_TYPE_CHANNEL | SFI_FLAG_ALLOW_DELETE ;
+    uint32_t flags = SFI_TYPE_CHATS | SFI_FLAG_ALLOW_DELETE ;
 
     if( assume_file_ready )
         flags |= SFI_FLAG_ASSUME_FILE_READY ;
@@ -401,7 +401,7 @@ void CreateGxsChatMsg::addExtraFile()
 {
     /* add a SubFileItem to the attachment section */
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::addExtraFile() opening file dialog";
+    std::cerr << "CreateGxsChatMsg::addExtraFile() opening file dialog";
     std::cerr << std::endl;
 #endif
 
@@ -427,7 +427,7 @@ void CreateGxsChatMsg::addAttachment(const std::string &path)
 {
     /* add a SubFileItem to the attachment section */
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::addAttachment()";
+    std::cerr << "CreateGxsChatMsg::addAttachment()";
     std::cerr << std::endl;
 #endif
 
@@ -435,7 +435,7 @@ void CreateGxsChatMsg::addAttachment(const std::string &path)
     setThumbNail(path, 2000);
 
     /* add widget in for new destination */
-    uint32_t flags =  SFI_TYPE_CHANNEL | SFI_STATE_EXTRA | SFI_FLAG_CREATE;
+    uint32_t flags =  SFI_TYPE_CHATS | SFI_STATE_EXTRA | SFI_FLAG_CREATE;
 
     // check attachment if hash exists already
     std::list<SubFileItem* >::iterator  it;
@@ -564,7 +564,7 @@ void CreateGxsChatMsg::checkAttachmentReady()
 void CreateGxsChatMsg::cancelMsg()
 {
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::cancelMsg() :"
+    std::cerr << "CreateGxsChatMsg::cancelMsg() :"
               << "Deleting EXTRA attachments" << std::endl;
 #endif
 
@@ -593,11 +593,11 @@ void CreateGxsChatMsg::newChannelMsg()
         std::list<RsGxsGroupId> groupIds;
         groupIds.push_back(mChannelId);
 
-        std::cerr << "CreateGxsChannelMsg::newChannelMsg() Req Group Summary(" << mChannelId << ")";
+        std::cerr << "CreateGxsChatMsg::newChannelMsg() Req Group Summary(" << mChannelId << ")";
         std::cerr << std::endl;
 
         uint32_t token;
-        mChannelQueue->requestGroupInfo(token, RS_TOKREQ_ANSTYPE_SUMMARY, opts, groupIds, CREATEMSG_CHANNELINFO);
+        mChannelQueue->requestGroupInfo(token, RS_TOKREQ_ANSTYPE_SUMMARY, opts, groupIds, CREATEMSG_CHATINFO);
 
         if(!mOrigPostId.isNull())
         {
@@ -605,7 +605,7 @@ void CreateGxsChatMsg::newChannelMsg()
 
             opts.mReqType = GXS_REQUEST_TYPE_MSG_DATA;
             message_ids[mChannelId].insert(mOrigPostId);
-            mChannelQueue->requestMsgInfo(token, RS_TOKREQ_ANSTYPE_SUMMARY, opts, message_ids, CREATEMSG_CHANNEL_POST_INFO);
+            mChannelQueue->requestMsgInfo(token, RS_TOKREQ_ANSTYPE_SUMMARY, opts, message_ids, CREATEMSG_CHAT_POST_INFO);
         }
     }
 }
@@ -622,7 +622,7 @@ void CreateGxsChatMsg::saveChannelInfo(const RsGroupMetaData &meta)
 void CreateGxsChatMsg::sendMsg()
 {
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::sendMsg()";
+    std::cerr << "CreateGxsChatMsg::sendMsg()";
     std::cerr << std::endl;
 #endif
 
@@ -744,7 +744,7 @@ void CreateGxsChatMsg::addThumbnail()
 void CreateGxsChatMsg::loadChannelPostInfo(const uint32_t &token)
 {
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::loadChannelPostInfo()";
+    std::cerr << "CreateGxsChatMsg::loadChannelPostInfo()";
     std::cerr << std::endl;
 #endif
 
@@ -753,7 +753,7 @@ void CreateGxsChatMsg::loadChannelPostInfo(const uint32_t &token)
 
     if (posts.size() != 1)
     {
-        std::cerr << "CreateGxsChannelMsg::loadChannelPostInfo() ERROR INVALID Number of posts in request" << std::endl;
+        std::cerr << "CreateGxsChatMsg::loadChannelPostInfo() ERROR INVALID Number of posts in request" << std::endl;
         return ;
     }
 
@@ -762,7 +762,7 @@ void CreateGxsChatMsg::loadChannelPostInfo(const uint32_t &token)
 
     if(post.mMeta.mGroupId != mChannelId || post.mMeta.mMsgId != mOrigPostId)
     {
-        std::cerr << "CreateGxsChannelMsg::loadChannelPostInfo() ERROR INVALID post ID or channel ID" << std::endl;
+        std::cerr << "CreateGxsChatMsg::loadChannelPostInfo() ERROR INVALID post ID or channel ID" << std::endl;
         return ;
     }
 
@@ -779,7 +779,7 @@ void CreateGxsChatMsg::loadChannelPostInfo(const uint32_t &token)
 void CreateGxsChatMsg::loadChannelInfo(const uint32_t &token)
 {
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::loadChannelInfo()";
+    std::cerr << "CreateGxsChatMsg::loadChannelInfo()";
     std::cerr << std::endl;
 #endif
 
@@ -793,7 +793,7 @@ void CreateGxsChatMsg::loadChannelInfo(const uint32_t &token)
     }
     else
     {
-        std::cerr << "CreateGxsChannelMsg::loadForumInfo() ERROR INVALID Number of Forums";
+        std::cerr << "CreateGxsChatMsg::loadChannelInfo() ERROR INVALID Number of Chat";
         std::cerr << std::endl;
     }
 }
@@ -801,7 +801,7 @@ void CreateGxsChatMsg::loadChannelInfo(const uint32_t &token)
 void CreateGxsChatMsg::loadRequest(const TokenQueue *queue, const TokenRequest &req)
 {
 #ifdef DEBUG_CREATE_GXS_MSG
-    std::cerr << "CreateGxsChannelMsg::loadRequest() UserType: " << req.mUserType;
+    std::cerr << "CreateGxsChatMsg::loadRequest() UserType: " << req.mUserType;
     std::cerr << std::endl;
 #endif
 
@@ -810,14 +810,14 @@ void CreateGxsChatMsg::loadRequest(const TokenQueue *queue, const TokenRequest &
         /* now switch on req */
         switch(req.mUserType)
         {
-            case CREATEMSG_CHANNELINFO:
+            case CREATEMSG_CHATINFO:
                 loadChannelInfo(req.mToken);
                 break;
-            case CREATEMSG_CHANNEL_POST_INFO:
+            case CREATEMSG_CHAT_POST_INFO:
                 loadChannelPostInfo(req.mToken);
                 break;
             default:
-                std::cerr << "CreateGxsChannelMsg::loadRequest() UNKNOWN UserType ";
+                std::cerr << "CreateGxsChatMsg::loadRequest() UNKNOWN UserType ";
                 std::cerr << std::endl;
         }
     }

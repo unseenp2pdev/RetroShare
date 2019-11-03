@@ -51,15 +51,17 @@ class RsGxsChatGroup : RsSerializable
         RsGxsImage  mImage; //conversation avatar image
         std::map<RsPeerId,RsGxsId> members;
         /// @see RsSerializable
-        bool mAutoDownload;
+        //bool mAutoDownload;
         virtual void serial_process( RsGenericSerializer::SerializeJob j,
                                  RsGenericSerializer::SerializeContext& ctx )
         {
             RS_SERIAL_PROCESS(mMeta);
             RS_SERIAL_PROCESS(mImage);
             RS_SERIAL_PROCESS(mDescription);
-            RS_SERIAL_PROCESS(mAutoDownload);
-            RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
+            RS_SERIAL_PROCESS(members);
+            //RS_SERIAL_PROCESS(mAutoDownload);
+
+            //RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
         }
 };
 
@@ -68,6 +70,8 @@ std::ostream &operator<<(std::ostream& out, const RsGxsChatGroup& group);
 class RsGxsChatMsg : RsSerializable
 {
     public:
+    RsGxsChatMsg() : mCount(0), mSize(0) {}
+
     RsMsgMetaData mMeta;
 
     std::set<RsGxsMessageId> mOlderVersions;

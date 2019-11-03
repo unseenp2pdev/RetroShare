@@ -29,8 +29,8 @@ GxsChatUserNotify::GxsChatUserNotify(RsGxsIfaceHelper *ifaceImpl, QObject *paren
 
 bool GxsChatUserNotify::hasSetting(QString *name, QString *group)
 {
-    if (name) *name = tr("Channel Post");
-    if (group) *group = "Channel";
+    if (name) *name = tr("Chats Post");
+    if (group) *group = "Chats";
 
     return true;
 }
