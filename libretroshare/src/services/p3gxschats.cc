@@ -50,12 +50,12 @@ RsGxsChats *rsGxsChats = NULL;
 
 #define GXSCHAT_STOREPERIOD	(3600 * 24 * 30)  // 30 days store
 
-#define	 GXSCHATS_SUBSCRIBED_META		1
-#define  GXSCHATS_UNPROCESSED_SPECIFIC	2
-#define  GXSCHATS_UNPROCESSED_GENERIC	3
+#define	 GXSCHATS_SUBSCRIBED_META		11
+#define  GXSCHATS_UNPROCESSED_SPECIFIC	12
+#define  GXSCHATS_UNPROCESSED_GENERIC	13
 
-#define CHAT_PROCESS	 		0x0001
-#define CHAT_TESTEVENT_DUMMYDATA	0x0002
+#define CHAT_PROCESS	 		0x0011
+#define CHAT_TESTEVENT_DUMMYDATA	0x0012
 #define DUMMYDATA_PERIOD		60	// long enough for some RsIdentities to be generated.
 
 #define CHAT_DOWNLOAD_PERIOD 	(3600 * 24 * 7)
@@ -120,7 +120,7 @@ uint32_t p3GxsChats::chatsAuthenPolicy()
 }
 
 static const uint32_t GXS_CHATS_CONFIG_MAX_TIME_NOTIFY_STORAGE = 86400*30*2 ; // ignore notifications for 2 months
-static const uint8_t  GXS_CHATS_CONFIG_SUBTYPE_NOTIFY_RECORD   = 0x01 ;
+static const uint8_t  GXS_CHATS_CONFIG_SUBTYPE_NOTIFY_RECORD   = 0x02 ;
 
 struct RsGxsChatNotifyRecordsItem: public RsItem
 {
@@ -660,11 +660,18 @@ void p3GxsChats::load_SpecificUnprocessedPosts(const uint32_t &token)
         return;
     }
 
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::load_SpecificUnprocessedPosts Download";
+        std::cerr << std::endl;
+#endif
 
     std::vector<RsGxsChatMsg>::iterator it;
     for(it = posts.begin(); it != posts.end(); ++it)
     {
         /* autodownload the files */
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "Post ID = "<<it->mMeta.mMsgId<<std::endl;
+#endif
         handleUnprocessedPost(*it);
     }
 }
@@ -713,10 +720,65 @@ void p3GxsChats::handleUnprocessedPost(const RsGxsChatMsg &msg)
 
     bool enabled = false ;
 
+    /* check that autodownload is set */
+    if (autoDownloadEnabled(msg.mMeta.mGroupId,enabled) && enabled )
+    {
+
 
 #ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::handleUnprocessedPost() AutoDownload Enabled ... handling";
+        std::cerr << std::endl;
+#endif
+
+        /* check the date is not too old */
+        rstime_t age = time(NULL) - msg.mMeta.mPublishTs;
+
+        if (age < (rstime_t) CHAT_DOWNLOAD_PERIOD )
+    {
+        /* start download */
+        // NOTE WE DON'T HANDLE PRIVATE CHANNELS HERE.
+        // MORE THOUGHT HAS TO GO INTO THAT STUFF.
+
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::handleUnprocessedPost() START DOWNLOAD";
+        std::cerr << std::endl;
+#endif
+
+        std::list<RsGxsFile>::const_iterator fit;
+        for(fit = msg.mFiles.begin(); fit != msg.mFiles.end(); ++fit)
+        {
+            std::string fname = fit->mName;
+            Sha1CheckSum hash  = Sha1CheckSum(fit->mHash);
+            uint64_t size     = fit->mSize;
+
+            std::list<RsPeerId> srcIds;
+            std::string localpath = "";
+            TransferRequestFlags flags = RS_FILE_REQ_BACKGROUND | RS_FILE_REQ_ANONYMOUS_ROUTING;
+
+            if (size < CHAT_MAX_AUTO_DL)
+            {
+                std::string directory ;
+                if(getChannelDownloadDirectory(msg.mMeta.mGroupId,directory))
+                    localpath = directory ;
+
+                rsFiles->FileRequest(fname, hash, size, localpath, flags, srcIds);
+            }
+            else
+                std::cerr << "WARNING: Chat file is not auto-downloaded because its size exceeds the threshold of " << CHAT_MAX_AUTO_DL << " bytes." << std::endl;
+        }
+    }
+
+        /* mark as processed */
+        uint32_t token;
+        RsGxsGrpMsgIdPair msgId(msg.mMeta.mGroupId, msg.mMeta.mMsgId);
+        setMessageProcessedStatus(token, msgId, true);
+    }
+#ifdef GXSCHATS_DEBUG
+    else
+    {
         std::cerr << "p3GxsChats::handleUnprocessedPost() AutoDownload Disabled ... skipping";
         std::cerr << std::endl;
+    }
 #endif
 }
 

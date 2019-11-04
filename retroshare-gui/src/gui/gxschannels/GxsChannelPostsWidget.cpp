@@ -39,9 +39,9 @@
 
 #define ROLE_PUBLISH FEED_TREEWIDGET_SORTROLE
 
-/****
- * #define DEBUG_CHANNEL
- ***/
+
+#define DEBUG_CHANNEL
+
 
 /* View mode */
 #define VIEW_MODE_FEEDS  1
