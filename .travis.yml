@@ -23,7 +23,6 @@ matrix:
             - qt59multimedia
             - qt59svg
             - qt59xmlpatterns
-            - bsdtar
             - ffmpeg
     - os: osx
       osx_image: xcode10.1
