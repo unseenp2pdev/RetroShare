@@ -26,7 +26,7 @@ matrix:
     - os: osx
       osx_image: xcode10.1
       compiler: clang
-      sudo: false
+      sudo: false   
 
 cache:
   - ccache
@@ -36,7 +36,7 @@ before_install:
 #  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get  --no-install-suggests --no-install-recommends --force-yes install p7zip-full; fi
  # unseenp2p - install Qt5.9 for travis
   - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y build-essential libssl-dev libsqlcipher-dev libbz2-dev libmicrohttpd-dev libsqlite3-dev libupnp-dev pkg-config qt5-default libxss-dev qtmultimedia5-dev libqt5x11extras5-dev libqt5designer5 libxapian-dev qttools5-dev libgnome-keyring-dev; fi
-  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -y qt59base qt59webengine qt59webchannel qt59svg qt59location qt59tools qt59translations; fi
+  - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get -y install qt59base qt59webengine qt59webchannel qt59svg qt59location qt59tools qt59translations qttools5-dev-tools; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew update ; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install ccach; export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then brew install qt5; fi
@@ -65,10 +65,19 @@ addons:
     build_command: " make -j4"
     branch_pattern: coverity_scan
 
+install:
+  # g++ 6
+  - sudo apt-get install -y g++-6
+
+  # Qt 5.11.2
+  - sudo apt-get install -y qt511base
 before_script:
   - if [ $TRAVIS_OS_NAME == linux ]; then qmake QMAKE_CC=$CC QMAKE_CXX=$CXX; fi
   - if [ $TRAVIS_OS_NAME == osx ]; then qmake QMAKE_CC=$CC QMAKE_CXX=$CXX CONFIG+=rs_macos10.14 INCLUDEPATH+=/usr/local/opt/openssl/include/ INCLUDEPATH+=$(find /usr/local/Cellar/sqlcipher/*/include | headn -n 1) INCLUDEPATH+=$(find /usr/local/Cellar/libmicrohttpd/*/include | head -n 1) QMAKE_LIBDIR+=/usr/local/opt/openssl/lib/ QMAKE_LIBDIR+=$(find /usr/local/Cellar/libmicrohttpd/*/lib | head -n 1) QMAKE_LIBDIR+=$(find /usr/local/Cellar/sqlcipher/*/lib | head -n 1); fi
-
+  #unseenp2p
+  - QTDIR="/opt/qt511"
+  - PATH="$QTDIR/bin:$PATH"
+  - source /opt/qt511/bin/qt511-env.sh
 script:
   - if [ $TRAVIS_OS_NAME == linux ] && [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then make -j2; fi
   - if [ $TRAVIS_OS_NAME == osx ] && [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then /Applications/Xcode.app/Contents/Developer/usr/bin/make -j2; fi

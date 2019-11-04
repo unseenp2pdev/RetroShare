@@ -1528,6 +1528,7 @@ void ChatLobbyWidget::filterItems(const QString &text)
         std::string filter = text.toStdString();
         rsMsgs->setSearchFilter(filter);
     }
+    ui->lobbyTreeWidget->selectionModel()->clearSelection();
     emit ui->lobbyTreeWidget->model()->layoutChanged();
     ui->lobbyTreeWidget->show();
 }
