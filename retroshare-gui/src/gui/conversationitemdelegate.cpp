@@ -77,13 +77,6 @@ ConversationItemDelegate::paint(QPainter* painter
         painter->fillRect(rect_, RingTheme::smartlistSelection_);
     }
 
-    //unseenp2p - try to draw a line at bottom of every item:
-    if (!selected)
-    {
-        QRect rect_line(opt.rect.left() + sizeImage_, opt.rect.top() + opt.rect.height(), opt.rect.width() + 2*dx_ - sizeImage_, 1);
-        painter->fillRect(rect_line, RingTheme::smartlistSelection_);
-    }
-
     QRect &rect = opt.rect;
 
     opt.decorationSize = QSize(sizeImage_, sizeImage_);
@@ -152,6 +145,13 @@ ConversationItemDelegate::paint(QPainter* painter
         {
             painter->fillPath(innerCircle, RingTheme::red_);
         }
+    }
+
+    //unseenp2p - try to draw a line at bottom of every item, only when having data (using statusStr)
+    if (statusStr.length() > 0 && !selected)
+    {
+        QRect rect_line(opt.rect.left() + sizeImage_, opt.rect.top() + opt.rect.height(), opt.rect.width() + 2*dx_ - sizeImage_, 1);
+        painter->fillRect(rect_line, RingTheme::smartlistSelection_);
     }
 
     paintConversationItem(painter, option, rect, index,
