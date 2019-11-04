@@ -220,7 +220,6 @@ void ChatLobbyWidget::selectConversation(const QModelIndex& index)
     ChatId chatId;
     if (chatItem.contactType == 0)      //groupchat, show groupchat chat view
     {
-        //ChatLobbyId chatLobbyId(uId);
         showGroupChatMVC(chatItem.chatLobbyId);
         chatId = ChatId(chatItem.chatLobbyId);
     }
@@ -1047,15 +1046,13 @@ void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickIn
 
        //Need to get the selected item with saving uId before sorting and updating the layout
        //so that we use uId to re-select the item with saved uId
+        // Even when user in search mode, we still can get the right selectedUId
        QModelIndexList list = ui->lobbyTreeWidget->selectionModel()->selectedIndexes();
-       int row = -1;
-       QModelIndex selectedIndex;
        std::string selectedUId;
        foreach (QModelIndex index, list)
        {
-           if (index.row()!=row)
+           if (index.row()!=-1)
            {
-               selectedIndex = index;
                selectedUId = rsMsgs->getSeletedUIdBeforeSorting(index.row());
                break;
            }
@@ -1085,7 +1082,6 @@ void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickIn
 
         rsMsgs->sortConversationItemListByRecentTime();
         emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
 
         // For both case of sending or receiving, just clear the selection and re-select chat item
         ui->lobbyTreeWidget->selectionModel()->clearSelection();
@@ -1097,7 +1093,6 @@ void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickIn
         QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
         ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
         emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
 
 }
 

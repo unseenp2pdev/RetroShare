@@ -1516,6 +1516,14 @@ void p3ChatService::updateUnreadNumberOfItemInConversationList(std::string uId, 
 std::string p3ChatService::getSeletedUIdBeforeSorting(int row)
 {
     return conversationItemList.at(row).uId;
+//    if (conversationListMode == CONVERSATION_MODE_WITHOUT_FILTER)
+//        return conversationItemList.at(row).uId;
+//    else if (conversationListMode == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+//    {
+//        if (row < static_cast<int>(filtererConversationItemList.size()))
+//        return filtererConversationItemList.at(row).uId;
+//    }
+//    return conversationItemList.at(row).uId;;
 }
 
 int p3ChatService::getIndexFromUId(std::string uId)
