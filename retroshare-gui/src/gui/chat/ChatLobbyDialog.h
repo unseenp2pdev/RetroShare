@@ -56,6 +56,8 @@ public:
 
     //unseenp2p  - move from private to public
     void updateParticipantsList();
+    //unseenp2p - move from protected to public
+    void processSettings(bool load);
 
 private slots:
 	void participantsTreeWidgetCustomPopupMenu( QPoint point );
@@ -64,7 +66,6 @@ private slots:
 	void leaveLobby() ;
 	void filterChanged(const QString &text);
     void showInPeopleTab();
-
 signals:
 	void lobbyLeave(ChatLobbyId) ;
 	void typingEventReceived(ChatLobbyId) ;
@@ -79,7 +80,6 @@ protected:
 	/** Default destructor */
 	virtual ~ChatLobbyDialog();
 
-	void processSettings(bool load);
 	virtual void init(const ChatId &id, const QString &title);
 	virtual bool canClose();
     virtual void addChatMsg(const ChatMessage &msg);

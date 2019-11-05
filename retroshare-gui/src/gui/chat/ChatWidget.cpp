@@ -1093,7 +1093,7 @@ void ChatWidget::addChatMsg(bool incoming, const QString &name, const RsGxsId gx
 		emit infoChanged(this);
 
         /* meiyousixin - need to update the recent time and sort the chat list */
-        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, QDateTime::currentDateTime().toTime_t());
+        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, name.toStdString(), QDateTime::currentDateTime().toTime_t(), message.toStdString(), false);
 	}
 }
 
@@ -1269,6 +1269,7 @@ void ChatWidget::sendChat()
 #endif
     rsMsgs->sendChat(chatId, msg);
 
+    std::string textToSignal = chatWidget->toPlainText().toStdString();
 	chatWidget->clear();
 	// workaround for Qt bug - http://bugreports.qt.nokia.com/browse/QTBUG-2533
 	// QTextEdit::clear() does not reset the CharFormat if document contains hyperlinks that have been accessed.
@@ -1277,8 +1278,9 @@ void ChatWidget::sendChat()
     /* meiyousixin - update recent time when user send msg, need to sort the contact list by recent time */
     if (this->chatType() == CHATTYPE_PRIVATE || this->chatType() == CHATTYPE_LOBBY )
     {
-        uint current_time = QDateTime::currentDateTime().toTime_t();
-        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), current_time);
+        unsigned int current_time = QDateTime::currentDateTime().toTime_t();
+        std::string nickInGroupChat = "You";
+        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
     }
 }
 

@@ -155,8 +155,8 @@ class NotifyQt: public QObject, public NotifyClient
 		void disableAllChanged(bool disableAll) const;
 
         /* meiyousixin - add more notification for sort by recent time */
-        void alreadySendChat(const ChatId&, uint current_time);
-        void newChatMessageReceive(const ChatId&, uint current_time);
+        void alreadySendChat(const ChatId&, std::string nickInGroupChat, uint current_time, std::string textmsg, bool);
+        void newChatMessageReceive(const ChatId&, std::string nickInGroupChat, uint current_time, std::string textmsg, bool);
 
 	public slots:
 		void UpdateGUI(); /* called by timer */

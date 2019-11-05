@@ -32,6 +32,9 @@
 #include "util/rsdeprecate.h"
 #include "util/rstime.h"
 
+////unseenp2p
+//#include "services/p3discovery2.h"
+
 class RsPeers;
 
 /**
@@ -389,6 +392,9 @@ struct RsPeerCryptoParams
 	int connexion_state;
 	std::string cipher_name;
 };
+
+
+
 
 struct RsGroupInfo : RsSerializable
 {
@@ -762,7 +768,6 @@ public:
     //unseenp2p - only for client
     virtual void saveSupernodeCert(const std::string& cert) =0;
     virtual std::list<std::string> getSupernodeCertList() =0;
-
 
 };
 

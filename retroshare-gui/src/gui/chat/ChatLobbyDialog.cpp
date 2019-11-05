@@ -419,10 +419,11 @@ ChatLobbyDialog::~ChatLobbyDialog()
 {
 	// announce leaving of lobby
 
+    //unseenp2p - no need to leave group (unsubscribeChatLobby = leave group)
 	// check that the lobby still exists.
-    if (mChatId.isLobbyId()) {
-        rsMsgs->unsubscribeChatLobby(mChatId.toLobbyId());
-	}
+//    if (mChatId.isLobbyId()) {
+//        rsMsgs->unsubscribeChatLobby(mChatId.toLobbyId());
+//	}
 
 	// save settings
 	processSettings(false);
@@ -452,6 +453,11 @@ void ChatLobbyDialog::processSettings(bool load)
 		actionSortByActivity->setChecked(Settings->value("sortbyActivity", QVariant(false)).toBool());
 		actionSortByName->setChecked(Settings->value("sortbyName", QVariant(true)).toBool());
 
+        //try to open the last chat window from here
+        ChatLobbyWidget *chatLobbyPage = dynamic_cast<ChatLobbyWidget*>(MainWindow::getPage(MainWindow::ChatLobby));
+        if (chatLobbyPage) {
+            chatLobbyPage->openLastChatWindow();
+        }
 	} else {
 		// save settings
 

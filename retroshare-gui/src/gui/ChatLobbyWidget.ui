@@ -128,6 +128,12 @@
       <layout class="QVBoxLayout" name="lobbyTreeVLayout">
        <item>
         <widget class="QFrame" name="toolBarFrame">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
@@ -145,7 +151,7 @@
            <number>1</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>12</number>
           </property>
           <property name="bottomMargin">
            <number>1</number>
@@ -190,21 +196,25 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeWidget" name="lobbyTreeWidget">
+        <widget class="SmartListView" name="lobbyTreeWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <property name="iconSize">
+         <property name="iconSize" stdset="0">
           <size>
            <width>16</width>
            <height>16</height>
           </size>
          </property>
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>
@@ -319,6 +329,11 @@
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
    <header location="global">gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SmartListView</class>
+   <extends>QWidget</extends>
+   <header>gui/smartlistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

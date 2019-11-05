@@ -3112,3 +3112,5 @@ bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
   {
       return mSupernodeCertList;
   }
+
+

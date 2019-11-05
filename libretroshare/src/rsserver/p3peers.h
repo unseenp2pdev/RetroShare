@@ -179,7 +179,6 @@ public:
     virtual void saveSupernodeCert(const std::string& cert);
     virtual std::list<std::string> getSupernodeCertList();
 
-
 private:
 
 	p3LinkMgr *mLinkMgr;

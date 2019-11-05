@@ -104,7 +104,6 @@ static bool populateContactInfoFromRsPeerDetails( const RsPeerDetails &detail,
     pkt->netMode = detail.netMode;
     pkt->vs_disc = detail.vs_disc;
     pkt->vs_dht = detail.vs_dht;
-
     //when broadcasting, we do not know how its friendship: for both client and supernode
     pkt->accept_connection = false;
     pkt->ownsign = false;

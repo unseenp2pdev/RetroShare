@@ -63,6 +63,7 @@ public:
 	uint32_t    sendTime;
 	uint32_t    recvTime;
 	std::string message;
+    std::string nickInGroupchat;
     bool        unread;
 };
 

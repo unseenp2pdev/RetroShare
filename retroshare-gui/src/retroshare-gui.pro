@@ -313,7 +313,7 @@ HEADERS += 	TorControl/AddOnionCommand.h \
 				TorControl/SecureRNG.h         \
 				TorControl/Settings.h          \
 				TorControl/StrUtil.h        \
-				TorControl/TorProcess_p.h        
+                                TorControl/TorProcess_p.h
 
 SOURCES += 	TorControl/AddOnionCommand.cpp \
 				TorControl/AuthenticateCommand.cpp \
@@ -572,13 +572,25 @@ HEADERS +=  rshare.h \
             gui/connect/ConnectProgressDialog.h \
             gui/groups/CreateGroup.h \
             gui/GetStartedDialog.h \
-        gui/statistics/BWGraph.h \
-    util/RsSyntaxHighlighter.h \
-    util/imageutil.h \
-    gui/NetworkDialog/pgpid_item_model.h \
-    gui/NetworkDialog/pgpid_item_proxy.h \
-    gui/common/RsCollection.h \
-    util/retroshareWin32.h
+            gui/statistics/BWGraph.h \
+            util/RsSyntaxHighlighter.h \
+            util/imageutil.h \
+            gui/NetworkDialog/pgpid_item_model.h \
+            gui/NetworkDialog/pgpid_item_proxy.h \
+            gui/common/RsCollection.h \
+            util/retroshareWin32.h \
+            gui/smartlistview.h \
+            gui/smartlistmodel.h \
+            gui/conversationitemdelegate.h\
+            gui/models/typedefs.h \
+            gui/models/behaviorcontroller.h \
+            gui/models/conversation.h \
+            gui/models/conversationmodel.h \
+#            gui/models/datatransfer.h \
+#            gui/models/datatransfermodel.h \
+            gui/models/interaction.h \
+            gui/models/profile.h
+
 #            gui/ForumsDialog.h \
 #            gui/forums/ForumDetails.h \
 #            gui/forums/EditForumDetails.h \
@@ -938,12 +950,18 @@ SOURCES +=  main.cpp \
             gui/statistics/BwCtrlWindow.cpp \
             gui/statistics/RttStatistics.cpp \
             gui/statistics/BWGraph.cpp \
-    util/RsSyntaxHighlighter.cpp \
-    util/imageutil.cpp \
-    gui/NetworkDialog/pgpid_item_model.cpp \
-    gui/NetworkDialog/pgpid_item_proxy.cpp \
-    gui/common/RsCollection.cpp \
-    util/retroshareWin32.cpp
+            util/RsSyntaxHighlighter.cpp \
+            util/imageutil.cpp \
+            gui/NetworkDialog/pgpid_item_model.cpp \
+            gui/NetworkDialog/pgpid_item_proxy.cpp \
+            gui/common/RsCollection.cpp \
+            util/retroshareWin32.cpp    \
+            gui/smartlistmodel.cpp \
+            gui/conversationitemdelegate.cpp \
+            gui/smartlistview.cpp \
+            gui/models/behaviorcontroller.cpp \
+            gui/models/conversationmodel.cpp
+
 #            gui/ForumsDialog.cpp \
 #            gui/forums/ForumDetails.cpp \
 #            gui/forums/EditForumDetails.cpp \
