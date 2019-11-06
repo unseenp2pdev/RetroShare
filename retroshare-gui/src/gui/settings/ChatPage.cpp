@@ -422,8 +422,8 @@ void ChatPage::on_pushButtonChangeChatFont_clicked()
 		// using fontTempChat.rawname() does not always work!
 		// see http://doc.qt.digia.com/qt-maemo/qfont.html#rawName
 		QStringList fontname = fontTempChat.toString().split(",");
-		ui.labelChatFontPreview->setText(fontname[0]);
-		ui.labelChatFontPreview->setFont(fontTempChat);
+        ui.labelChatFontPreview->setText(fontname[0]);
+        ui.labelChatFontPreview->setFont(fontTempChat);
 		updateChatParams();
 	}
 }

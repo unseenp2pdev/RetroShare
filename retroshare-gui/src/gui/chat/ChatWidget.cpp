@@ -1014,7 +1014,7 @@ void ChatWidget::addChatMsg(bool incoming, const QString &name, const RsGxsId gx
 	if (!Settings->valueFromGroup("Chat", "EnableCustomFontSize", true).toBool()) {
 		formatTextFlag |= RSHTML_FORMATTEXT_REMOVE_FONT_SIZE;
 	}
-	int desiredMinimumFontSize = Settings->valueFromGroup("Chat", "MinimumFontSize", 10).toInt();
+    int desiredMinimumFontSize = Settings->valueFromGroup("Chat", "MinimumFontSize", 10).toInt();
 	if (!Settings->valueFromGroup("Chat", "EnableBold", true).toBool()) {
 		formatTextFlag |= RSHTML_FORMATTEXT_REMOVE_FONT_WEIGHT;
 	}

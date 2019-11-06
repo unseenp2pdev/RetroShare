@@ -530,7 +530,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
+              <iconset resource="../WikiPoos/Wiki_images.qrc">
                <normaloff>:/images/arrow-left.png</normaloff>:/images/arrow-left.png</iconset>
              </property>
              <property name="autoRaise">
@@ -556,7 +556,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
+              <iconset resource="../WikiPoos/Wiki_images.qrc">
                <normaloff>:/images/arrow-right.png</normaloff>:/images/arrow-right.png</iconset>
              </property>
              <property name="autoRaise">
@@ -1035,6 +1035,7 @@ border-image: url(:/images/closepressed.png)
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../WikiPoos/Wiki_images.qrc"/>
   <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
  </resources>
