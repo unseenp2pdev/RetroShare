@@ -121,8 +121,23 @@
    </item>
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>true</bool>
+     </property>
+     <property name="handleWidth">
+      <number>0</number>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>true</bool>
      </property>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="lobbyTreeVLayout">
@@ -203,6 +218,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>235</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="autoFillBackground">
           <bool>true</bool>
          </property>
@@ -248,6 +269,12 @@
         </property>
         <item row="0" column="0">
          <widget class="QGroupBox" name="lobbyinfo_groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>390</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -321,14 +348,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>StyledLabel</class>
-   <extends>QLabel</extends>
-   <header>gui/common/StyledLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
    <header location="global">gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
+   <class>StyledLabel</class>
+   <extends>QLabel</extends>
+   <header>gui/common/StyledLabel.h</header>
   </customwidget>
   <customwidget>
    <class>SmartListView</class>

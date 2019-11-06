@@ -133,7 +133,8 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
     ui->splitter->setSizes(QList<int>() << 280*fact << width());
-
+    ui->splitter->setCollapsible(0, false);
+    ui->splitter->setCollapsible(1, false);
     //sort the conversation list
     rsMsgs->setConversationListMode(CONVERSATION_MODE_WITHOUT_FILTER);
     rsMsgs->sortConversationItemListByRecentTime();
