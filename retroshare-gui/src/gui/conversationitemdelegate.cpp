@@ -96,7 +96,12 @@ ConversationItemDelegate::paint(QPainter* painter
     if (auto messageCount = index.data(static_cast<int>(SmartListModel::Role::UnreadMessagesCount)).toInt())
     {
         QString messageCountText = (messageCount > 20) ? "20+" : QString::number(messageCount);
-        qreal fontSize = messageCountText.count() > 1 ? 10 : 12;
+#ifdef WINDOWS_SYS
+        int fontSize = messageCountText.count() > 1 ? 8 : 10;
+#else
+        int fontSize = messageCountText.count() > 1 ? 10 : 12;
+#endif
+
         font.setPointSize(fontSize);
 
         // ellipse
