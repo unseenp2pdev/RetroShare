@@ -98,6 +98,7 @@ ConversationItemDelegate::paint(QPainter* painter
         QString messageCountText = (messageCount > 20) ? "20+" : QString::number(messageCount);
 #ifdef WINDOWS_SYS
         int fontSize = messageCountText.count() > 1 ? 8 : 10;
+        if (messageCountText.count()>= 3) fontSize = 7;
 #else
         int fontSize = messageCountText.count() > 1 ? 10 : 12;
 #endif
@@ -106,7 +107,12 @@ ConversationItemDelegate::paint(QPainter* painter
 
         // ellipse
         QPainterPath ellipse;
+#ifdef WINDOWS_SYS
+        qreal ellipseHeight = sizeImage_ / 4;
+#else
         qreal ellipseHeight = sizeImage_ / 5;
+#endif
+
         qreal ellipseWidth = ellipseHeight;
         QPointF ellipseCenter(rectAvatar.right() - ellipseWidth + 1, rectAvatar.top() + ellipseHeight + 1);
         QRect ellipseRect(ellipseCenter.x() - ellipseWidth, ellipseCenter.y() - ellipseHeight,
