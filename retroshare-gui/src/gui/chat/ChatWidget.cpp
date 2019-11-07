@@ -212,6 +212,8 @@ ChatWidget::ChatWidget(QWidget *parent)
 	connect(ui->chatTextEdit, SIGNAL(textChanged()), this, SLOT(updateCMPreview()) );
 #endif
 	ui->cmPreview->setVisible(false);
+    ui->chatTextEditHSplitter->setCollapsible(0, false);
+    ui->chatTextEditHSplitter->setCollapsible(1, false);
 
 	ui->textBrowser->resetImagesStatus(Settings->getChatLoadEmbeddedImages());
 	ui->textBrowser->installEventFilter(this);

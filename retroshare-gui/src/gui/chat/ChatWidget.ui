@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>667</width>
-    <height>349</height>
+    <width>734</width>
+    <height>671</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>370</width>
+    <height>0</height>
+   </size>
   </property>
   <layout class="QGridLayout">
    <property name="leftMargin">
@@ -21,6 +27,9 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing">
     <number>0</number>
    </property>
    <property name="verticalSpacing">
@@ -226,8 +235,8 @@ border-image: url(:/images/closepressed.png)
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
-             <height>30</height>
+             <width>360</width>
+             <height>360</height>
             </size>
            </property>
            <property name="contextMenuPolicy">
@@ -296,6 +305,12 @@ border-image: url(:/images/closepressed.png)
             </item>
             <item>
              <widget class="QSplitter" name="chatTextEditHSplitter">
+              <property name="minimumSize">
+               <size>
+                <width>484</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -303,7 +318,7 @@ border-image: url(:/images/closepressed.png)
                <number>2</number>
               </property>
               <property name="childrenCollapsible">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <widget class="MimeTextEdit" name="chatTextEdit">
                <property name="sizePolicy">
@@ -314,7 +329,7 @@ border-image: url(:/images/closepressed.png)
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>0</width>
+                 <width>360</width>
                  <height>30</height>
                 </size>
                </property>
@@ -322,7 +337,14 @@ border-image: url(:/images/closepressed.png)
                 <string>Type a message here</string>
                </property>
               </widget>
-              <widget class="RSTextBrowser" name="cmPreview"/>
+              <widget class="RSTextBrowser" name="cmPreview">
+               <property name="minimumSize">
+                <size>
+                 <width>124</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
              </widget>
             </item>
            </layout>
@@ -530,7 +552,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../WikiPoos/Wiki_images.qrc">
+              <iconset resource="../images.qrc">
                <normaloff>:/images/arrow-left.png</normaloff>:/images/arrow-left.png</iconset>
              </property>
              <property name="autoRaise">
@@ -556,7 +578,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../WikiPoos/Wiki_images.qrc">
+              <iconset resource="../images.qrc">
                <normaloff>:/images/arrow-right.png</normaloff>:/images/arrow-right.png</iconset>
              </property>
              <property name="autoRaise">
@@ -1008,14 +1030,14 @@ border-image: url(:/images/closepressed.png)
  </widget>
  <customwidgets>
   <customwidget>
-   <class>StyledLabel</class>
-   <extends>QLabel</extends>
-   <header>gui/common/StyledLabel.h</header>
-  </customwidget>
-  <customwidget>
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
    <header location="global">gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
+   <class>StyledLabel</class>
+   <extends>QLabel</extends>
+   <header>gui/common/StyledLabel.h</header>
   </customwidget>
   <customwidget>
    <class>RSTextBrowser</class>
@@ -1035,7 +1057,6 @@ border-image: url(:/images/closepressed.png)
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../WikiPoos/Wiki_images.qrc"/>
   <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
  </resources>

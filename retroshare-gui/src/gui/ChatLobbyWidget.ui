@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>803</width>
-    <height>517</height>
+    <height>580</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>790</width>
+    <height>580</height>
+   </size>
   </property>
   <layout class="QVBoxLayout">
    <property name="leftMargin">
@@ -220,8 +226,14 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>235</width>
+           <width>300</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="autoFillBackground">
@@ -246,6 +258,12 @@
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>590</width>
+        <height>0</height>
+       </size>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -364,8 +382,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="icons.qrc"/>
   <include location="../Unseengui/unseengui.qrc"/>
+  <include location="icons.qrc"/>
  </resources>
  <connections/>
 </ui>

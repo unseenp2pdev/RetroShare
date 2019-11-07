@@ -197,6 +197,8 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
 	/* Initialize splitter */
 	ui.splitter->setStretchFactor(0, 1);
 	ui.splitter->setStretchFactor(1, 0);
+    ui.splitter->setCollapsible(0, false);
+    ui.splitter->setCollapsible(1, false);
 
 	connect(unsubscribeButton, SIGNAL(clicked()), this , SLOT(leaveLobby()));
 
