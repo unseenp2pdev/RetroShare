@@ -475,16 +475,14 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
             rsMsgs->saveContactOrGroupChatToModelData(groupname, "", 0, current_time, "", true, 0, 1,"", id, uId );
 
             //after open new window and add the new conversation item, need to sort and update the layout
-            rsMsgs->sortConversationItemListByRecentTime();
+            rsMsgs->sortConversationItemListByRecentTime();           
         }
-
-        // for both case, need to re-select the conversation item
+        // need to re-select the conversation item when we have new chat only
         int seletedrow = rsMsgs->getIndexFromUId(uId);
         QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
         ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
         emit ui->lobbyTreeWidget->model()->layoutChanged();
         ui->lobbyTreeWidget->show();
-
 	}
 }
 
@@ -533,15 +531,16 @@ void ChatLobbyWidget::setCurrentChatPage(ChatLobbyDialog *d)
         //re-select the left conversation item
         std::string uId = std::to_string(d->chatId().toLobbyId());
         int seletedrow = rsMsgs->getIndexFromUId(uId);
-        ui->lobbyTreeWidget->selectionModel()->clearSelection();
-        emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
+        if (seletedrow >= 0)
+        {
+            ui->lobbyTreeWidget->selectionModel()->clearSelection();
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
 
-        //update again after clear seletion
-        QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
-        ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
-        emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
+            //update again after clear seletion
+            QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+            ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
+        }
     }
 }
 
@@ -553,15 +552,16 @@ void ChatLobbyWidget::setCurrentOne2OneChatPage(PopupChatDialog *d)
         //re-select the right conversation item
         std::string uId = d->chatId().toPeerId().toStdString();
         int seletedrow = rsMsgs->getIndexFromUId(uId);
-        ui->lobbyTreeWidget->selectionModel()->clearSelection();
-        emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
+        if (seletedrow >= 0)
+        {
+            ui->lobbyTreeWidget->selectionModel()->clearSelection();
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
 
-        //update again after clear seletion
-        QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
-        ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
-        emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
+            //update again after clear seletion
+            QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+            ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
+        }
     }
 }
 
@@ -1588,7 +1588,6 @@ void ChatLobbyWidget::openLastChatWindow()
     {
         ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
         emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
     }
 
     alreadyOpenLastChatWindow = true;

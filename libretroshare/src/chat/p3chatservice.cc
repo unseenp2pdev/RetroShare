@@ -1528,7 +1528,7 @@ std::string p3ChatService::getSeletedUIdBeforeSorting(int row)
 
 int p3ChatService::getIndexFromUId(std::string uId)
 {
-    int index = 0;
+    int index = -1;
     for (unsigned int i = 0; i < conversationItemList.size(); i++ )
     {
         if (conversationItemList[i].uId == uId)

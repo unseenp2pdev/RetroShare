@@ -108,7 +108,7 @@ ConversationItemDelegate::paint(QPainter* painter
         // ellipse
         QPainterPath ellipse;
 #ifdef WINDOWS_SYS
-        qreal ellipseHeight = sizeImage_ / 4;
+        qreal ellipseHeight = sizeImage_ / 4.5;
 #else
         qreal ellipseHeight = sizeImage_ / 5;
 #endif
