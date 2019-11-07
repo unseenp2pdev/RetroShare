@@ -84,7 +84,7 @@ protected:
     /* GxsGroupFeedItem */
     virtual QString groupName();
     virtual void loadGroup(const uint32_t &token);
-    virtual RetroShareLink::enumType getLinkType() { return RetroShareLink::TYPE_CHANNEL; }
+    virtual RetroShareLink::enumType getLinkType() { return RetroShareLink::TYPE_CHATS; }
 
     /* GxsFeedItem */
     virtual QString messageName();

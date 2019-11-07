@@ -334,7 +334,6 @@ void NotifyPage::load()
 #if 0
 	whileBlocking(ui.notify_Blogs)->setChecked(newsflags & RS_FEED_TYPE_BLOG);
 #endif
-	whileBlocking(ui.notify_Chat)->setChecked(newsflags & RS_FEED_TYPE_CHAT);
 	whileBlocking(ui.notify_Messages)->setChecked(newsflags & RS_FEED_TYPE_MSG);
 	whileBlocking(ui.notify_Chat)->setChecked(newsflags & RS_FEED_TYPE_CHAT);
 	whileBlocking(ui.notify_Security)->setChecked(newsflags & RS_FEED_TYPE_SECURITY);

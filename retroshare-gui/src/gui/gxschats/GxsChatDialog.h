@@ -47,8 +47,8 @@ public:
 
 protected:
     /* GxsGroupFrameDialog */
-    virtual RetroShareLink::enumType getLinkType() { return RetroShareLink::TYPE_CHANNEL; }
-    virtual GroupFrameSettings::Type groupFrameSettingsType() { return GroupFrameSettings::Channel; }
+    virtual RetroShareLink::enumType getLinkType() { return RetroShareLink::TYPE_CHATS; }
+    virtual GroupFrameSettings::Type groupFrameSettingsType() { return GroupFrameSettings::Chats; }
     virtual QString getHelpString() const ;
     virtual void groupInfoToGroupItemInfo(const RsGroupMetaData &groupInfo, GroupItemInfo &groupItemInfo, const RsUserdata *userdata);
     virtual bool getDistantSearchResults(TurtleRequestId id, std::map<RsGxsGroupId,RsGxsGroupSummary>& group_infos);
