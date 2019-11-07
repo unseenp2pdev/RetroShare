@@ -113,6 +113,8 @@ FriendsDialog::FriendsDialog(QWidget *parent)
     /* Set initial size the splitter */
     ui.splitter->setStretchFactor(0, 0);
     ui.splitter->setStretchFactor(1, 1);
+    ui.splitter->setCollapsible(0, false);
+    ui.splitter->setCollapsible(1, false);
     /*remove
 QList<int> sizes;
     sizes << height() << 100; // Qt calculates the right sizes
