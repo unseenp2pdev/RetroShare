@@ -58,15 +58,15 @@ protected:
 
 private slots:
     void toggleAutoDownload();
-        void setDefaultDirectory();
-        void setDownloadDirectory();
-        void specifyDownloadDirectory();
+    void setDefaultDirectory();
+    void setDownloadDirectory();
+    void specifyDownloadDirectory();
 
 private:
     /* GxsGroupFrameDialog */
     virtual QString text(TextType type);
     virtual QString icon(IconType type);
-    virtual QString settingsGroupName() { return "ChannelDialog"; }
+    virtual QString settingsGroupName() { return "ChatDialog"; }
     virtual GxsGroupDialog *createNewGroupDialog(TokenQueue *tokenQueue);
     virtual GxsGroupDialog *createGroupDialog(TokenQueue *tokenQueue, RsTokenService *tokenService, GxsGroupDialog::Mode mode, RsGxsGroupId groupId);
     virtual int shareKeyType();
