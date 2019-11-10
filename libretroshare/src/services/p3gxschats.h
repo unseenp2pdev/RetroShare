@@ -97,6 +97,37 @@ virtual bool updateGroup(uint32_t &token, RsGxsChatGroup &group);
      */
     void receiveDistantSearchResults( TurtleRequestId id,
                                       const RsGxsGroupId& grpId );
+    /* Comment service - Provide RsGxsCommentService - redirect to p3GxsCommentService */
+    virtual bool getCommentData(uint32_t token, std::vector<RsGxsComment> &msgs)
+    { return mCommentService->getGxsCommentData(token, msgs); }
+
+    virtual bool getRelatedComments( uint32_t token,  std::vector<RsGxsComment> &msgs )
+    { return mCommentService->getGxsRelatedComments(token, msgs); }
+
+virtual bool createComment(uint32_t &token, RsGxsComment &msg)
+    {
+        return mCommentService->createGxsComment(token, msg);
+    }
+
+virtual bool createVote(uint32_t &token, RsGxsVote &msg)
+    {
+        return mCommentService->createGxsVote(token, msg);
+    }
+
+virtual bool acknowledgeComment(uint32_t token, std::pair<RsGxsGroupId, RsGxsMessageId>& msgId)
+    {
+        return acknowledgeMsg(token, msgId);
+    }
+
+
+virtual bool acknowledgeVote(uint32_t token, std::pair<RsGxsGroupId, RsGxsMessageId>& msgId)
+    {
+        if (mCommentService->acknowledgeVote(token, msgId))
+        {
+            return true;
+        }
+        return acknowledgeMsg(token, msgId);
+    }
 
     // Overloaded from RsGxsIface.
 virtual bool subscribeToGroup(uint32_t &token, const RsGxsGroupId &groupId, bool subscribe);
@@ -186,6 +217,7 @@ bool generateGroup(uint32_t &token, std::string groupName);
     std::vector<ChatDummyRef> mGenRefs;
     RsGxsMessageId mGenThreadId;
 
+    p3GxsCommentService *mCommentService;
     std::map<RsGxsGroupId,rstime_t> mKnownChats;
 
     /** Store search callbacks with timeout*/

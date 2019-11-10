@@ -101,7 +101,7 @@ class RsGxsChatMsg : RsSerializable
 
 std::ostream &operator<<(std::ostream& out, const RsGxsChatMsg& post);
 
-class RsGxsChats: public RsGxsIfaceHelper
+class RsGxsChats: public RsGxsIfaceHelper, public RsGxsCommentService
 {
 public:
 

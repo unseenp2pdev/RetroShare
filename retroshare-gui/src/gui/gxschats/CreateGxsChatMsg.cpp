@@ -44,6 +44,8 @@
 
 #define DEBUG_CREATE_GXS_MSG
 
+
+
 /** Constructor */
 CreateGxsChatMsg::CreateGxsChatMsg(const RsGxsGroupId &cId, RsGxsMessageId existing_post)
     : QDialog (NULL, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
@@ -57,9 +59,9 @@ CreateGxsChatMsg::CreateGxsChatMsg(const RsGxsGroupId &cId, RsGxsMessageId exist
     headerFrame->setHeaderImage(QPixmap(":/images/channels.png"));
 
     if(!existing_post.isNull())
-        headerFrame->setHeaderText(tr("Edit Conversation Post"));
+        headerFrame->setHeaderText(tr("Edit Channel Post"));
     else
-        headerFrame->setHeaderText(tr("New Conversation Post"));
+        headerFrame->setHeaderText(tr("New Channel Post"));
 
     setAttribute ( Qt::WA_DeleteOnClose, true );
 
@@ -103,6 +105,7 @@ CreateGxsChatMsg::~CreateGxsChatMsg()
 
     delete(mChannelQueue);
 }
+
 
 void CreateGxsChatMsg::contextMenu(QPoint /*point*/)
 {
@@ -181,25 +184,25 @@ void CreateGxsChatMsg::dragEnterEvent(QDragEnterEvent *event)
 
     if (event->mimeData()->hasFormat("text/plain"))
     {
-        std::cerr << "CreateGxsChannelMsg::dragEnterEvent() Accepting PlainText";
+        std::cerr << "CreateGxsChatMsg::dragEnterEvent() Accepting PlainText";
         std::cerr << std::endl;
         event->acceptProposedAction();
     }
     else if (event->mimeData()->hasUrls())
     {
-        std::cerr << "CreateGxsChannelMsg::dragEnterEvent() Accepting Urls";
+        std::cerr << "CreateGxsChatMsg::dragEnterEvent() Accepting Urls";
         std::cerr << std::endl;
         event->acceptProposedAction();
     }
     else if (event->mimeData()->hasFormat("application/x-rsfilelist"))
     {
-        std::cerr << "CreateGxsChannelMsg::dragEnterEvent() accepting Application/x-qabs...";
+        std::cerr << "CreateGxsChatMsg::dragEnterEvent() accepting Application/x-qabs...";
         std::cerr << std::endl;
         event->acceptProposedAction();
     }
     else
     {
-        std::cerr << "CreateGxsChannelMsg::dragEnterEvent() No PlainText/Urls";
+        std::cerr << "CreateGxsChatMsg::dragEnterEvent() No PlainText/Urls";
         std::cerr << std::endl;
     }
 }
@@ -208,7 +211,7 @@ void CreateGxsChatMsg::dropEvent(QDropEvent *event)
 {
     if (!(Qt::CopyAction & event->possibleActions()))
     {
-        std::cerr << "CreateGxsChannelMsg::dropEvent() Rejecting uncopyable DropAction";
+        std::cerr << "CreateGxsChatMsg::dropEvent() Rejecting uncopyable DropAction";
         std::cerr << std::endl;
 
         /* can't do it */
@@ -413,10 +416,10 @@ void CreateGxsChatMsg::addExtraFile()
     }
 }
 
-//void CreateGxsChatMsg::addSubject(const QString& text)
-//{
-//    subjectEdit->setText(text) ;
-//}
+void CreateGxsChatMsg::addSubject(const QString& text)
+{
+    subjectEdit->setText(text) ;
+}
 
 void CreateGxsChatMsg::addHtmlText(const QString& text)
 {
@@ -615,8 +618,8 @@ void CreateGxsChatMsg::saveChannelInfo(const RsGroupMetaData &meta)
     mChannelMeta = meta;
     mChannelMetaLoaded = true;
 
-    channelName->setText(QString::fromUtf8(mChannelMeta.mGroupName.c_str()));
-    //subjectEdit->setFocus();
+    chatName->setText(QString::fromUtf8(mChannelMeta.mGroupName.c_str()));
+    subjectEdit->setFocus();
 }
 
 void CreateGxsChatMsg::sendMsg()
@@ -627,7 +630,7 @@ void CreateGxsChatMsg::sendMsg()
 #endif
 
     /* construct message bits */
-    //std::string subject = std::string(misc::removeNewLine(subjectEdit->text()).toUtf8());
+    std::string subject = std::string(misc::removeNewLine(subjectEdit->text()).toUtf8());
     QString text;
     RsHtml::optimizeHtml(msgEdit, text);
     std::string msg = std::string(text.toUtf8());
@@ -660,19 +663,19 @@ void CreateGxsChatMsg::sendMsg()
         }
     }
 
-    sendMessage( msg, files);
+    sendMessage(subject, msg, files);
 }
 
-void CreateGxsChatMsg::sendMessage( const std::string &msg, const std::list<RsGxsFile> &files)
+void CreateGxsChatMsg::sendMessage(const std::string &subject, const std::string &msg, const std::list<RsGxsFile> &files)
 {
-//    if(subject.empty())
-//    {	/* error message */
-//        QMessageBox::warning(this, tr("UnseenP2P"), tr("Please add a Subject"), QMessageBox::Ok, QMessageBox::Ok);
+    if(subject.empty())
+    {	/* error message */
+        QMessageBox::warning(this, tr("UnseenP2P"), tr("Please add a Subject"), QMessageBox::Ok, QMessageBox::Ok);
 
-//        return; //Don't add  an empty Subject!!
-//    }
-//    else
-//    /* rsGxsChannels */
+        return; //Don't add  an empty Subject!!
+    }
+    else
+    /* rsGxsChannels */
     if (rsGxsChats)
     {
         RsGxsChatMsg post;
@@ -683,7 +686,7 @@ void CreateGxsChatMsg::sendMessage( const std::string &msg, const std::list<RsGx
         post.mMeta.mMsgId.clear() ;
 
         post.mMeta.mOrigMsgId = mOrigPostId;
-        //post.mMeta.mMsgName = subject;
+        post.mMeta.mMsgName = subject;
         post.mMsg = msg;
         post.mFiles = files;
 
@@ -714,10 +717,10 @@ void CreateGxsChatMsg::sendMessage( const std::string &msg, const std::list<RsGx
         if (generateCount) {
 #ifdef ENABLE_GENERATE
             for (int count = 0; count < generateCount; ++count) {
-                RsGxsChatMsg generatePost = post;
+                RsGxsChannelPost generatePost = post;
                 generatePost.mMeta.mMsgName = QString("%1 %2").arg(QString::fromUtf8(post.mMeta.mMsgName.c_str())).arg(count + 1, 3, 10, QChar('0')).toUtf8().constData();
 
-                rsGxsChats->createPost(token, generatePost);
+                rsGxsChannels->createPost(token, generatePost);
             }
 #endif
         } else {
@@ -766,7 +769,7 @@ void CreateGxsChatMsg::loadChannelPostInfo(const uint32_t &token)
         return ;
     }
 
-    //subjectEdit->setText(QString::fromUtf8(post.mMeta.mMsgName.c_str())) ;
+    subjectEdit->setText(QString::fromUtf8(post.mMeta.mMsgName.c_str())) ;
     msgEdit->setText(QString::fromUtf8(post.mMsg.c_str())) ;
 
     for(std::list<RsGxsFile>::const_iterator it(post.mFiles.begin());it!=post.mFiles.end();++it)
@@ -793,7 +796,7 @@ void CreateGxsChatMsg::loadChannelInfo(const uint32_t &token)
     }
     else
     {
-        std::cerr << "CreateGxsChatMsg::loadChannelInfo() ERROR INVALID Number of Chat";
+        std::cerr << "CreateGxsChatMsg::loadForumInfo() ERROR INVALID Number of Forums";
         std::cerr << std::endl;
     }
 }
@@ -822,3 +825,4 @@ void CreateGxsChatMsg::loadRequest(const TokenQueue *queue, const TokenRequest &
         }
     }
 }
+

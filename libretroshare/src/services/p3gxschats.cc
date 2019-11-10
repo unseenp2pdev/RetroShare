@@ -75,6 +75,7 @@ p3GxsChats::p3GxsChats(
 {
     // For Dummy Msgs.
     mGenActive = false;
+    mCommentService = new p3GxsCommentService(this,  RS_SERVICE_GXS_TYPE_CHATS);
 
     RsTickEvent::schedule_in(CHAT_PROCESS, 0);
 

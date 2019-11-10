@@ -45,7 +45,7 @@ public:
     ~CreateGxsChatMsg();
 
     void addHtmlText(const QString& text) ;
-    //void addSubject(const QString& text) ;
+    void addSubject(const QString& text) ;
     void addAttachment(const std::string &path);
     void addAttachment(const RsFileHash &hash, const std::string &fname, uint64_t size, bool local, const RsPeerId &srcId,bool assume_file_ready = false);
 
@@ -79,7 +79,7 @@ private:
     void saveChannelInfo(const RsGroupMetaData &group);
 
     void parseRsFileListAttachments(const std::string &attachList);
-    void sendMessage(const std::string &msg, const std::list<RsGxsFile> &files);
+    void sendMessage(const std::string &subject, const std::string &msg, const std::list<RsGxsFile> &files);
     bool setThumbNail(const std::string& path, int frame);
 
     RsGxsGroupId mChannelId;

@@ -79,7 +79,7 @@ public:
 	bool isPlayable(bool &startable);
 
 	void setChannelId(const std::string &channelId) { mChannelId = channelId; }
-    void setChatsId(const std::string &chatsId) { mChatsId = chatsId; }
+    void setChatsId(const std::string &chatId) { mChatId = chatId; }
 
 public slots:
 	void download();
@@ -108,7 +108,7 @@ private:
 	uint64_t    mFileSize;
 	RsPeerId    mSrcId;
 	std::string mChannelId;
-    std::string mChatsId;
+    std::string mChatId;
 
 	uint32_t    mMode;
 	uint32_t    mType;

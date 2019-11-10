@@ -472,6 +472,7 @@ HEADERS +=  rshare.h \
             gui/settings/TransferPage.h \
             gui/settings/ChatPage.h \
             gui/settings/ChannelPage.h \
+            gui/settings/GxsChatPage.h \
             gui/settings/PostedPage.h \
             gui/settings/ServicePermissionsPage.h \
             gui/settings/AddFileAssociationDialog.h \
@@ -658,6 +659,7 @@ FORMS +=    gui/StartDialog.ui \
             gui/settings/SoundPage.ui \
             gui/settings/ChatPage.ui \
             gui/settings/ChannelPage.ui \
+            gui/settings/GxsChatPage.ui \
             gui/settings/PostedPage.ui \
             gui/settings/ServicePermissionsPage.ui \
             gui/settings/PluginItem.ui \
@@ -884,6 +886,7 @@ SOURCES +=  main.cpp \
             gui/settings/TransferPage.cpp \
             gui/settings/ChatPage.cpp \
             gui/settings/ChannelPage.cpp \
+            gui/settings/GxsChatPage.cpp \
             gui/settings/PostedPage.cpp \
             gui/settings/ServicePermissionsPage.cpp \
             gui/settings/AddFileAssociationDialog.cpp \

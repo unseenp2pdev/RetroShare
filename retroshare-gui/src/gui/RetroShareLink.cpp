@@ -59,13 +59,13 @@
 #include <iostream>
 #include <time.h>
 
-//#define DEBUG_RSLINK 1
+#define DEBUG_RSLINK 1
 
 #define HOST_FILE        "file"
 #define HOST_PERSON      "person"
 #define HOST_FORUM       "forum"
 #define HOST_CHANNEL     "channel"
-#define HOST_CHATS       "chats"
+#define HOST_CHATS       "gxschat"
 #define HOST_SEARCH      "search"
 #define HOST_MESSAGE     "message"
 #define HOST_CERTIFICATE "certificate"
@@ -76,7 +76,7 @@
 #define HOST_IDENTITY    "identity"
 #define HOST_FILE_TREE   "collection"
 #define HOST_CHAT_ROOM   "chat_room"
-#define HOST_REGEXP      "file|person|forum|channel|chats|search|message|certificate|extra|private_chat|public_msg|posted|identity|collection|chat_room"
+#define HOST_REGEXP      "file|person|forum|channel|gxschat|search|message|certificate|extra|private_chat|public_msg|posted|identity|collection|chat_room"
 
 #define FILE_NAME       "name"
 #define FILE_SIZE       "size"
@@ -399,12 +399,13 @@ void RetroShareLink::fromUrl(const QUrl& url)
 
 		RsGxsId id(gxsid.toStdString()) ;
 
-		if(!id.isNull())
+        if(!id.isNull()){
 			*this = createIdentity(id,name,radix) ;
 #ifdef DEBUG_RSLINK
 		std::cerr << "Got an identity link!!" << std::endl;
 #endif
-		else
+        }
+        else
 			std::cerr << "(EE) identity link is not valid." << std::endl;
 		return ;
 	}
@@ -516,7 +517,14 @@ RetroShareLink RetroShareLink::createGxsMessageLink(const RetroShareLink::enumTy
 		link._type = linkType;
 	}
 
+    std::cerr << "RetroShareLink::createGxsMessageLink()"<< std::endl;
+    std::cerr << "Name="<<link._name.toCFString() << std::endl;
+    std::cerr << "Hash="<<link._hash.toCFString() << std::endl;
+    std::cerr << "msgId="<<link._msgId.toCFString() << std::endl;
+
 	link.check();
+
+    std::cerr << "isValid ="<<link.valid() << std::endl;
 
 	return link;
 }
@@ -794,17 +802,21 @@ void RetroShareLink::check()
 				_valid = false;
 		break;
 
-        case TYPE_CHATS:
-            if(_size != 0)
+        case TYPE_CHATS:{
+            if(_size != 0){
+                std::cerr <<"Size = 0"<<std::endl;
                 _valid = false;
-
-            if(_name.isEmpty())
+            }
+            if(_name.isEmpty()){
+                std::cerr <<"Name is empty"<<std::endl;
                 _valid = false;
-
-            if(_hash.isEmpty())
+            }
+            if(_hash.isEmpty()){
+                std::cerr <<"Hash is empty"<<std::endl;
                 _valid = false;
-        break;
-
+            }
+            break;
+        }
 		case TYPE_SEARCH:
 			if(_size != 0)
 				_valid = false;

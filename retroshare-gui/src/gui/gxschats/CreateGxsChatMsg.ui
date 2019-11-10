@@ -14,7 +14,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>New Conversation Post</string>
+   <string>New Channel Post</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../Unseengui/unseengui.qrc">
@@ -62,11 +62,38 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="channelPostTab">
+        <widget class="QWidget" name="chatPostTab">
          <attribute name="title">
           <string>Channel Post</string>
          </attribute>
-         <layout class="QGridLayout" name="channelPostTabGLayout">
+         <layout class="QGridLayout" name="chatPostTabGLayout">
+          <item row="0" column="0" colspan="3">
+           <layout class="QHBoxLayout" name="chatNameHLayout">
+            <item>
+             <widget class="QLabel" name="chatNameLabel">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Channel Post to:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="chatName">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
           <item row="1" column="0">
            <layout class="QGridLayout" name="channelAttachGLayout">
             <item row="0" column="0" colspan="2">
@@ -106,46 +133,6 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </item>
-          <item row="0" column="0" colspan="3">
-           <layout class="QHBoxLayout" name="channelNameHLayout">
-            <item>
-             <widget class="QLabel" name="channelNameLabel">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Channel Post to:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="channelName">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="2">
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>12</width>
-              <height>98</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item row="1" column="1">
            <widget class="QLabel" name="thumbnail_label">
             <property name="maximumSize">
@@ -165,6 +152,19 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>12</width>
+              <height>98</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="2" column="0" colspan="3">
            <widget class="QGroupBox" name="messageGBox">
             <property name="title">
@@ -172,7 +172,24 @@ p, li { white-space: pre-wrap; }
             </property>
             <layout class="QVBoxLayout" name="messageGBoxVLayout">
              <item>
-              <layout class="QHBoxLayout" name="subjectHLayout"/>
+              <layout class="QHBoxLayout" name="subjectHLayout">
+               <item>
+                <widget class="QLabel" name="subjectLabel">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Subject :</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="subjectEdit"/>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="MimeTextEdit" name="msgEdit"/>
@@ -285,8 +302,8 @@ p, li { white-space: pre-wrap; }
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>801</width>
-               <height>30</height>
+               <width>817</width>
+               <height>24</height>
               </rect>
              </property>
              <property name="sizePolicy">

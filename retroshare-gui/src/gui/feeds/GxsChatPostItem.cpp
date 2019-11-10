@@ -41,7 +41,8 @@
 #include <iostream>
 #include <cmath>
 
-//#define DEBUG_ITEM 1
+
+#define DEBUG_ITEM 1
 
 
 GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsGroupId &groupId, const RsGxsMessageId &messageId, bool isHome, bool autoUpdate,const std::set<RsGxsMessageId>& older_versions) :
@@ -79,8 +80,8 @@ void GxsChatPostItem::init(const RsGxsMessageId& messageId,const std::set<RsGxsM
 // It was used to load a channel post where the post item is already known.
 
 #ifdef SUSPENDED
-GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChatGroup &group, const RsGxsChatMsg &post, bool isHome, bool autoUpdate) :
-    GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChats, autoUpdate)
+GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChannelGroup &group, const RsGxsChannelPost &post, bool isHome, bool autoUpdate) :
+    GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChannels, autoUpdate)
 {
 #ifdef DEBUG_ITEM
     std::cerr << "GxsChatPostItem::GxsChatPostItem() Direct Load";
@@ -110,8 +111,8 @@ GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const 
     mLoaded = false ;
 }
 
-GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChatMsg &post, bool isHome, bool autoUpdate) :
-    GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChats, autoUpdate)
+GxsChatPostItem::GxsChatPostItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsChannelPost &post, bool isHome, bool autoUpdate) :
+    GxsFeedItem(feedHolder, feedId, post.mMeta.mGroupId, post.mMeta.mMsgId, isHome, rsGxsChannels, autoUpdate)
 {
 #ifdef DEBUG_ITEM
     std::cerr << "GxsChatPostItem::GxsChatPostItem() Direct Load";
@@ -205,7 +206,6 @@ void GxsChatPostItem::setup()
     ui->warn_image_label->hide();
     ui->warning_label->hide();
 
-    ui->commentButton->hide();
     ui->titleLabel->setMinimumWidth(100);
     ui->subjectLabel->setMinimumWidth(100);
     ui->warning_label->setMinimumWidth(100);
@@ -215,7 +215,6 @@ void GxsChatPostItem::setup()
     ui->mainFrame->style()->polish(  ui->mainFrame);
 
     ui->expandFrame->hide();
-
 }
 
 bool GxsChatPostItem::setGroup(const RsGxsChatGroup &group, bool doFill)
@@ -287,21 +286,21 @@ void GxsChatPostItem::loadComments()
 void GxsChatPostItem::loadGroup(const uint32_t &token)
 {
 #ifdef DEBUG_ITEM
-    std::cerr << "GxsChatGroupItem::loadGroup()";
+    std::cerr << "GxsChatPostItem::loadGroup()";
     std::cerr << std::endl;
 #endif
 
     std::vector<RsGxsChatGroup> groups;
     if (!rsGxsChats->getGroupData(token, groups))
     {
-        std::cerr << "GxsChatGroupItem::loadGroup() ERROR getting data";
+        std::cerr << "GxsChatPostItem::loadGroup() ERROR getting data";
         std::cerr << std::endl;
         return;
     }
 
     if (groups.size() != 1)
     {
-        std::cerr << "GxsChatGroupItem::loadGroup() Wrong number of Items";
+        std::cerr << "GxsChatPostItem::loadGroup() Wrong number of Items";
         std::cerr << std::endl;
         return;
     }
@@ -357,22 +356,23 @@ void GxsChatPostItem::loadComment(const uint32_t &token)
     std::cerr << std::endl;
 #endif
 
-//    std::vector<RsGxsComment> cmts;
-//    if (!rsGxsChats->getRelatedComments(token, cmts))
-//    {
-//        std::cerr << "GxsChatPostItem::loadComment() ERROR getting data";
-//        std::cerr << std::endl;
-//        return;
-//    }
+    std::vector<RsGxsComment> cmts;
+    if (!rsGxsChats->getRelatedComments(token, cmts))
+    {
 
-//    size_t comNb = cmts.size();
-//    QString sComButText = tr("Comment");
-//    if (comNb == 1) {
-//        sComButText = sComButText.append("(1)");
-//    } else if (comNb > 1) {
-//        sComButText = tr("Comments ").append("(%1)").arg(comNb);
-//    }
-//    ui->commentButton->setText(sComButText);
+        std::cerr << "GxsChatPostItem::loadComment() ERROR getting data";
+        std::cerr << std::endl;
+        return;
+    }
+
+    size_t comNb = cmts.size();
+    QString sComButText = tr("Comment");
+    if (comNb == 1) {
+        sComButText = sComButText.append("(1)");
+    } else if (comNb > 1) {
+        sComButText = tr("Comments ").append("(%1)").arg(comNb);
+    }
+    ui->commentButton->setText(sComButText);
 }
 
 void GxsChatPostItem::fill()
@@ -407,7 +407,7 @@ void GxsChatPostItem::fill()
             removeItem();
         }
 
-        title = tr("Chats Feed") + ": ";
+        title = tr("GxsChat Feed") + ": ";
         RetroShareLink link = RetroShareLink::createGxsGroupLink(RetroShareLink::TYPE_CHATS, mPost.mMeta.mGroupId, groupName());
         title += link.toHtml();
         ui->titleLabel->setText(title);
@@ -415,6 +415,10 @@ void GxsChatPostItem::fill()
         RetroShareLink msgLink = RetroShareLink::createGxsMessageLink(RetroShareLink::TYPE_CHATS, mPost.mMeta.mGroupId, mPost.mMeta.mMsgId, messageName());
         ui->subjectLabel->setText(msgLink.toHtml());
 
+#ifdef DEBUG_ITEM
+    std::cerr << "GxsChatPostItem::loadComment() and MessageLink="<< msgLink.toHtml().toCFString();
+    std::cerr << std::endl;
+#endif
         if (IS_GROUP_SUBSCRIBED(mGroup.mMeta.mSubscribeFlags) || IS_GROUP_ADMIN(mGroup.mMeta.mSubscribeFlags))
         {
             ui->unsubscribeButton->setEnabled(true);
@@ -436,12 +440,11 @@ void GxsChatPostItem::fill()
         /* subject */
         ui->titleLabel->setText(QString::fromUtf8(mPost.mMeta.mMsgName.c_str()));
 
-        //uint32_t autorized_lines = (int)floor((ui->logoLabel->height() - ui->titleLabel->height() - ui->buttonHLayout->sizeHint().height())/QFontMetricsF(ui->subjectLabel->font()).height());
+        uint32_t autorized_lines = (int)floor((ui->logoLabel->height() - ui->titleLabel->height() - ui->buttonHLayout->sizeHint().height())/QFontMetricsF(ui->subjectLabel->font()).height());
 
         // fill first 4 lines of message. (csoler) Disabled the replacement of smileys and links, because the cost is too crazy
-        //ui->subjectLabel->setText(RsHtml().formatText(NULL, RsStringUtil::CopyLines(QString::fromUtf8(mPost.mMsg.c_str()), autorized_lines), RSHTML_FORMATTEXT_EMBED_SMILEYS | RSHTML_FORMATTEXT_EMBED_LINKS));
+        ui->subjectLabel->setText(RsHtml().formatText(NULL, RsStringUtil::CopyLines(QString::fromUtf8(mPost.mMsg.c_str()), autorized_lines), RSHTML_FORMATTEXT_EMBED_SMILEYS | RSHTML_FORMATTEXT_EMBED_LINKS));
 
-        ui->subjectLabel->hide();
         //ui->subjectLabel->setText(RsStringUtil::CopyLines(QString::fromUtf8(mPost.mMsg.c_str()), 2)) ;
 
         //QString score = QString::number(post.mTopScore);
@@ -474,8 +477,7 @@ void GxsChatPostItem::fill()
     if (mFeedHolder)
     {
         if (mIsHome) {
-            //ui->commentButton->show();
-            ui->commentButton->hide();
+            ui->commentButton->show();
         } else if (ui->commentButton->icon().isNull()){
             //Icon is seted if a comment received.
             ui->commentButton->hide();
@@ -522,7 +524,6 @@ void GxsChatPostItem::fill()
     } else {
         ui->filelabel->setVisible(false);
     }
-    ui->filelabel->setVisible(false);
 
     if (mFileItems.empty() == false) {
         std::list<SubFileItem *>::iterator it;
@@ -557,7 +558,6 @@ void GxsChatPostItem::fill()
         layout->addWidget(fi);
     }
 
-    expand(true);
     mInFill = false;
 }
 

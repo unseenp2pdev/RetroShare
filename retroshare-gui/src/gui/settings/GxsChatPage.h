@@ -1,7 +1,8 @@
+
 /****************************************************************
  *  RetroShare is distributed under the following license:
  *
- *  Copyright (C) 2014 RetroShare Team
+ *  Copyright (C) 2006, crypton
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,33 +20,34 @@
  *  Boston, MA  02110-1301, USA.
  ****************************************************************/
 
-#include "GxsChatUserNotify.h"
-#include "gui/MainWindow.h"
+#ifndef GXSCHATPAGE_H
+#define GXSCHATPAGE_H
 
-GxsChatUserNotify::GxsChatUserNotify(RsGxsIfaceHelper *ifaceImpl, QObject *parent) :
-    GxsUserNotify(ifaceImpl, parent)
+#include <retroshare-gui/configpage.h>
+#include "ui_GxsChatPage.h"
+
+class GxsChatPage : public ConfigPage
 {
-}
+    Q_OBJECT
 
-bool GxsChatUserNotify::hasSetting(QString *name, QString *group)
-{
-    if (name) *name = tr("GxsChats Post");
-    if (group) *group = "GxsChats";
+public:
+    GxsChatPage(QWidget * parent = 0, Qt::WindowFlags flags = 0);
+    ~GxsChatPage();
 
-    return true;
-}
+    /** Loads the settings for this page */
+    virtual void load();
 
-QIcon GxsChatUserNotify::getIcon()
-{
-    return QIcon(":/home/img/face_icon/youtube-play-button_128.png");
-}
+    virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/youtube-play-button_x.svg") ; }
+    virtual QString pageName() const { return tr("GsxChats") ; }
+    virtual QString helpText() const { return ""; }
 
-QIcon GxsChatUserNotify::getMainIcon(bool hasNew)
-{
-    return hasNew ? QIcon(":/home/img/face_icon/youtube-play-button_v_128.png") : QIcon(":/home/img/face_icon/youtube-play-button_128.png");
-}
+protected slots:
+    void updateLoadThread() ;
 
-void GxsChatUserNotify::iconClicked()
-{
-    MainWindow::showWindow(MainWindow::Channels);
-}
+private:
+    Ui::GxsChatPage ui;
+};
+
+
+
+#endif // GXSCHATPAGE_H
