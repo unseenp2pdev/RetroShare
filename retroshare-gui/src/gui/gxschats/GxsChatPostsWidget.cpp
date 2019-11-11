@@ -164,7 +164,7 @@ void GxsChatPostsWidget::processSettings(bool load)
 
 void GxsChatPostsWidget::settingsChanged()
 {
-    mUseThread = Settings->getChannelLoadThread();
+    mUseThread = Settings->getChatsLoadThread();
 
     mStateHelper->setWidgetVisible(ui->progressBar, mUseThread);
 }
@@ -212,7 +212,7 @@ void GxsChatPostsWidget::openChat(const RsPeerId & /*peerId*/)
 //// Callback from Widget->FeedHolder->ServiceDialog->CommentContainer->CommentDialog,
 void GxsChatPostsWidget::openComments(uint32_t /*type*/, const RsGxsGroupId &groupId, const QVector<RsGxsMessageId>& msg_versions,const RsGxsMessageId &msgId, const QString &title)
 {
-    //emit loadComment(groupId, msg_versions,msgId, title);
+    emit loadComment(groupId, msg_versions,msgId, title);
 }
 
 void GxsChatPostsWidget::createMsg()
@@ -542,10 +542,10 @@ void GxsChatPostsWidget::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, Gx
 #ifdef DEBUG_CHAT
                     std::cerr << " and is more recent => following" << std::endl;
 #endif
-//                    for(std::set<RsGxsMessageId>::const_iterator itt(posts[current_index].mOlderVersions.begin());itt!=posts[current_index].mOlderVersions.end();++itt)
-//                        posts[source_index].mOlderVersions.insert(*itt);
+                    for(std::set<RsGxsMessageId>::const_iterator itt(posts[current_index].mOlderVersions.begin());itt!=posts[current_index].mOlderVersions.end();++itt)
+                        posts[source_index].mOlderVersions.insert(*itt);
 
-//                    //posts[source_index].mOlderVersions.insert(posts[current_index].mMeta.mMsgId);
+                    posts[source_index].mOlderVersions.insert(posts[current_index].mMeta.mMsgId);
                     posts[current_index].mMeta.mMsgId.clear();	    // clear the msg Id so the post will be ignored
                 }
 #ifdef DEBUG_CHAT

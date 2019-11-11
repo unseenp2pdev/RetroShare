@@ -39,7 +39,7 @@ GxsChatPage::GxsChatPage(QWidget * parent, Qt::WindowFlags flags)
 
 void GxsChatPage::updateLoadThread()
 {
-    Settings->setChannelLoadThread(ui.loadThreadCheckBox->isChecked());
+    Settings->setChatsLoadThread(ui.loadThreadCheckBox->isChecked());
     NotifyQt::getInstance()->notifySettingsChanged();
 }
 

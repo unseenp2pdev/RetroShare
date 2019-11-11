@@ -1083,12 +1083,12 @@ void RshareSettings::setChannelLoadThread(bool value)
 /* Chat */
 bool RshareSettings::getChatsLoadThread()
 {
-    return valueFromGroup("Chats", "LoadThread", false).toBool();
+    return valueFromGroup("GxsChat", "LoadThread", false).toBool();
 }
 
 void RshareSettings::setChatsLoadThread(bool value)
 {
-    setValueToGroup("Chats", "LoadThread", value);
+    setValueToGroup("GxsChat", "LoadThread", value);
 }
 
 
@@ -1104,7 +1104,7 @@ static QString groupFrameSettingsTypeToString(GroupFrameSettings::Type type)
 	case GroupFrameSettings::Channel:
 		return "Channel";
     case GroupFrameSettings::Chats:
-        return "Chats";
+        return "GxsChat";
 	case GroupFrameSettings::Posted:
 		return "Posted";
 	}

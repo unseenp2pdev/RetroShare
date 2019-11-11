@@ -91,7 +91,7 @@ void GxsChatDialog::shareOnChannel(const RsGxsGroupId& channel_id,const QList<Re
     if(!file_links.empty())
     {
         QString subject = (*file_links.begin()).name() ;
-        //msgDialog->addSubject(subject);
+        msgDialog->addSubject(subject);
     }
 
     msgDialog->addHtmlText(txt);
@@ -268,8 +268,8 @@ void GxsChatDialog::groupTreeCustomActions(RsGxsGroupId grpId, int subscribeFlag
 
 RsGxsCommentService *GxsChatDialog::getCommentService()
 {
-    //return rsGxsChats;
-    return NULL;
+    return rsGxsChats;
+    //return NULL;
 }
 
 QWidget *GxsChatDialog::createCommentHeaderWidget(const RsGxsGroupId &grpId, const RsGxsMessageId &msgId)

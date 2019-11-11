@@ -38,7 +38,7 @@ public:
     ~GxsChatDialog();
 
     virtual QIcon iconPixmap() const { return QIcon(IMAGE_GXSCHANNELS) ; } //MainPage
-    virtual QString pageName() const { return tr("GxsChats") ; } //MainPage
+    virtual QString pageName() const { return tr("GxsChat") ; } //MainPage
     virtual QString helpText() const { return ""; } //MainPage
 
     virtual UserNotify *getUserNotify(QObject *parent);
