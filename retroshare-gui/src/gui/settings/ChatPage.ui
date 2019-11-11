@@ -876,7 +876,7 @@
           <enum>QTabWidget::North</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="publicTab">
           <attribute name="title">
@@ -903,7 +903,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="publicStyle"/>
+              <widget class="QComboBox" name="publicStyle">
+               <property name="minimumSize">
+                <size>
+                 <width>84</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="publicLabelVariant">
@@ -1017,7 +1024,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="privateStyle"/>
+              <widget class="QComboBox" name="privateStyle">
+               <property name="minimumSize">
+                <size>
+                 <width>84</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="privateLabelVariant">
@@ -1131,7 +1145,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="historyStyle"/>
+              <widget class="QComboBox" name="historyStyle">
+               <property name="minimumSize">
+                <size>
+                 <width>84</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QLabel" name="historyLabelVariant">
