@@ -38,7 +38,7 @@ public:
     virtual void load();
 
     virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/youtube-play-button_x.svg") ; }
-    virtual QString pageName() const { return tr("GsxChats") ; }
+    virtual QString pageName() const { return tr("GxsChats") ; }
     virtual QString helpText() const { return ""; }
 
 protected slots:

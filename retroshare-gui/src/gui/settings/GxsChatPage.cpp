@@ -32,7 +32,7 @@ GxsChatPage::GxsChatPage(QWidget * parent, Qt::WindowFlags flags)
 
     /* Initialize GroupFrameSettingsWidget */
     ui.groupFrameSettingsWidget->setOpenAllInNewTabText(tr("Open each GxsChat in a new tab"));
-    ui.groupFrameSettingsWidget->setType(GroupFrameSettings::Channel) ;
+    ui.groupFrameSettingsWidget->setType(GroupFrameSettings::Chats) ;
 
     connect(ui.loadThreadCheckBox,SIGNAL(toggled(bool)),this,SLOT(updateLoadThread())) ;
 }
@@ -50,6 +50,6 @@ GxsChatPage::~GxsChatPage()
 /** Loads the settings for this page */
 void GxsChatPage::load()
 {
-    whileBlocking(ui.loadThreadCheckBox)->setChecked(Settings->getChannelLoadThread());
-    ui.groupFrameSettingsWidget->loadSettings(GroupFrameSettings::Channel);
+    whileBlocking(ui.loadThreadCheckBox)->setChecked(Settings->getChatsLoadThread());
+    ui.groupFrameSettingsWidget->loadSettings(GroupFrameSettings::Chats);
 }

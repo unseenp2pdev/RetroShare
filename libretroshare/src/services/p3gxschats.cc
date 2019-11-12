@@ -671,7 +671,7 @@ void p3GxsChats::load_SpecificUnprocessedPosts(const uint32_t &token)
     {
         /* autodownload the files */
 #ifdef GXSCHATS_DEBUG
-        std::cerr << "Post ID = "<<it->mMeta.mMsgId<<std::endl;
+        std::cerr << "*********Post ID = "<<it->mMeta.mMsgId<<"  *******"<<std::endl;
 #endif
         handleUnprocessedPost(*it);
     }
