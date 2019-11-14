@@ -75,7 +75,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>New Message</string>
+          <string>Compose Mail</string>
          </property>
          <property name="text">
           <string>Compose</string>
@@ -111,7 +111,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Reply to selected message</string>
+          <string>Reply to selected mail</string>
          </property>
          <property name="text">
           <string>Reply</string>
@@ -140,7 +140,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Reply all to selected message</string>
+          <string>Reply all to selected mail</string>
          </property>
          <property name="text">
           <string>Reply all</string>
@@ -181,7 +181,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Forward selected message</string>
+          <string>Forward selected mail</string>
          </property>
          <property name="text">
           <string>Forward</string>
@@ -217,7 +217,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Remove selected message</string>
+          <string>Remove selected mail</string>
          </property>
          <property name="text">
           <string>Delete</string>
@@ -246,7 +246,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="toolTip">
-          <string>Print selected message</string>
+          <string>Print selected mail</string>
          </property>
          <property name="text">
           <string>Print</string>
@@ -355,7 +355,7 @@
      <x>0</x>
      <y>0</y>
      <width>698</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

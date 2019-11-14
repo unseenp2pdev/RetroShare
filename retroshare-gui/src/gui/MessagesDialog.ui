@@ -65,8 +65,57 @@
       <property name="horizontalSpacing">
        <number>6</number>
       </property>
-      <item row="0" column="9">
-       <widget class="Line" name="toolBarFrameLineR">
+      <item row="0" column="13">
+       <widget class="QToolButton" name="viewtoolButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Display</string>
+        </property>
+        <property name="icon">
+         <iconset resource="images.qrc">
+          <normaloff>:/images/looknfeel.png</normaloff>:/images/looknfeel.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::MenuButtonPopup</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="16">
+       <widget class="QToolButton" name="helpButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="icon">
+         <iconset resource="../Unseengui/unseengui.qrc">
+          <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="Line" name="toolBarFrameLineL">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -160,28 +209,18 @@
          <string notr="true"/>
         </property>
         <property name="text">
-         <string>Messages</string>
+         <string>Mail</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="15">
-       <widget class="LineEditClear" name="filterLineEdit">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
+      <item row="0" column="0">
+       <widget class="QLabel" name="titleBarPixmap">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>200</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="QToolButton" name="forwardmessageButton">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -190,33 +229,17 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>16777</width>
-          <height>16777</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Forward selected message</string>
-        </property>
-        <property name="text">
-         <string>Foward</string>
-        </property>
-        <property name="icon">
-         <iconset resource="images.qrc">
-          <normaloff>:/images/mailforward24-hover.png</normaloff>:/images/mailforward24-hover.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
           <width>24</width>
           <height>24</height>
          </size>
         </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
+        <property name="text">
+         <string/>
         </property>
-        <property name="autoRaise">
+        <property name="pixmap">
+         <pixmap resource="../Unseengui/unseengui.qrc">:/home/img/face_icon/envelope_xu_128.png</pixmap>
+        </property>
+        <property name="scaledContents">
          <bool>true</bool>
         </property>
        </widget>
@@ -271,46 +294,8 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="13">
-       <widget class="QToolButton" name="viewtoolButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="text">
-         <string>Display</string>
-        </property>
-        <property name="icon">
-         <iconset resource="images.qrc">
-          <normaloff>:/images/looknfeel.png</normaloff>:/images/looknfeel.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::MenuButtonPopup</enum>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="titleBarPixmap">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="0" column="8">
+       <widget class="QToolButton" name="forwardmessageButton">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -319,18 +304,127 @@
         </property>
         <property name="maximumSize">
          <size>
+          <width>16777</width>
+          <height>16777</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Forward selected message</string>
+        </property>
+        <property name="text">
+         <string>Foward</string>
+        </property>
+        <property name="icon">
+         <iconset resource="images.qrc">
+          <normaloff>:/images/mailforward24-hover.png</normaloff>:/images/mailforward24-hover.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
           <width>24</width>
           <height>24</height>
          </size>
         </property>
-        <property name="text">
-         <string/>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
         </property>
-        <property name="pixmap">
-         <pixmap resource="../Unseengui/unseengui.qrc">:/home/img/face_icon/envelope_xu_128.png</pixmap>
-        </property>
-        <property name="scaledContents">
+        <property name="autoRaise">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="14">
+       <spacer name="toolBarFrameSpacerR">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="2">
+       <spacer name="toolBarFrameSpacerL">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="9">
+       <widget class="Line" name="toolBarFrameLineR">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <widget class="QToolButton" name="replyallmessageButton">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777</width>
+          <height>16777</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Reply all to selected message</string>
+        </property>
+        <property name="text">
+         <string>Reply all</string>
+        </property>
+        <property name="icon">
+         <iconset resource="images.qrc">
+          <normaloff>:/images/replymailall24-hover.png</normaloff>:/images/replymailall24-hover.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="15">
+       <widget class="LineEditClear" name="filterLineEdit">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -407,100 +501,6 @@
         </property>
         <property name="autoRaise">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <widget class="QToolButton" name="replyallmessageButton">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777</width>
-          <height>16777</height>
-         </size>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Reply all to selected message</string>
-        </property>
-        <property name="text">
-         <string>Reply all</string>
-        </property>
-        <property name="icon">
-         <iconset resource="images.qrc">
-          <normaloff>:/images/replymailall24-hover.png</normaloff>:/images/replymailall24-hover.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="16">
-       <widget class="QToolButton" name="helpButton">
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="icon">
-         <iconset resource="icons.qrc">
-          <normaloff>:/home/img/question-64.png</normaloff>:/home/img/question-64.png</iconset>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="14">
-       <spacer name="toolBarFrameSpacerR">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="2">
-       <spacer name="toolBarFrameSpacerL">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="5">
-       <widget class="Line" name="toolBarFrameLineL">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -874,7 +874,12 @@
   <customwidget>
    <class>LineEditClear</class>
    <extends>QLineEdit</extends>
-   <header location="global">gui/common/LineEditClear.h</header>
+   <header>gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RSTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>gui/common/RSTreeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>RSTabWidget</class>
@@ -882,18 +887,12 @@
    <header>gui/common/RSTabWidget.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>RSTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>gui/common/RSTreeWidget.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>replymessageButton</tabstop>
   <tabstop>listWidget</tabstop>
  </tabstops>
  <resources>
-  <include location="icons.qrc"/>
   <include location="images.qrc"/>
   <include location="../Unseengui/unseengui.qrc"/>
  </resources>

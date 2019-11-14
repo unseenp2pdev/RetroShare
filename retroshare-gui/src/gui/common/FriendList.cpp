@@ -428,7 +428,7 @@ void FriendList::peerTreeWidgetCustomPopupMenu()
          case TYPE_GPG:
         {
              contextMenu->addAction(tr("Chat"), this, SLOT(chatfriendproxy()));              //hide icon: QIcon(IMAGE_CHAT)
-             contextMenu->addAction(tr("Send message"), this, SLOT(msgfriend()));             //hide icon QIcon(IMAGE_MSG)
+             contextMenu->addAction(tr("Email"), this, SLOT(msgfriend()));             //hide icon QIcon(IMAGE_MSG)
 
              contextMenu->addSeparator();
 
