@@ -564,6 +564,11 @@ void p3Msgs::saveContactOrGroupChatToModelData(std::string displayName, std::str
                                                 contactType, groupChatType,rsPeerIdStr, chatLobbyId, uId);
 }
 
+void p3Msgs::removeContactOrGroupChatFromModelData(std::string uId)
+{
+    mChatSrv->removeContactOrGroupChatFromModelData(uId);
+}
+
 std::vector<conversationInfo> p3Msgs::getConversationItemList()
 {
     return mChatSrv->getConversationItemList();

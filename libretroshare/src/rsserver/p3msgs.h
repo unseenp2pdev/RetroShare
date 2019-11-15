@@ -140,6 +140,7 @@ class p3Msgs: public RsMsgs
           virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
                                                          unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                          int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId);
+          virtual void removeContactOrGroupChatFromModelData(std::string uId);
           virtual std::vector<conversationInfo> getConversationItemList();
           virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg );
           virtual void sortConversationItemListByRecentTime();

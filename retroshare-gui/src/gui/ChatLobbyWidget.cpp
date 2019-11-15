@@ -1199,45 +1199,52 @@ void ChatLobbyWidget::unsubscribeChatLobby(ChatLobbyId id)
 {
 //	std::cerr << "Unsubscribing from chat room" << std::endl;
 
-//	// close the tab.
+    // close the tab.
 
-//	std::map<ChatLobbyId,ChatLobbyInfoStruct>::iterator it = _lobby_infos.find(id) ;
+    std::map<ChatLobbyId,ChatLobbyInfoStruct>::iterator it = _lobby_infos.find(id) ;
 
-//	if(it != _lobby_infos.end())
-//	{
-//		if (myChatLobbyUserNotify){
-//			myChatLobbyUserNotify->chatLobbyCleared(id, "");
-//		}
+    if(it != _lobby_infos.end())
+    {
+        if (myChatLobbyUserNotify){
+            myChatLobbyUserNotify->chatLobbyCleared(id, "");
+        }
 
-//		ui->stackedWidget->removeWidget(it->second.dialog) ;
-//		_lobby_infos.erase(it) ;
-//    }
+        ui->stackedWidget->removeWidget(it->second.dialog) ;
+        _lobby_infos.erase(it) ;
+    }
 
-//    //remove item from conversations list
-//    QTreeWidgetItem *rItem = getTreeWidgetItem(id);
-//    if (rItem)
-//    {
-//        commonItem->removeChild(rItem);
-//    }
+    //remove item from conversations list, using the MVC now
+    std::string uId = std::to_string(id);
+    if (rsMsgs->isChatIdInConversationList(uId))
+    {
+        rsMsgs->removeContactOrGroupChatFromModelData(uId);
+        emit ui->lobbyTreeWidget->model()->layoutChanged();
+    }
+    // need to re-select the conversation item when we have new chat only
+//    int seletedrow = rsMsgs->getIndexFromUId(uId);
+//    QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+//    ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
 
-//	// Unsubscribe the chat lobby
-//    ChatDialog::closeChat(ChatId(id));
-//	rsMsgs->unsubscribeChatLobby(id);
+
+    // Unsubscribe the chat lobby
+    ChatDialog::closeChat(ChatId(id));
+    rsMsgs->unsubscribeChatLobby(id);
 //    bool isAutoSubscribe = rsMsgs->getLobbyAutoSubscribe(id);
 //	if (isAutoSubscribe) rsMsgs->setLobbyAutoSubscribe(id, !isAutoSubscribe);
 
-//	ChatLobbyDialog *cldCW=NULL ;
-//	if (NULL != (cldCW = dynamic_cast<ChatLobbyDialog *>(ui->stackedWidget->currentWidget())))
-//	{
+//    ChatLobbyDialog *cldCW=NULL ;
+//    if (NULL != (cldCW = dynamic_cast<ChatLobbyDialog *>(ui->stackedWidget->currentWidget())))
+//    {
+//        //get the selection for this dialog
+//        //QTreeWidgetItem *qtwiFound = getTreeWidgetItem(cldCW->id());
+//        //if (qtwiFound) {
+//            //ui->lobbyTreeWidget->setCurrentItem(qtwiFound);
 
-//		QTreeWidgetItem *qtwiFound = getTreeWidgetItem(cldCW->id());
-//		if (qtwiFound) {
-//			ui->lobbyTreeWidget->setCurrentItem(qtwiFound);
-//		}
-//	} else {
-//		ui->lobbyTreeWidget->clearSelection();
+//        //}
+//    } else {
+//        //ui->lobbyTreeWidget->clearSelection();
 
-//	}
+//    }
 }
 // Try to add selection of contact chat in the same tree widget
 void ChatLobbyWidget::updateCurrentLobby()
