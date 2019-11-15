@@ -289,7 +289,7 @@ struct conversationInfo
     std::string nickInGroupChat;        // only in groupchat
     unsigned int UnreadMessagesCount = 0;
     std::string LastInteractionDate;    // date for last message
-    unsigned int lastMsgDatetime;               // QDateTime::currentDateTime().toTime_t()
+    long long lastMsgDatetime;               // QDateTime::currentDateTime().toTime_t()
     std::string lastMessage;
     bool isOtherLastMsg;            // true if receiving msg, false if sending msg
     int contactType;                // 0 - groupchat, 1 - contact chat
@@ -558,7 +558,7 @@ virtual bool resetMessageStandardTagTypes(Rs::Msgs::MsgTagType& tags) = 0;
                                                    unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                    int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId) = 0;
     virtual std::vector<conversationInfo> getConversationItemList() = 0;
-    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
+    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
     virtual void sortConversationItemListByRecentTime() = 0;
     virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset) = 0;
     virtual std::string getSeletedUIdBeforeSorting(int row) = 0;

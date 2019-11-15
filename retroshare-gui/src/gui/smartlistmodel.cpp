@@ -194,11 +194,13 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
         /////// GET DATETIME for last msg //////////
         ////////////////////////////////////////////
         //date time format for msg: Mon Jan 21 12:39:35 1970 or Sat Oct 26 10:13:09 2019
+        //                         "Sat Nov 9 17:49:42 2019"
         // if msg in the day, choose the "12:39"
         // if msg in the 7 days, choose the 3 first character like "Mon"
         // if msg older than 7 days, choose "Jan 21"
         QString timedateForMsgResult;
-        QDateTime dateTime =  QDateTime::fromTime_t(chatItem.lastMsgDatetime);
+        //QDateTime dateTime =  QDateTime::fromTime_t(chatItem.lastMsgDatetime);
+        QDateTime dateTime =  QDateTime::fromSecsSinceEpoch(chatItem.lastMsgDatetime);
         QString timedateForMsg = dateTime.toString();
         qint64 secondsOfDatetime = dateTime.toSecsSinceEpoch();
 
@@ -206,30 +208,9 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
         // if msg in the day, choose the "12:39"
         if (now - secondsOfDatetime <  86400)       //secondsIn1Day  =  86400;
         {
-            timedateForMsgResult = timedateForMsg.mid(11,5);
-            int hour = timedateForMsgResult.mid(0,2).toInt();
-            if (hour >= 12) {
-               QString timehour;
-               if (hour > 12)
-               {
-                   timehour = QString::number(hour - 12);
-                   timehour.append(timedateForMsgResult.mid(2,3));
-                   timehour.append(" PM");
-                   timedateForMsgResult = timehour;
-               }
-               else timedateForMsgResult.append(" PM");
-            }
-            else
-            {
-                //check if the timedate is AM, it will take: "8:56:", need to remove the last ":"
-                int lastIndex = timedateForMsgResult.length()-1;
-                if (timedateForMsgResult[lastIndex] == ":")
-                {
-                    timedateForMsgResult.chop(1);
-                }
-
-                timedateForMsgResult.append(" AM");
-            }
+            // (SystemLocale)	"11/9/19 5:49 PM"	QString
+            QString sysLocal = dateTime.toString(Qt::SystemLocaleDate);
+            timedateForMsgResult = sysLocal.mid(sysLocal.length() - 8, 8);
         }
         // if msg in the 7 days, choose the 3 first character like "Mon"
         else if (now - secondsOfDatetime < 604800)      //secondsIn7Days = 604800;
@@ -239,8 +220,10 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
         // if msg older than 7 days, choose "Jan 21"
         else
         {
-            timedateForMsgResult = timedateForMsg.mid(4,6);
-            timedateForMsgResult.append(timedateForMsg.mid(19,4));
+            // (SystemLocale)	"11/9/19 5:49 PM"	QString --> get this one: 11/9/19
+            QString sysLocal = dateTime.toString(Qt::SystemLocaleDate);
+            timedateForMsgResult = sysLocal.mid(0,8);
+            //timedateForMsgResult.append(timedateForMsg.mid(19,4));
         }
 
         //GET LAST MSG from html format

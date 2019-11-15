@@ -21,10 +21,18 @@
  *
  */
 
+#include <QPixmap>
+#include <QImage>
+#include <QSize>
+#include <QPainter>
+
 #include "rshare.h"
 #include "GxsIdTreeWidgetItem.h"
 #include "GxsIdDetails.h"
 #include "util/HandleRichText.h"
+#include "retroshare/rspeers.h"
+#include "retroshare/rsstatus.h"
+#include "gui/common/AvatarDefs.h"
 
 #define BANNED_IMAGE ":/icons/yellow_biohazard64.png"
 
@@ -147,15 +155,36 @@ void GxsIdRSTreeWidgetItem::processResult(bool success)
 
 void GxsIdRSTreeWidgetItem::setAvatar(const RsGxsImage &avatar)
 {
-	mAvatar = avatar;
+   mAvatar = avatar;
+}
+
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
 }
 
 QVariant GxsIdRSTreeWidgetItem::data(int column, int role) const
 {
     if (column == idColumn()) 
     {
-	    if (role == Qt::ToolTipRole)
-	    {
+        if (role == Qt::ToolTipRole)
+        {
 		    QString t = RSTreeWidgetItem::data(column, role).toString();
 		    QImage pix;
 
@@ -164,7 +193,21 @@ QVariant GxsIdRSTreeWidgetItem::data(int column, int role) const
 		    else if(rsReputations->overallReputationLevel(mId) == RsReputations::REPUTATION_LOCALLY_NEGATIVE)
 			    pix = QImage(BANNED_IMAGE) ;
             else if (mAvatar.mSize == 0 || !pix.loadFromData(mAvatar.mData, mAvatar.mSize, "PNG"))
-                pix = GxsIdDetails::makeDefaultIcon(mId);
+            {
+                //Unseenp2p - try to get sslId (RsPeerId) from the RsGxsId to get the avatar from sllid
+                QPixmap avatar;
+                RsIdentityDetails details;
+                if (rsIdentity->getIdDetails(mId, details ))
+                {
+                    AvatarDefs::getAvatarFromGpgId(details.mPgpId,avatar);
+                    if (!avatar.isNull())  pix = avatar.toImage();
+                    else
+                        pix =  QImage(":/app/images/unseen128.png");
+                }
+                else pix = QImage(":/app/images/unseen128.png");
+            }
+
+            pix = getCirclePhoto(pix, pix.size().width());
 
 		    int S = QFontMetricsF(font(column)).height();
 
@@ -174,7 +217,12 @@ QVariant GxsIdRSTreeWidgetItem::data(int column, int role) const
 		    }
 
 		    return t;
-	    }
+        }
+
+//        if (role == Qt::DecorationRole)
+//        {
+
+//        }
     }
 
     return RSTreeWidgetItem::data(column, role);

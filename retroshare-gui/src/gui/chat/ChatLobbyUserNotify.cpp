@@ -115,7 +115,7 @@ QIcon ChatLobbyUserNotify::getMainIcon(bool hasNew)
 
 unsigned int ChatLobbyUserNotify::getNewCount()
 {
-	int iNum=0;
+    unsigned int iNum=0;
     for (lobby_map::iterator itCL=_listMsg.begin(); itCL!=_listMsg.end();)
     {
         iNum+=itCL->second.size();

@@ -569,7 +569,7 @@ std::vector<conversationInfo> p3Msgs::getConversationItemList()
     return mChatSrv->getConversationItemList();
 }
 
-void p3Msgs::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+void p3Msgs::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg )
 {
     mChatSrv->updateRecentTimeOfItemInConversationList(uId, nickInGroupChat, lastMsgDatetime, textmsg, isOtherMsg);
 }

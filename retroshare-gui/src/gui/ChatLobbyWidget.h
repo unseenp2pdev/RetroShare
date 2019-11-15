@@ -132,7 +132,7 @@ protected slots:
 	void updatePeerLeaving(ChatLobbyId);
 	void autoSubscribeItem();
 	void copyItemLink();
-    void updateRecentTime(const ChatId&, std::string, unsigned int, std::string, bool);
+    void updateRecentTime(const ChatId&, std::string, long long, std::string, bool);
     //void updateP2PMessageChanged(bool incoming, const ChatId& chatId, QDateTime time, QString senderName, QString msg);
     void updateP2PMessageChanged(ChatMessage);
     void on_addContactButton_clicked();

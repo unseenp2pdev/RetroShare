@@ -90,8 +90,8 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
 	QObject::connect( NotifyQt::getInstance(), SIGNAL(chatLobbyEvent(qulonglong,int,const RsGxsId&,const QString&)), this, SLOT(displayChatLobbyEvent(qulonglong,int,const RsGxsId&,const QString&)));
 	QObject::connect( NotifyQt::getInstance(), SIGNAL(chatLobbyInviteReceived()), this, SLOT(readChatLobbyInvites()));
 
-    QObject::connect( NotifyQt::getInstance(), SIGNAL(alreadySendChat(const ChatId&, std::string, uint, std::string, bool)), this, SLOT(updateRecentTime(const ChatId&, std::string, uint, std::string, bool)));
-    QObject::connect( NotifyQt::getInstance(), SIGNAL(newChatMessageReceive(const ChatId&, std::string, uint, std::string, bool)), this, SLOT(updateRecentTime(const ChatId&, std::string, uint, std::string, bool)));
+    QObject::connect( NotifyQt::getInstance(), SIGNAL(alreadySendChat(const ChatId&, std::string, long long, std::string, bool)), this, SLOT(updateRecentTime(const ChatId&, std::string, long long, std::string, bool)));
+    QObject::connect( NotifyQt::getInstance(), SIGNAL(newChatMessageReceive(const ChatId&, std::string, long long, std::string, bool)), this, SLOT(updateRecentTime(const ChatId&, std::string, long long, std::string, bool)));
 
     QObject::connect( ui->lobbyTreeWidget, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(lobbyTreeWidgetCustomPopupMenu(QPoint)));
     QObject::connect( ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(filterItems(QString)));
@@ -1028,7 +1028,7 @@ void ChatLobbyWidget::copyItemLink()
 }
 
 //update recent time for every chat item and sort by recent time
-void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickInGroupChat, unsigned int current_time, std::string textmsg, bool isSend)
+void ChatLobbyWidget::updateRecentTime(const ChatId & chatId, std::string nickInGroupChat, long long current_time, std::string textmsg, bool isSend)
 {
 
         //Need to update the Conversation list in rsMsg, then update the GUI of chat item list in ChatLobbyWIdget
@@ -1308,9 +1308,9 @@ void ChatLobbyWidget::updateMessageChanged(bool incoming, ChatLobbyId id, QDateT
 //	QTreeWidgetItem *current_item = ui->lobbyTreeWidget->currentItem();
 //	bool bIsCurrentItem = (current_item != NULL && current_item->data(COLUMN_DATA, ROLE_ID).toULongLong() == id);
 
-//	if (myChatLobbyUserNotify){
-//		if (incoming) myChatLobbyUserNotify->chatLobbyNewMessage(id, time, senderName, msg);
-//	}
+    if (myChatLobbyUserNotify){
+        if (incoming) myChatLobbyUserNotify->chatLobbyNewMessage(id, time, senderName, msg);
+    }
 
 //	// Don't show anything for current lobby.
 //	//
@@ -1354,14 +1354,14 @@ void ChatLobbyWidget::updateP2PMessageChanged(ChatMessage msg)
 //    QTreeWidgetItem *item = getTreeWidgetItemForChatId(msg.chat_id);
 //    QTreeWidgetItem *current_item = ui->lobbyTreeWidget->currentItem();
 
-//    if (myChatLobbyUserNotify)
-//    {
-//        QDateTime sendTime = QDateTime::fromTime_t(msg.sendTime);
-//        QString message = QString::fromUtf8(msg.msg.c_str());
-//        QString ownName = QString::fromUtf8(rsPeers->getPeerName(rsPeers->getOwnId()).c_str());
-//        QString name = msg.incoming? QString::fromStdString(rsPeers->getGPGName(rsPeers->getGPGId(msg.chat_id.toPeerId()))): ownName;
-//        if (msg.incoming) myChatLobbyUserNotify->chatP2PNewMessage(msg.chat_id, sendTime, name, message);
-//    }
+    if (myChatLobbyUserNotify)
+    {
+        QDateTime sendTime = QDateTime::fromTime_t(msg.sendTime);
+        QString message = QString::fromUtf8(msg.msg.c_str());
+        QString ownName = QString::fromUtf8(rsPeers->getPeerName(rsPeers->getOwnId()).c_str());
+        QString name = msg.incoming? QString::fromStdString(rsPeers->getGPGName(rsPeers->getGPGId(msg.chat_id.toPeerId()))): ownName;
+        if (msg.incoming) myChatLobbyUserNotify->chatP2PNewMessage(msg.chat_id, sendTime, name, message);
+    }
 
 //    if (item && current_item && item == current_item)
 //    {

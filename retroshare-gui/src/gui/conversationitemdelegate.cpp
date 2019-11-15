@@ -219,7 +219,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     QRect rectName1(rect.left() + leftMargin,
                     rect.top()   + topMargin,
-                    rect1Width - 2*dx_,
+                    rect1Width,
                     rect.height() / 2 - 2);
 
     QRect rectName2(rectName1.left(),
@@ -259,7 +259,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     QRect rectInfo1(rectName1.left() + rectName1.width(),
                     rect.top() + topMargin,
-                    infoTextWidth_ - rightMargin + infoTextWidthModifier + 9 + 2* dx_,
+                    infoTextWidth_ - rightMargin + infoTextWidthModifier + dx_,
                     rect.height() / 2 - 2);
 
     QRect rectInfo2(rectInfo1.left(),
@@ -274,6 +274,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
         font.setBold(false);
         pen.setColor(RingTheme::grey_);
         painter->setPen(pen);
+        font.setPointSize(fontSize_ - 1);
         painter->setFont(font);
         lastUsedStr = fontMetrics.elidedText(lastUsedStr, Qt::ElideRight, rectInfo1.width());
         painter->drawText(rectInfo1, Qt::AlignVCenter | Qt::AlignRight, lastUsedStr);

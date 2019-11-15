@@ -328,7 +328,7 @@ struct RsIdentityDetails : RsSerializable
 		RS_SERIAL_PROCESS(mFlags);
 		RS_SERIAL_PROCESS(mPgpId);
 		//RS_SERIAL_PROCESS(mReputation);
-		//RS_SERIAL_PROCESS(mAvatar);
+        RS_SERIAL_PROCESS(mAvatar);
 		RS_SERIAL_PROCESS(mLastUsageTS);
 		RS_SERIAL_PROCESS(mUseCases);
 	}

@@ -121,7 +121,7 @@ void p3HistoryMgr::addMessage(const ChatMessage& cm)
 		item->peerName = peerName;
 		item->sendTime = cm.sendTime;
 		item->recvTime = cm.recvTime;
-        item->nickInGroupChat = cm.peer_alternate_nickname;
+        item->nickInGroupChat = cm.peer_alternate_nickname; //unseenp2p - save the nickname to history for show right then
 
 		item->message = cm.msg ;
         if (!item->incoming) item->unread = false;

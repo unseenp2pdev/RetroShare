@@ -70,6 +70,7 @@ private:
     RsReputations::ReputationLevel mReputationLevel ;
 	uint32_t mIconTypeMask;
 	RsGxsImage mAvatar;
+    QImage sslAvatar;
 };
 
 #endif

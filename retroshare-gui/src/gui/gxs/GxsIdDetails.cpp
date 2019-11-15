@@ -31,6 +31,8 @@
 #include "retroshare-gui/RsAutoUpdatePage.h"
 
 #include <retroshare/rspeers.h>
+#include "retroshare/rsstatus.h"
+#include "gui/common/AvatarDefs.h"
 
 #include <iostream>
 #include <QPainter>
@@ -445,6 +447,27 @@ static bool findTagIcon(int tag_class, int /*tag_type*/, QIcon &icon)
 //	return image_cache[id] ;
 //}
 
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
+}
+
 /**
  * @brief GxsIdDetails::makeIdentIcon
  * @param id: RsGxsId to compute
@@ -453,9 +476,21 @@ static bool findTagIcon(int tag_class, int /*tag_type*/, QIcon &icon)
  * Bring the source code from this adaptation:
  * http://francisshanahan.com/identicon5/test.html
  */
-    QImage GxsIdDetails::makeDefaultIcon(const RsGxsId& id)
+QImage GxsIdDetails::makeDefaultIcon(const RsGxsId& id)
 {
-    return  QImage(":/app/images/unseen128.png");//update Default Icon //  drawIdentIcon(QString::fromStdString(id.toStdString()),64*3, true);
+    //we can get the sslid or gpgId from id, and get the avatar from sslid,
+    QPixmap avatar;
+    QImage circleAvatar = QImage(":/app/images/unseen128.png");;
+    RsIdentityDetails details;
+    if (rsIdentity->getIdDetails(id, details ))
+    {
+        AvatarDefs::getAvatarFromGpgId(details.mPgpId,avatar);
+        if (!avatar.isNull())
+        {
+            circleAvatar = avatar.toImage();
+        }
+    }
+    return  getCirclePhoto(circleAvatar, circleAvatar.size().width()); //update Default Icon //  drawIdentIcon(QString::fromStdString(id.toStdString()),64*3, true);
 }
 
 /**
@@ -1040,7 +1075,22 @@ void GxsIdDetails::getIcons(const RsIdentityDetails &details, QList<QIcon> &icon
 #if QT_VERSION < 0x040700
             pix = QPixmap::fromImage(makeDefaultIcon(details.mId));
 #else
-            pix.convertFromImage(makeDefaultIcon(details.mId));
+            QImage pix3;
+            QImage pix2;
+            QPixmap bestAvatar;
+            RsPeerDetails detail;
+            RsPeerId peerId;
+            if (rsPeers->getGPGDetails(details.mPgpId, detail))
+            {
+                AvatarDefs::getAvatarFromGpgId(details.mPgpId, bestAvatar);
+                pix2 = getCirclePhoto(bestAvatar.toImage(),bestAvatar.toImage().size().width()) ;
+            }
+            else
+            {
+                pix2 = GxsIdDetails::makeDefaultIcon(details.mId);
+            }
+            pix.convertFromImage(pix2);
+            //pix.convertFromImage(makeDefaultIcon(details.mId));
 #endif
 
 

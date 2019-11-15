@@ -938,6 +938,7 @@ void p3ChatService::initChatMessage(RsChatMsgItem *c, ChatMessage &m)
     {
         m.lobby_peer_gxs_id = lobbyItem->signature.keyId ;
         m.chat_id = ChatId(lobbyItem->lobby_id);
+        //unseenp2p - try to save the nickname into peer_alternate_nickname to use then (for ex. in history)
         RsIdentityDetails details;
         if (rsIdentity->getIdDetails(m.lobby_peer_gxs_id, details ))
         {
@@ -1478,7 +1479,7 @@ std::vector<conversationInfo> p3ChatService::getConversationItemList()
      return conversationItemList;
 }
 
-void p3ChatService::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, unsigned int lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+void p3ChatService::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg )
 {
     //for (std::vector<conversationInfo>::iterator it = conversationItemList.begin() ; it != conversationItemList.end(); ++it)
     for (unsigned int i = 0; i < conversationItemList.size(); i++ )

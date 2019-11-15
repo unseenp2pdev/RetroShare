@@ -399,9 +399,9 @@ void ChatWidget::init(const ChatId &chat_id, const QString &title)
                     if (rsIdentity->getIdDetails(RsGxsId(historyIt->peerName), details))
                         name = QString::fromUtf8(details.mNickname.c_str());
                     else
-                        name = QString::fromUtf8(historyIt->peerName.c_str());
+                        name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
                 } else {
-                    name = QString::fromUtf8(historyIt->peerName.c_str());
+                    name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
                 }
 
                 addChatMsg(historyIt->incoming, name, RsGxsId(historyIt->peerName.c_str()), QDateTime::fromTime_t(historyIt->sendTime), QDateTime::fromTime_t(historyIt->recvTime), QString::fromUtf8(historyIt->message.c_str()), MSGTYPE_HISTORY);
@@ -1095,7 +1095,8 @@ void ChatWidget::addChatMsg(bool incoming, const QString &name, const RsGxsId gx
 		emit infoChanged(this);
 
         /* meiyousixin - need to update the recent time and sort the chat list */
-        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, name.toStdString(), QDateTime::currentDateTime().toTime_t(), message.toStdString(), false);
+        long long current_time = QDateTime::currentSecsSinceEpoch();
+        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, name.toStdString(), current_time, message.toStdString(), false);
 	}
 }
 
@@ -1280,7 +1281,8 @@ void ChatWidget::sendChat()
     /* meiyousixin - update recent time when user send msg, need to sort the contact list by recent time */
     if (this->chatType() == CHATTYPE_PRIVATE || this->chatType() == CHATTYPE_LOBBY )
     {
-        unsigned int current_time = QDateTime::currentDateTime().toTime_t();
+        //unsigned int current_time = QDateTime::currentDateTime().toTime_t();
+        long long current_time = QDateTime::currentSecsSinceEpoch();
         std::string nickInGroupChat = "You";
         emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
     }
