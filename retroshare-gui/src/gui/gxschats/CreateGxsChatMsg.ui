@@ -64,7 +64,7 @@
         </property>
         <widget class="QWidget" name="chatPostTab">
          <attribute name="title">
-          <string>Channel Post</string>
+          <string>GxsChat Post</string>
          </attribute>
          <layout class="QGridLayout" name="chatPostTabGLayout">
           <item row="0" column="0" colspan="3">
@@ -78,7 +78,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Channel Post to:</string>
+               <string>Conversation Post to:</string>
               </property>
              </widget>
             </item>
@@ -123,7 +123,7 @@ p, li { white-space: pre-wrap; }
             <item row="1" column="1">
              <widget class="QPushButton" name="addThumbnailButton">
               <property name="text">
-               <string>Add Channel Thumbnail</string>
+               <string>Add GxsChat Thumbnail</string>
               </property>
               <property name="icon">
                <iconset resource="../images.qrc">
@@ -282,7 +282,7 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="4">
            <widget class="QCheckBox" name="thumbNailCb">
             <property name="toolTip">
-             <string>Allow channels to get frame for message thumbnail from movie media attachments or not</string>
+             <string>Allow Gxschats to get frame for message thumbnail from movie media attachments or not</string>
             </property>
             <property name="text">
              <string>Auto Thumbnail</string>

@@ -29,7 +29,7 @@
 #include <algorithm>
 
 
-#define DEBUG_ITEM	1
+//#define DEBUG_ITEM	1
 
 
 GxsFeedItem::GxsFeedItem(FeedHolder *feedHolder, uint32_t feedId, const RsGxsGroupId &groupId, const RsGxsMessageId &messageId, bool isHome, RsGxsIfaceHelper *iface, bool autoUpdate) :

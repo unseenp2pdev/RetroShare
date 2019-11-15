@@ -80,7 +80,7 @@ UserNotify *GxsChatDialog::getUserNotify(QObject *parent)
 
 void GxsChatDialog::shareOnChannel(const RsGxsGroupId& channel_id,const QList<RetroShareLink>& file_links)
 {
-    std::cerr << "Sharing file link on channel " << channel_id << ": Not yet implemented!" << std::endl;
+    std::cerr << "Sharing file link on gxschat " << channel_id << ": Not yet implemented!" << std::endl;
 
     CreateGxsChatMsg *msgDialog = new CreateGxsChatMsg(channel_id) ;
 
@@ -269,7 +269,6 @@ void GxsChatDialog::groupTreeCustomActions(RsGxsGroupId grpId, int subscribeFlag
 RsGxsCommentService *GxsChatDialog::getCommentService()
 {
     return rsGxsChats;
-    //return NULL;
 }
 
 QWidget *GxsChatDialog::createCommentHeaderWidget(const RsGxsGroupId &grpId, const RsGxsMessageId &msgId)
@@ -299,8 +298,8 @@ void GxsChatDialog::loadGroupSummaryToken(const uint32_t &token, std::list<RsGro
     rsGxsChats->getGroupData(token, groups);
 
     /* Save groups to fill icons and description */
-    GxsChatGroupInfoData *channelData = new GxsChatGroupInfoData;
-    userdata = channelData;
+    GxsChatGroupInfoData *gxschatData = new GxsChatGroupInfoData;
+    userdata = gxschatData;
 
     std::vector<RsGxsChatGroup>::iterator groupIt;
     for (groupIt = groups.begin(); groupIt != groups.end(); ++groupIt) {
@@ -310,11 +309,11 @@ void GxsChatDialog::loadGroupSummaryToken(const uint32_t &token, std::list<RsGro
         if (group.mImage.mData != NULL) {
             QPixmap image;
             image.loadFromData(group.mImage.mData, group.mImage.mSize, "PNG");
-            channelData->mIcon[group.mMeta.mGroupId] = image;
+            gxschatData->mIcon[group.mMeta.mGroupId] = image;
         }
 
         if (!group.mDescription.empty()) {
-            channelData->mDescription[group.mMeta.mGroupId] = QString::fromUtf8(group.mDescription.c_str());
+            gxschatData->mDescription[group.mMeta.mGroupId] = QString::fromUtf8(group.mDescription.c_str());
         }
     }
 }
@@ -323,20 +322,20 @@ void GxsChatDialog::groupInfoToGroupItemInfo(const RsGroupMetaData &groupInfo, G
 {
     GxsGroupFrameDialog::groupInfoToGroupItemInfo(groupInfo, groupItemInfo, userdata);
 
-    const GxsChatGroupInfoData *channelData = dynamic_cast<const GxsChatGroupInfoData*>(userdata);
-    if (!channelData) {
+    const GxsChatGroupInfoData *gxschatData = dynamic_cast<const GxsChatGroupInfoData*>(userdata);
+    if (!gxschatData) {
         std::cerr << "GxsChatDialog::groupInfoToGroupItemInfo() Failed to cast data to GxsChatGroupInfoData";
         std::cerr << std::endl;
         return;
     }
 
-    QMap<RsGxsGroupId, QString>::const_iterator descriptionIt = channelData->mDescription.find(groupInfo.mGroupId);
-    if (descriptionIt != channelData->mDescription.end()) {
+    QMap<RsGxsGroupId, QString>::const_iterator descriptionIt = gxschatData->mDescription.find(groupInfo.mGroupId);
+    if (descriptionIt != gxschatData->mDescription.end()) {
         groupItemInfo.description = descriptionIt.value();
     }
 
-    QMap<RsGxsGroupId, QIcon>::const_iterator iconIt = channelData->mIcon.find(groupInfo.mGroupId);
-    if (iconIt != channelData->mIcon.end()) {
+    QMap<RsGxsGroupId, QIcon>::const_iterator iconIt = gxschatData->mIcon.find(groupInfo.mGroupId);
+    if (iconIt != gxschatData->mIcon.end()) {
         groupItemInfo.icon = iconIt.value();
     }
 }

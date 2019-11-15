@@ -662,8 +662,8 @@ void p3GxsChats::load_SpecificUnprocessedPosts(const uint32_t &token)
     }
 
 #ifdef GXSCHATS_DEBUG
-        std::cerr << "p3GxsChats::load_SpecificUnprocessedPosts Download";
-        std::cerr << std::endl;
+        std::cerr << "p3GxsChats::load_SpecificUnprocessedPosts Download"<< std::endl;
+        std::cerr <<"Post Size="<<posts.size()<<std::endl;
 #endif
 
     std::vector<RsGxsChatMsg>::iterator it;
@@ -965,8 +965,8 @@ bool p3GxsChats::ExtraFileRemove(const RsFileHash &hash)
 /* so we need the same tick idea as wiki for generating dummy chats
  */
 
-#define 	MAX_GEN_GROUPS		50
-#define 	MAX_GEN_POSTS		300
+#define 	MAX_GEN_GROUPS		20
+#define 	MAX_GEN_POSTS		50
 
 std::string p3GxsChats::genRandomId()
 {

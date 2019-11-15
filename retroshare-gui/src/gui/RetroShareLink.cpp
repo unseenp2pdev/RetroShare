@@ -517,15 +517,7 @@ RetroShareLink RetroShareLink::createGxsMessageLink(const RetroShareLink::enumTy
 		link._type = linkType;
 	}
 
-    std::cerr << "RetroShareLink::createGxsMessageLink()"<< std::endl;
-    std::cerr << "Name="<<link._name.toCFString() << std::endl;
-    std::cerr << "Hash="<<link._hash.toCFString() << std::endl;
-    std::cerr << "msgId="<<link._msgId.toCFString() << std::endl;
-
 	link.check();
-
-    std::cerr << "isValid ="<<link.valid() << std::endl;
-
 	return link;
 }
 
