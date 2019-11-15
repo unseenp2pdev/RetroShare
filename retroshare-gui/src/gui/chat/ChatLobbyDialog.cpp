@@ -97,9 +97,9 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
     voteNegativeAct = new QAction(QIcon(":/icons/png/thumbs-down.png"), tr("Ban this person (Sets negative opinion)"), this);
     voteNeutralAct = new QAction(QIcon(":/icons/png/thumbs-neutral.png"), tr("Give neutral opinion"), this);
     votePositiveAct = new QAction(QIcon(":/icons/png/thumbs-up.png"), tr("Give positive opinion"), this);
-    distantChatAct = new QAction(QIcon(":/images/chat_24.png"), tr("Start private chat"), this);
-    sendMessageAct = new QAction(QIcon(":/images/mail_new.png"), tr("Send Message"), this);
-    showInPeopleAct = new QAction(QIcon(), tr("Show author in people tab"), this);
+    //distantChatAct = new QAction(QIcon(":/images/chat_24.png"), tr("Start private chat"), this);
+    sendMessageAct = new QAction(QIcon(":/images/mail_new.png"), tr("Send Email"), this);
+    //showInPeopleAct = new QAction(QIcon(), tr("Show author in people tab"), this);
 
     QActionGroup *sortgrp = new QActionGroup(this);
     actionSortByName = new QAction(QIcon(), tr("Sort by Name"), this);
@@ -114,12 +114,12 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
 
 
     connect(muteAct, SIGNAL(triggered()), this, SLOT(changeParticipationState()));
-    connect(distantChatAct, SIGNAL(triggered()), this, SLOT(distantChatParticipant()));
+    //connect(distantChatAct, SIGNAL(triggered()), this, SLOT(distantChatParticipant()));
     connect(sendMessageAct, SIGNAL(triggered()), this, SLOT(sendMessage()));
     connect(votePositiveAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
     connect(voteNeutralAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
     connect(voteNegativeAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
-    connect(showInPeopleAct, SIGNAL(triggered()), this, SLOT(showInPeopleTab()));
+    //connect(showInPeopleAct, SIGNAL(triggered()), this, SLOT(showInPeopleTab()));
 
     connect(actionSortByName, SIGNAL(triggered()), this, SLOT(sortParcipants()));
     connect(actionSortByActivity, SIGNAL(triggered()), this, SLOT(sortParcipants()));
@@ -273,16 +273,16 @@ void ChatLobbyDialog::initParticipantsContextMenu(QMenu *contextMnu, QList<RsGxs
 	if (idList.isEmpty())
 		return;
 
-	contextMnu->addAction(distantChatAct);
+    //contextMnu->addAction(distantChatAct);
 	contextMnu->addAction(sendMessageAct);
 	contextMnu->addSeparator();
 	contextMnu->addAction(muteAct);
 	contextMnu->addAction(votePositiveAct);
 	contextMnu->addAction(voteNeutralAct);
 	contextMnu->addAction(voteNegativeAct);
-	contextMnu->addAction(showInPeopleAct);
+    //contextMnu->addAction(showInPeopleAct);
 
-	distantChatAct->setEnabled(false);
+    //distantChatAct->setEnabled(false);
 	sendMessageAct->setEnabled(true);
 	muteAct->setEnabled(false);
 	muteAct->setCheckable(true);
@@ -290,21 +290,21 @@ void ChatLobbyDialog::initParticipantsContextMenu(QMenu *contextMnu, QList<RsGxs
 	votePositiveAct->setEnabled(false);
 	voteNeutralAct->setEnabled(false);
 	voteNegativeAct->setEnabled(false);
-	showInPeopleAct->setEnabled(idList.count() == 1);
+    //showInPeopleAct->setEnabled(idList.count() == 1);
 
-	distantChatAct->setData(QVariant::fromValue(idList));
+    //distantChatAct->setData(QVariant::fromValue(idList));
 	sendMessageAct->setData(QVariant::fromValue(idList));
 	muteAct->setData(QVariant::fromValue(idList));
 	votePositiveAct->setData(QVariant::fromValue(idList));
 	voteNeutralAct->setData(QVariant::fromValue(idList));
 	voteNegativeAct->setData(QVariant::fromValue(idList));
-	showInPeopleAct->setData(QVariant::fromValue(idList));
+    //showInPeopleAct->setData(QVariant::fromValue(idList));
 
 	RsGxsId gxsid = idList.at(0);
 
 	if(!gxsid.isNull() && !rsIdentity->isOwnId(gxsid))
 	{
-		distantChatAct->setEnabled(true);
+        //distantChatAct->setEnabled(true);
 		votePositiveAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_POSITIVE);
 		voteNeutralAct->setEnabled((rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_POSITIVE) || (rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_NEGATIVE) );
 		voteNegativeAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_NEGATIVE);
