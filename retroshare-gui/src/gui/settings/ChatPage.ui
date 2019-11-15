@@ -14,7 +14,7 @@
    <item row="3" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="general">
       <attribute name="title">
@@ -143,7 +143,7 @@
                  </font>
                 </property>
                 <property name="minimum">
-                 <number>11</number>
+                 <number>13</number>
                 </property>
                 <property name="maximum">
                  <number>64</number>
