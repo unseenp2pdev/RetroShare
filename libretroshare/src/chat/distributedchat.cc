@@ -1685,21 +1685,22 @@ void DistributedChatService::handleFriendUnsubscribeLobby(RsChatLobbyUnsubscribe
 				it->second.participating_friends.erase(it2) ;
 				break ;
 			}
-//        RsPgpId pgpId = rsPeers->getGPGId(item->PeerId());
-//        RsPeerId leaveMemberId = item->PeerId();
-//        RsGxsId gxsId = RsGxsId(leaveMemberId);
-//        for(std::map<RsGxsId, rstime_t>::iterator it3(it->second.gxs_ids.begin());it3!=it->second.gxs_ids.end();++it3)
-//            if((*it3).first == gxsId)
-//            {
-//#ifdef DEBUG_CHAT_LOBBIES
-//                std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
-//#endif
-//                std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
-//                it->second.gxs_ids.erase((*it3).first) ;
-//                break ;
-//            }
+        RsPgpId pgpId = rsPeers->getGPGId(item->PeerId());
+        RsPeerId leaveMemberId = item->PeerId();
+        RsGxsId gxsId = RsGxsId(leaveMemberId);
+        for(std::map<RsGxsId, rstime_t>::iterator it3(it->second.gxs_ids.begin());it3!=it->second.gxs_ids.end();++it3)
+            if((*it3).first == gxsId)
+            {
+#ifdef DEBUG_CHAT_LOBBIES
+                std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+#endif
+                //std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+                it->second.gxs_ids.erase((*it3).first) ;
+                break ;
+            }
 	}
-
+    //save immediately for
+    saveGroupChatInfo();
 
 	RsServer::notify()->notifyListChange(NOTIFY_LIST_CHAT_LOBBY_LIST, NOTIFY_TYPE_MOD) ;
 }
