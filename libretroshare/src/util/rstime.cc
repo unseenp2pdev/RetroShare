@@ -52,10 +52,10 @@ RsScopeTimer::RsScopeTimer(const std::string& name)
 
 RsScopeTimer::~RsScopeTimer()
 {
-	if (!_name.empty())
-	{
-		std::cerr << "Time for \"" << _name << "\": " << duration() << std::endl;
-	}
+//	if (!_name.empty())
+//	{
+//        std::cerr << "Time for \"" << _name << "\": " << duration() << std::endl;
+//	}
 }
 
 double RsScopeTimer::currentTime()

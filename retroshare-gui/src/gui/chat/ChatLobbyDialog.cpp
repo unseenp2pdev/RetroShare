@@ -379,6 +379,7 @@ void ChatLobbyDialog::init(const ChatId &/*id*/, const QString &/*title*/)
         }
         ui.chatWidget->setWelcomeMessage(msg);
     }
+    //else return;
 
     ChatDialog::init(ChatId(lobbyId), title);
 
@@ -580,12 +581,12 @@ void ChatLobbyDialog::updateParticipantsList()
 
         //rsMsgs->locked_printDebugInfo();
         rstime_t now = time(NULL) ;
-        std::cerr << "   Participating friends: " << std::endl;
-        std::cerr << "   groupchat name: " << linfo.lobby_name << std::endl;
-        std::cerr << "   Participating nick names (rsgxsId): " << std::endl;
+//        std::cerr << "   Participating friends: " << std::endl;
+//        std::cerr << "   groupchat name: " << linfo.lobby_name << std::endl;
+//        std::cerr << "   Participating nick names (rsgxsId): " << std::endl;
 
-        for(std::map<RsGxsId,rstime_t>::const_iterator it2(linfo.gxs_ids.begin());it2!=linfo.gxs_ids.end();++it2)
-            std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
+//        for(std::map<RsGxsId,rstime_t>::const_iterator it2(linfo.gxs_ids.begin());it2!=linfo.gxs_ids.end();++it2)
+//            std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
 
         ChatLobbyInfo cliInfo=linfo;
         QList<QTreeWidgetItem*>  qlOldParticipants=ui.participantsList->findItems("*",Qt::MatchWildcard,COLUMN_ID);

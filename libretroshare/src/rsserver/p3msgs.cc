@@ -260,7 +260,7 @@ ChatLobbyId ChatId::toLobbyId() const
         return lobby_id;
     else
     {
-        std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
+        //std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
         return 0;
     }
 }

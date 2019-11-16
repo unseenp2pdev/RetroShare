@@ -274,7 +274,7 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
         font.setBold(false);
         pen.setColor(RingTheme::grey_);
         painter->setPen(pen);
-        font.setPointSize(fontSize_ - 1);
+        font.setPointSize(fontSize_ - 2);
         painter->setFont(font);
         lastUsedStr = fontMetrics.elidedText(lastUsedStr, Qt::ElideRight, rectInfo1.width());
         painter->drawText(rectInfo1, Qt::AlignVCenter | Qt::AlignRight, lastUsedStr);

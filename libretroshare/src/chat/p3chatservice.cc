@@ -866,7 +866,7 @@ bool p3ChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
     cm.incoming = true;
     cm.online = true;
     cm.unread = true; //need to update this field when user already read the msg
-    std::cerr << "Msg go here first? " << std::endl;
+    //std::cerr << "Msg go here first? " << std::endl;
     RsServer::notify()->notifyChatMessage(cm);
     
     // cyril: history is temporarily diabled for distant chat, since we need to store the full tunnel ID, but then
