@@ -403,6 +403,9 @@ border-image: url(:/images/closepressed.png)
            </item>
            <item>
             <widget class="QToolButton" name="attachPictureButton">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="focusPolicy">
               <enum>Qt::NoFocus</enum>
              </property>
@@ -471,70 +474,6 @@ border-image: url(:/images/closepressed.png)
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="searchButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="contextMenuPolicy">
-              <enum>Qt::CustomContextMenu</enum>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons.qrc">
-               <normaloff>:/icons/png/search.png</normaloff>:/icons/png/search.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="LineEditClear" name="leSearch"/>
-           </item>
-           <item>
-            <widget class="QToolButton" name="markButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
-             </property>
-             <property name="icon">
-              <iconset resource="../icons.qrc">
-               <normaloff>:/icons/png/highlight.png</normaloff>:/icons/png/highlight.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>28</width>
-               <height>28</height>
-              </size>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QToolButton" name="searchBefore">
              <property name="minimumSize">
               <size>
@@ -552,7 +491,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
+              <iconset resource="../WikiPoos/Wiki_images.qrc">
                <normaloff>:/images/arrow-left.png</normaloff>:/images/arrow-left.png</iconset>
              </property>
              <property name="autoRaise">
@@ -578,7 +517,7 @@ border-image: url(:/images/closepressed.png)
               <enum>Qt::NoFocus</enum>
              </property>
              <property name="icon">
-              <iconset resource="../images.qrc">
+              <iconset resource="../WikiPoos/Wiki_images.qrc">
                <normaloff>:/images/arrow-right.png</normaloff>:/images/arrow-right.png</iconset>
              </property>
              <property name="autoRaise">
@@ -796,6 +735,70 @@ border-image: url(:/images/closepressed.png)
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="searchButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="icon">
+           <iconset resource="../icons.qrc">
+            <normaloff>:/icons/png/search.png</normaloff>:/icons/png/search.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="LineEditClear" name="leSearch"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="markButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="icon">
+           <iconset resource="../icons.qrc">
+            <normaloff>:/icons/png/highlight.png</normaloff>:/icons/png/highlight.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QFrame" name="pluginTitleFrame">
@@ -1057,8 +1060,9 @@ border-image: url(:/images/closepressed.png)
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
+  <include location="../WikiPoos/Wiki_images.qrc"/>
+  <include location="../images.qrc"/>
  </resources>
  <connections/>
 </ui>
