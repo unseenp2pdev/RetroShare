@@ -98,6 +98,7 @@ ChatWidget::ChatWidget(QWidget *parent)
 	ui->emoteiconButton->setIconSize(iconSize);
 	ui->attachPictureButton->setFixedSize(buttonSize);
 	ui->attachPictureButton->setIconSize(iconSize);
+    ui->attachPictureButton->hide();    //hide Search image Button
 	ui->addFileButton->setFixedSize(buttonSize);
 	ui->addFileButton->setIconSize(iconSize);
 	ui->pushtoolsButton->setFixedSize(buttonSize);
