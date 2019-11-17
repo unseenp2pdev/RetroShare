@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
     <Name>Unseen P2P Communicator</Name>
-    <Version>0.6.7</Version>
+    <Version>0.6.9</Version>
     <Title>Unseen P2P Communicator</Title>
     <Publisher>Unseen.is</Publisher>
     <!-- Directory name is used in component.xml -->
