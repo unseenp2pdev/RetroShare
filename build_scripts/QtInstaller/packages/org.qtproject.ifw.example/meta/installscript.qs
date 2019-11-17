@@ -100,7 +100,7 @@ Component.prototype.targetChooserClicked = function()
 Component.prototype.targetDirectoryChanged = function()
 {
     var dir = targetDirectoryPage.targetDirectory.text;
-    if (installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.exe")) {
+    if (installer.fileExists(dir) && (installer.fileExists(dir + "/maintenancetool.exe") || installer.fileExists(dir + "/maintenancetool.app") || installer.fileExists(dir + "/maintenancetool") ) ) {
         targetDirectoryPage.warning.setText("<p style=\"color: red\">Existing installation detected and will be overwritten.</p>");
     }
     else if (installer.fileExists(dir)) {
@@ -115,8 +115,34 @@ Component.prototype.targetDirectoryChanged = function()
 
 Component.prototype.componentSelectionPageEntered = function()
 {
+    var uninstall_script="function Controller() { gui.clickButton(buttons.NextButton);  gui.clickButton(buttons.NextButton); installer.uninstallationFinished.connect(this, this.uninstallationFinished);} \n" +
+                         "Controller.prototype.uninstallationFinished = function() { gui.clickButton(buttons.NextButton); } \n" +
+                         "Controller.prototype.FinishedPageCallback = function() { gui.clickButton(buttons.FinishButton); } \n" ;
+
     var dir = installer.value("TargetDir");
-    if (installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.exe")) {
+    if (systemInfo.productType === "windows" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.exe")) {
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+            //need to create the uninstall script
+            installer.execute("md " + dir + "/scripts");  //make directory if is empty.
+            installer.execute("echo ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
+        }
         installer.execute(dir + "/maintenancetool.exe", "--script=" + dir + "/scripts/auto_uninstall.qs");
     }
+    else if (systemInfo.productType === "osx" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.app")) {
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+            //need to create the uninstall script
+            installer.execute("mkdir " + dir + "/scripts");  //make directory if is empty.
+            installer.execute("touch ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
+        }
+        installer.execute(dir + "/maintenancetool.app", "--script=" + dir + "/scripts/auto_uninstall.qs");
+    }
+    else if (systemInfo.productType === "x11" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool")) {
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+            //need to create the uninstall script
+            installer.execute("mkdir " + dir + "/scripts");  //make directory if is empty.
+            installer.execute("touch ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
+        }
+        installer.execute(dir + "/maintenancetool", "--script=" + dir + "/scripts/auto_uninstall.qs");
+    }
+
 }
