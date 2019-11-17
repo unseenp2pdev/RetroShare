@@ -37,7 +37,6 @@ static const std::string  ONLINE_NO_REQ_SYNC            =  "NO_REQUEST";
 /****
  * #define P3DISC_DEBUG	1
  ****/
-#define P3DISC_DEBUG	1
 
 static bool populateContactInfo( const peerState &detail,
                                  RsDiscContactItem *pkt,

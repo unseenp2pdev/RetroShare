@@ -260,7 +260,7 @@ ChatLobbyId ChatId::toLobbyId() const
         return lobby_id;
     else
     {
-        std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
+        //std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
         return 0;
     }
 }
@@ -562,6 +562,11 @@ void p3Msgs::saveContactOrGroupChatToModelData(std::string displayName, std::str
     mChatSrv->saveContactOrGroupChatToModelData(displayName, nickInGroupChat,
                                                 UnreadMessagesCount,lastMsgDatetime, lastMessage, isOtherLastMsg,
                                                 contactType, groupChatType,rsPeerIdStr, chatLobbyId, uId);
+}
+
+void p3Msgs::removeContactOrGroupChatFromModelData(std::string uId)
+{
+    mChatSrv->removeContactOrGroupChatFromModelData(uId);
 }
 
 std::vector<conversationInfo> p3Msgs::getConversationItemList()

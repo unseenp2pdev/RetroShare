@@ -557,6 +557,7 @@ virtual bool resetMessageStandardTagTypes(Rs::Msgs::MsgTagType& tags) = 0;
     virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
                                                    unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
                                                    int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId) = 0;
+    virtual void removeContactOrGroupChatFromModelData(std::string uId) = 0;
     virtual std::vector<conversationInfo> getConversationItemList() = 0;
     virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
     virtual void sortConversationItemListByRecentTime() = 0;

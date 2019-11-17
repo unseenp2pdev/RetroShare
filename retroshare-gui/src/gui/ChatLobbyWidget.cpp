@@ -448,34 +448,34 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
 
 	if(_lobby_infos.find(d->id()) == _lobby_infos.end())
 	{
+        ChatLobbyId id = d->id();
+        ChatLobbyInfo linfo;
         ui->stackedWidget->addWidget(d) ;
 
-		connect(d,SIGNAL(lobbyLeave(ChatLobbyId)),this,SLOT(unsubscribeChatLobby(ChatLobbyId))) ;
-		connect(d,SIGNAL(typingEventReceived(ChatLobbyId)),this,SLOT(updateTypingStatus(ChatLobbyId))) ;
-		connect(d,SIGNAL(messageReceived(bool,ChatLobbyId,QDateTime,QString,QString)),this,SLOT(updateMessageChanged(bool,ChatLobbyId,QDateTime,QString,QString))) ;
-		connect(d,SIGNAL(peerJoined(ChatLobbyId)),this,SLOT(updatePeerEntering(ChatLobbyId))) ;
-		connect(d,SIGNAL(peerLeft(ChatLobbyId)),this,SLOT(updatePeerLeaving(ChatLobbyId))) ;
+        connect(d,SIGNAL(lobbyLeave(ChatLobbyId)),this,SLOT(unsubscribeChatLobby(ChatLobbyId))) ;
+        connect(d,SIGNAL(typingEventReceived(ChatLobbyId)),this,SLOT(updateTypingStatus(ChatLobbyId))) ;
+        connect(d,SIGNAL(messageReceived(bool,ChatLobbyId,QDateTime,QString,QString)),this,SLOT(updateMessageChanged(bool,ChatLobbyId,QDateTime,QString,QString))) ;
+        connect(d,SIGNAL(peerJoined(ChatLobbyId)),this,SLOT(updatePeerEntering(ChatLobbyId))) ;
+        connect(d,SIGNAL(peerLeft(ChatLobbyId)),this,SLOT(updatePeerLeaving(ChatLobbyId))) ;
 
-		ChatLobbyId id = d->id();
-		_lobby_infos[id].dialog = d ;
-		_lobby_infos[id].default_icon = QIcon() ;
-		_lobby_infos[id].last_typing_event = time(NULL) ;
 
+        _lobby_infos[id].dialog = d ;
+        _lobby_infos[id].default_icon = QIcon() ;
+        _lobby_infos[id].last_typing_event = time(NULL) ;
         //get the groupchat info
         std::string uId = std::to_string(id);
         if (!rsMsgs->isChatIdInConversationList(uId))
         {
             uint current_time = QDateTime::currentDateTime().toTime_t();
-            ChatLobbyInfo linfo;
             std::string groupname = "Unknown name";
             if(rsMsgs->getChatLobbyInfo(id,linfo))
             {
-               groupname = linfo.lobby_name.c_str();
-            }
-            rsMsgs->saveContactOrGroupChatToModelData(groupname, "", 0, current_time, "", true, 0, 1,"", id, uId );
+                groupname = linfo.lobby_name.c_str();
+                rsMsgs->saveContactOrGroupChatToModelData(groupname, "", 0, current_time, "", true, 0, 1,"", id, uId );
 
-            //after open new window and add the new conversation item, need to sort and update the layout
-            rsMsgs->sortConversationItemListByRecentTime();           
+                //after open new window and add the new conversation item, need to sort and update the layout
+                rsMsgs->sortConversationItemListByRecentTime();
+            }
         }
         // need to re-select the conversation item when we have new chat only
         int seletedrow = rsMsgs->getIndexFromUId(uId);
@@ -513,7 +513,6 @@ void ChatLobbyWidget::addOne2OneChatPage(PopupChatDialog *d)
     int seletedrow = rsMsgs->getIndexFromUId(uId);
     ui->lobbyTreeWidget->selectionModel()->clearSelection();
     emit ui->lobbyTreeWidget->model()->layoutChanged();
-    ui->lobbyTreeWidget->show();
 
     // for both case, need to re-select the conversation item
     QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
@@ -1197,47 +1196,35 @@ void ChatLobbyWidget::unsubscribeItem()
 
 void ChatLobbyWidget::unsubscribeChatLobby(ChatLobbyId id)
 {
-//	std::cerr << "Unsubscribing from chat room" << std::endl;
 
-//	// close the tab.
+    // close the tab.
+    std::map<ChatLobbyId,ChatLobbyInfoStruct>::iterator it = _lobby_infos.find(id) ;
 
-//	std::map<ChatLobbyId,ChatLobbyInfoStruct>::iterator it = _lobby_infos.find(id) ;
+    if(it != _lobby_infos.end())
+    {
+        if (myChatLobbyUserNotify){
+            myChatLobbyUserNotify->chatLobbyCleared(id, "");
+        }
 
-//	if(it != _lobby_infos.end())
-//	{
-//		if (myChatLobbyUserNotify){
-//			myChatLobbyUserNotify->chatLobbyCleared(id, "");
-//		}
+        ui->stackedWidget->removeWidget(it->second.dialog) ;
+        _lobby_infos.erase(it) ;
+    }
 
-//		ui->stackedWidget->removeWidget(it->second.dialog) ;
-//		_lobby_infos.erase(it) ;
-//    }
+    //remove item from conversations list, using the MVC now
+    std::string uId = std::to_string(id);
+    if (rsMsgs->isChatIdInConversationList(uId))
+    {
+        rsMsgs->removeContactOrGroupChatFromModelData(uId);
+        emit ui->lobbyTreeWidget->model()->layoutChanged();
+    }
 
-//    //remove item from conversations list
-//    QTreeWidgetItem *rItem = getTreeWidgetItem(id);
-//    if (rItem)
-//    {
-//        commonItem->removeChild(rItem);
-//    }
-
-//	// Unsubscribe the chat lobby
-//    ChatDialog::closeChat(ChatId(id));
-//	rsMsgs->unsubscribeChatLobby(id);
+    // Unsubscribe the chat lobby
+    ChatDialog::closeChat(ChatId(id));
+    rsMsgs->unsubscribeChatLobby(id);
 //    bool isAutoSubscribe = rsMsgs->getLobbyAutoSubscribe(id);
-//	if (isAutoSubscribe) rsMsgs->setLobbyAutoSubscribe(id, !isAutoSubscribe);
+//	if (isAutoSubscribe)
+    rsMsgs->setLobbyAutoSubscribe(id, false );
 
-//	ChatLobbyDialog *cldCW=NULL ;
-//	if (NULL != (cldCW = dynamic_cast<ChatLobbyDialog *>(ui->stackedWidget->currentWidget())))
-//	{
-
-//		QTreeWidgetItem *qtwiFound = getTreeWidgetItem(cldCW->id());
-//		if (qtwiFound) {
-//			ui->lobbyTreeWidget->setCurrentItem(qtwiFound);
-//		}
-//	} else {
-//		ui->lobbyTreeWidget->clearSelection();
-
-//	}
 }
 // Try to add selection of contact chat in the same tree widget
 void ChatLobbyWidget::updateCurrentLobby()

@@ -866,7 +866,7 @@ bool p3ChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
     cm.incoming = true;
     cm.online = true;
     cm.unread = true; //need to update this field when user already read the msg
-    std::cerr << "Msg go here first? " << std::endl;
+    //std::cerr << "Msg go here first? " << std::endl;
     RsServer::notify()->notifyChatMessage(cm);
     
     // cyril: history is temporarily diabled for distant chat, since we need to store the full tunnel ID, but then
@@ -1474,6 +1474,34 @@ void p3ChatService::statusChange(const std::list<pqiServicePeer> &plist)
      conversationItemList.push_back(entry);
 }
 
+ void p3ChatService::removeContactOrGroupChatFromModelData(std::string uId)
+ {
+     std::vector<conversationInfo>::iterator it2;
+
+     for(it2 = conversationItemList.begin(); it2 != conversationItemList.end();)
+     {
+
+        if((*it2).uId == uId)
+        {
+           it2 = conversationItemList.erase(it2);
+           break;
+        }
+        else
+        {
+           ++it2;
+        }
+     }
+
+//     for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+//     {
+//         if (conversationItemList[i].uId == uId)
+//         {
+//            conversationItemList.
+//             break;
+//         }
+//     }
+ }
+
 std::vector<conversationInfo> p3ChatService::getConversationItemList()
 {
      return conversationItemList;
@@ -1590,15 +1618,6 @@ void p3ChatService::setSearchFilter(const std::string &filtertext)
             filtererConversationItemList.push_back(item);
         }
    }
-
-//    std::string filter = text;
-//    std::remove_copy_if(conversationItemList.begin(), conversationItemList.end(), std::back_inserter(filtererConversationItemList),
-//                 [&filter](const conversationInfo& item)
-//    {
-
-//        bool exists = item.displayName.find(filter) != std::string::npos;
-//         return exists;
-//    });
 }
 
 std::vector<conversationInfo> p3ChatService::getSearchFilteredConversationItemList()
