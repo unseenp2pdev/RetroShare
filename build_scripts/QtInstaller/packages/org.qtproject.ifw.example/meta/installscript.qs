@@ -121,7 +121,7 @@ Component.prototype.componentSelectionPageEntered = function()
 
     var dir = installer.value("TargetDir");
     if (systemInfo.productType === "windows" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.exe")) {
-        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs")){
             //need to create the uninstall script
             installer.execute("md " + dir + "/scripts");  //make directory if is empty.
             installer.execute("echo ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
@@ -129,7 +129,7 @@ Component.prototype.componentSelectionPageEntered = function()
         installer.execute(dir + "/maintenancetool.exe", "--script=" + dir + "/scripts/auto_uninstall.qs");
     }
     else if (systemInfo.productType === "osx" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool.app")) {
-        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs")){
             //need to create the uninstall script
             installer.execute("mkdir " + dir + "/scripts");  //make directory if is empty.
             installer.execute("touch ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
@@ -137,7 +137,7 @@ Component.prototype.componentSelectionPageEntered = function()
         installer.execute(dir + "/maintenancetool.app", "--script=" + dir + "/scripts/auto_uninstall.qs");
     }
     else if (systemInfo.productType === "x11" && installer.fileExists(dir) && installer.fileExists(dir + "/maintenancetool")) {
-        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs"){
+        if(!installer.fileExists(dir + "/scripts/auto_uninstall.qs")){
             //need to create the uninstall script
             installer.execute("mkdir " + dir + "/scripts");  //make directory if is empty.
             installer.execute("touch ", uninstall_script + " > " + dir + "/scripts/auto_uninstall.qs"); //add auto remove script.
