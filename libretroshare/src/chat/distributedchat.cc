@@ -37,7 +37,7 @@
 #include "gxs/rsgixs.h"
 #include "services/p3idservice.h"
 
-//#define DEBUG_CHAT_LOBBIES 1
+#define DEBUG_CHAT_LOBBIES 1
 
 static const int 		CONNECTION_CHALLENGE_MAX_COUNT 	  =   20 ; // sends a connection challenge every 20 messages
 static const rstime_t	CONNECTION_CHALLENGE_MAX_MSG_AGE	  =   30 ; // maximum age of a message to be used in a connection challenge
@@ -78,7 +78,7 @@ void DistributedChatService::flush()
 
 	if(last_clean_time_lobby + LOBBY_CACHE_CLEANING_PERIOD < now)
 	{
-		cleanLobbyCaches() ;
+        //cleanLobbyCaches() ;
         last_clean_time_lobby = now ;
 
         // also make sure that the default identity is not null
@@ -789,6 +789,7 @@ void DistributedChatService::handleRecvChatLobbyEventItem(RsChatLobbyEventItem *
 			std::cerr << "  added nickname " << item->nick << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
 #endif
 		}
+        triggerConfigSave();
 	}
 	else if(item->event_type == RS_CHAT_LOBBY_EVENT_KEEP_ALIVE)		// keep alive packet. 
 	{
@@ -808,6 +809,7 @@ void DistributedChatService::handleRecvChatLobbyEventItem(RsChatLobbyEventItem *
 #endif
 		}
 	}
+
     RsServer::notify()->notifyChatLobbyEvent(item->lobby_id,item->event_type,item->signature.keyId,item->string1) ;
 }
 void DistributedChatService::getListOfNearbyChatLobbies(std::vector<VisibleChatLobbyRecord>& visible_lobbies)
@@ -901,7 +903,7 @@ bool DistributedChatService::bounceLobbyObject(RsChatLobbyBouncingObject *item,c
 	if(!locked_bouncingObjectCheck(item,peer_id,lobby.participating_friends.size()))
 		return false;
 
-	// Forward to allparticipating friends, except this peer.
+    // Forward to all participating friends, except this peer.
 
 	for(std::set<RsPeerId>::const_iterator it(lobby.participating_friends.begin());it!=lobby.participating_friends.end();++it)
 		if((*it)!=peer_id && mServControl->isPeerConnected(mServType, *it)) 
@@ -1694,7 +1696,7 @@ void DistributedChatService::handleFriendUnsubscribeLobby(RsChatLobbyUnsubscribe
 #ifdef DEBUG_CHAT_LOBBIES
                 std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
 #endif
-                //std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+                std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
                 it->second.gxs_ids.erase((*it3).first) ;
                 break ;
             }
@@ -1932,21 +1934,21 @@ void DistributedChatService::cleanLobbyCaches()
 			bool changed = false ;
 
             //unseenp2p - remove all cases that remove the member from member list
-//            for(std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();)
-//				if(it2->second + MAX_KEEP_INACTIVE_NICKNAME < now)
-//				{
-//#ifdef DEBUG_CHAT_LOBBIES
-//					std::cerr << "  removing inactive nickname 0x" << std::hex << it2->first << ", time=" << std::dec << now - it2->second << " secs ago" << std::endl;
-//#endif
+            for(std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();)
+                if(it2->second + MAX_KEEP_INACTIVE_NICKNAME < now)
+                {
+#ifdef DEBUG_CHAT_LOBBIES
+                    std::cerr << "  removing inactive nickname 0x" << std::hex << it2->first << ", time=" << std::dec << now - it2->second << " secs ago" << std::endl;
+#endif
 
-//                    std::map<RsGxsId,rstime_t>::iterator tmp(it2) ;
-//					++tmp ;
-//                    it->second.gxs_ids.erase(it2) ;
-//					it2 = tmp ;
-//					changed = true ;
-//				}
-//				else
-//					++it2 ;
+                    std::map<RsGxsId,rstime_t>::iterator tmp(it2) ;
+                    ++tmp ;
+                    it->second.gxs_ids.erase(it2) ;
+                    it2 = tmp ;
+                    changed = true ;
+                }
+                else
+                    ++it2 ;
 
 			if(changed)
 				changed_lobbies.push_back(it->first) ;
