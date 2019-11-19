@@ -1407,63 +1407,65 @@ void ChatLobbyWidget::readChatLobbyInvites()
 		if(found)
 			continue ;
 
-        QMessageBox mb(QObject::tr("Join chat room"),
-                       tr("%1 invites you to chat room named %2").arg(QString::fromUtf8(rsPeers->getPeerName((*it).peer_id).c_str())).arg(RsHtml::plainText(it->lobby_name)),
-                       QMessageBox::Question, QMessageBox::Yes,QMessageBox::No, 0);
+//        QMessageBox mb(QObject::tr("Join chat room"),
+//                       tr("%1 invites you to chat room named %2").arg(QString::fromUtf8(rsPeers->getPeerName((*it).peer_id).c_str())).arg(RsHtml::plainText(it->lobby_name)),
+//                       QMessageBox::Question, QMessageBox::Yes,QMessageBox::No, 0);
 
 
-		QLabel *label;
-		GxsIdChooser *idchooser = new GxsIdChooser;
+//		QLabel *label;
+//		GxsIdChooser *idchooser = new GxsIdChooser;
 
-		if( (*it).lobby_flags & RS_CHAT_LOBBY_FLAGS_PGP_SIGNED )
-		{
-			idchooser->loadIds(IDCHOOSER_ID_REQUIRED | IDCHOOSER_NON_ANONYMOUS,default_id) ;
-			label = new QLabel(tr("Choose a non anonymous identity for this chat room:"));
-		}
-		else
-		{
-			idchooser->loadIds(IDCHOOSER_ID_REQUIRED,default_id) ;
-			label = new QLabel(tr("Choose an identity for this chat room:"));
-		}
-		myInviteYesButton = mb.button(QMessageBox::Yes);
-		myInviteIdChooser = idchooser;
-		connect(idchooser, SIGNAL(currentIndexChanged(int)), this, SLOT(idChooserCurrentIndexChanged(int)));
-		idChooserCurrentIndexChanged(0);
+//		if( (*it).lobby_flags & RS_CHAT_LOBBY_FLAGS_PGP_SIGNED )
+//		{
+//			idchooser->loadIds(IDCHOOSER_ID_REQUIRED | IDCHOOSER_NON_ANONYMOUS,default_id) ;
+//			label = new QLabel(tr("Choose a non anonymous identity for this chat room:"));
+//		}
+//		else
+//		{
+//			idchooser->loadIds(IDCHOOSER_ID_REQUIRED,default_id) ;
+//			label = new QLabel(tr("Choose an identity for this chat room:"));
+//		}
+//		myInviteYesButton = mb.button(QMessageBox::Yes);
+//		myInviteIdChooser = idchooser;
+//		connect(idchooser, SIGNAL(currentIndexChanged(int)), this, SLOT(idChooserCurrentIndexChanged(int)));
+//		idChooserCurrentIndexChanged(0);
 
-		QGridLayout* layout = qobject_cast<QGridLayout*>(mb.layout());
-		if (layout) {
-			layout->addWidget(label, layout->rowCount(), 0, 1, layout->columnCount(), Qt::AlignHCenter ) ;
-			layout->addWidget(idchooser, layout->rowCount(), 0, 1, layout->columnCount(), Qt::AlignRight ) ;
-		} else {
-			//Not QGridLayout so add at end
-			mb.layout()->addWidget(label) ;
-			mb.layout()->addWidget(idchooser) ;
-		}
+//		QGridLayout* layout = qobject_cast<QGridLayout*>(mb.layout());
+//		if (layout) {
+//			layout->addWidget(label, layout->rowCount(), 0, 1, layout->columnCount(), Qt::AlignHCenter ) ;
+//			layout->addWidget(idchooser, layout->rowCount(), 0, 1, layout->columnCount(), Qt::AlignRight ) ;
+//		} else {
+//			//Not QGridLayout so add at end
+//			mb.layout()->addWidget(label) ;
+//			mb.layout()->addWidget(idchooser) ;
+//		}
 
-		int res = mb.exec();
-		myInviteYesButton = NULL;
-		myInviteIdChooser = NULL;
+//		int res = mb.exec();
+//		myInviteYesButton = NULL;
+//		myInviteIdChooser = NULL;
 
-        if (res == QMessageBox::No)
-        {
-            rsMsgs->denyLobbyInvite((*it).lobby_id);
-            continue ;
-        }
+//        if (res == QMessageBox::No)
+//        {
+//            rsMsgs->denyLobbyInvite((*it).lobby_id);
+//            continue ;
+//        }
 
-        RsGxsId chosen_id ;
-        idchooser->getChosenId(chosen_id) ;
+//        RsGxsId chosen_id ;
+//        idchooser->getChosenId(chosen_id) ;
 
-        if(chosen_id.isNull())
-        {
-            rsMsgs->denyLobbyInvite((*it).lobby_id);
-            continue ;
-        }
+//        if(chosen_id.isNull())
+//        {
+//            rsMsgs->denyLobbyInvite((*it).lobby_id);
+//            continue ;
+//        }
 
-        if(rsMsgs->acceptLobbyInvite((*it).lobby_id,chosen_id))
+        // auto accept groupchat invite using default gxsId
+        //chosen_id = default_id;
+        if(rsMsgs->acceptLobbyInvite((*it).lobby_id,default_id)) // before: chosen_id
         {
             ChatDialog::chatFriend(ChatId((*it).lobby_id),true);
             rsMsgs->setLobbyAutoSubscribe((*it).lobby_id, true);
-            rsMsgs->joinVisibleChatLobby((*it).lobby_id, chosen_id);
+            rsMsgs->joinVisibleChatLobby((*it).lobby_id, default_id); // before: chosen_id
         }
         else
             std::cerr << "Can't join chat room with id 0x" << std::hex << (*it).lobby_id << std::dec << std::endl;
