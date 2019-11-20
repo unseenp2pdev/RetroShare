@@ -69,7 +69,7 @@ const static uint32_t timeToInactivity = 60 * 10;   // in seconds
 ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::WindowFlags flags)
         : ChatDialog(parent, flags), lobbyId(lid),
           bullet_red_128(":/app/images/statusicons/dnd.png"), bullet_grey_128(":/app/images/statusicons/bad.png"),
-          bullet_green_128(":/app/images/statusicons/online.png"), bullet_yellow_128(":/app/images/statusicons/away.png")
+          bullet_green_128(":/app/images/statusicons/online.png"), bullet_yellow_128(":/app/images/statusicons/away.png"), bullet_unknown_128(":/app/images/statusicons/ask.png")
 {
     /* Invoke Qt Designer generated QObject setup routine */
     ui.setupUi(this);
@@ -94,10 +94,10 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
     QHeaderView * header = ui.participantsList->header();
     QHeaderView_setSectionResizeModeColumn(header, COLUMN_NAME, QHeaderView::Stretch);
 
-    muteAct = new QAction(QIcon(), tr("Mute participant"), this);
-    voteNegativeAct = new QAction(QIcon(":/icons/png/thumbs-down.png"), tr("Ban this person (Sets negative opinion)"), this);
-    voteNeutralAct = new QAction(QIcon(":/icons/png/thumbs-neutral.png"), tr("Give neutral opinion"), this);
-    votePositiveAct = new QAction(QIcon(":/icons/png/thumbs-up.png"), tr("Give positive opinion"), this);
+//    muteAct = new QAction(QIcon(), tr("Mute participant"), this);
+//    voteNegativeAct = new QAction(QIcon(":/icons/png/thumbs-down.png"), tr("Ban this person (Sets negative opinion)"), this);
+//    voteNeutralAct = new QAction(QIcon(":/icons/png/thumbs-neutral.png"), tr("Give neutral opinion"), this);
+//    votePositiveAct = new QAction(QIcon(":/icons/png/thumbs-up.png"), tr("Give positive opinion"), this);
     //distantChatAct = new QAction(QIcon(":/images/chat_24.png"), tr("Start private chat"), this);
     sendMessageAct = new QAction(QIcon(":/images/mail_new.png"), tr("Send Email"), this);
     //showInPeopleAct = new QAction(QIcon(), tr("Show author in people tab"), this);
@@ -114,12 +114,12 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
     actionSortByActivity->setActionGroup(sortgrp);
 
 
-    connect(muteAct, SIGNAL(triggered()), this, SLOT(changeParticipationState()));
+//    connect(muteAct, SIGNAL(triggered()), this, SLOT(changeParticipationState()));
     //connect(distantChatAct, SIGNAL(triggered()), this, SLOT(distantChatParticipant()));
     connect(sendMessageAct, SIGNAL(triggered()), this, SLOT(sendMessage()));
-    connect(votePositiveAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
-    connect(voteNeutralAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
-    connect(voteNegativeAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
+//    connect(votePositiveAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
+//    connect(voteNeutralAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
+//    connect(voteNegativeAct, SIGNAL(triggered()), this, SLOT(voteParticipant()));
     //connect(showInPeopleAct, SIGNAL(triggered()), this, SLOT(showInPeopleTab()));
 
     connect(actionSortByName, SIGNAL(triggered()), this, SLOT(sortParcipants()));
@@ -128,7 +128,9 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
         /* Add filter actions */
     QTreeWidgetItem *headerItem = ui.participantsList->headerItem();
     QString headerText = headerItem->text(COLUMN_NAME );
-    ui.filterLineEdit->addFilter(QIcon(), headerText, COLUMN_NAME , QString("%1 %2").arg(tr("Search"), headerText));
+    ui.filterLineEdit->setPlaceholderText("Search ");
+    ui.filterLineEdit->showFilterIcon();
+    //ui.filterLineEdit->addFilter(QIcon(), headerText, COLUMN_NAME , QString("%1 %2").arg(tr("Search"), headerText));
 
     // just empiric values
     double scaler_factor = S > 25 ? 2.4 : 1.8;
@@ -141,7 +143,7 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
     inviteFriendsButton->setMaximumSize(icon_size);
     inviteFriendsButton->setText(QString()) ;
     inviteFriendsButton->setAutoRaise(true) ;
-    inviteFriendsButton->setToolTip(tr("Invite friends to this lobby"));
+    inviteFriendsButton->setToolTip(tr("Invite friends to this group"));
 
     mParticipantCompareRole = new RSTreeWidgetItemCompareRole;
     mParticipantCompareRole->setRole(COLUMN_ACTIVITY, ROLE_SORT);
@@ -186,7 +188,7 @@ ChatLobbyDialog::ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent, Qt::Wi
     unsubscribeButton->setMaximumSize(icon_size);
     unsubscribeButton->setText(QString()) ;
     unsubscribeButton->setAutoRaise(true) ;
-    unsubscribeButton->setToolTip(tr("Leave this chat room (Unsubscribe)"));
+    unsubscribeButton->setToolTip(tr("Leave this group chat"));
 
     {
     QIcon icon ;
@@ -276,42 +278,42 @@ void ChatLobbyDialog::initParticipantsContextMenu(QMenu *contextMnu, QList<RsGxs
 
     //contextMnu->addAction(distantChatAct);
     contextMnu->addAction(sendMessageAct);
-    contextMnu->addSeparator();
-    contextMnu->addAction(muteAct);
-    contextMnu->addAction(votePositiveAct);
-    contextMnu->addAction(voteNeutralAct);
-    contextMnu->addAction(voteNegativeAct);
+//    contextMnu->addSeparator();
+//    contextMnu->addAction(muteAct);
+//    contextMnu->addAction(votePositiveAct);
+//    contextMnu->addAction(voteNeutralAct);
+//    contextMnu->addAction(voteNegativeAct);
     //contextMnu->addAction(showInPeopleAct);
 
     //distantChatAct->setEnabled(false);
     sendMessageAct->setEnabled(true);
-    muteAct->setEnabled(false);
-    muteAct->setCheckable(true);
-    muteAct->setChecked(false);
-    votePositiveAct->setEnabled(false);
-    voteNeutralAct->setEnabled(false);
-    voteNegativeAct->setEnabled(false);
+//    muteAct->setEnabled(false);
+//    muteAct->setCheckable(true);
+//    muteAct->setChecked(false);
+//    votePositiveAct->setEnabled(false);
+//    voteNeutralAct->setEnabled(false);
+//    voteNegativeAct->setEnabled(false);
     //showInPeopleAct->setEnabled(idList.count() == 1);
 
     //distantChatAct->setData(QVariant::fromValue(idList));
     sendMessageAct->setData(QVariant::fromValue(idList));
-    muteAct->setData(QVariant::fromValue(idList));
-    votePositiveAct->setData(QVariant::fromValue(idList));
-    voteNeutralAct->setData(QVariant::fromValue(idList));
-    voteNegativeAct->setData(QVariant::fromValue(idList));
+//    muteAct->setData(QVariant::fromValue(idList));
+//    votePositiveAct->setData(QVariant::fromValue(idList));
+//    voteNeutralAct->setData(QVariant::fromValue(idList));
+//    voteNegativeAct->setData(QVariant::fromValue(idList));
     //showInPeopleAct->setData(QVariant::fromValue(idList));
 
-    RsGxsId gxsid = idList.at(0);
+//    RsGxsId gxsid = idList.at(0);
 
-    if(!gxsid.isNull() && !rsIdentity->isOwnId(gxsid))
-    {
-        //distantChatAct->setEnabled(true);
-        votePositiveAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_POSITIVE);
-        voteNeutralAct->setEnabled((rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_POSITIVE) || (rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_NEGATIVE) );
-        voteNegativeAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_NEGATIVE);
-        muteAct->setEnabled(true);
-        muteAct->setChecked(isParticipantMuted(gxsid));
-    }
+//    if(!gxsid.isNull() && !rsIdentity->isOwnId(gxsid))
+//    {
+//        //distantChatAct->setEnabled(true);
+//        votePositiveAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_POSITIVE);
+//        voteNeutralAct->setEnabled((rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_POSITIVE) || (rsReputations->overallReputationLevel(gxsid) == RsReputations::REPUTATION_LOCALLY_NEGATIVE) );
+//        voteNegativeAct->setEnabled(rsReputations->overallReputationLevel(gxsid) != RsReputations::REPUTATION_LOCALLY_NEGATIVE);
+//        muteAct->setEnabled(true);
+//        muteAct->setChecked(isParticipantMuted(gxsid));
+//    }
 }
 
 void ChatLobbyDialog::voteParticipant()
@@ -323,19 +325,19 @@ void ChatLobbyDialog::voteParticipant()
         return ;
     }
 
-    QList<RsGxsId> idList = act->data().value<QList<RsGxsId>>();
+//    QList<RsGxsId> idList = act->data().value<QList<RsGxsId>>();
 
-    RsReputations::Opinion op = RsReputations::OPINION_NEUTRAL ;
-    if (act == votePositiveAct)
-        op = RsReputations::OPINION_POSITIVE;
-    if (act == voteNegativeAct)
-        op = RsReputations::OPINION_NEGATIVE;
+//    RsReputations::Opinion op = RsReputations::OPINION_NEUTRAL ;
+//    if (act == votePositiveAct)
+//        op = RsReputations::OPINION_POSITIVE;
+//    if (act == voteNegativeAct)
+//        op = RsReputations::OPINION_NEGATIVE;
 
-    for (QList<RsGxsId>::iterator item = idList.begin(); item != idList.end(); ++item)
-    {
-        rsReputations->setOwnOpinion(*item, op);
-        std::cerr << "Giving opinion to GXS id " << *item << " to " << op << std::endl;
-    }
+//    for (QList<RsGxsId>::iterator item = idList.begin(); item != idList.end(); ++item)
+//    {
+//        rsReputations->setOwnOpinion(*item, op);
+//        std::cerr << "Giving opinion to GXS id " << *item << " to " << op << std::endl;
+//    }
 
     updateParticipantsList();
 }
@@ -674,12 +676,14 @@ void ChatLobbyDialog::updateParticipantsList()
                     widgetitem->setIcon(COLUMN_ICON, bullet_yellow_128);
                     break;
                 case RS_STATUS_BUSY:
-
                     widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
                     break;
                 }
             }
-            else widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
+            else
+            {
+                widgetitem->setIcon(COLUMN_ICON, bullet_unknown_128 );
+            }
 
 //            if(isParticipantMuted(it2->first))
 //                widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
@@ -697,11 +701,11 @@ void ChatLobbyDialog::updateParticipantsList()
             widgetitem->updateBannedState();
 
             QTime qtLastAct=QTime(0,0,0).addSecs(now-tLastAct);
-            widgetitem->setToolTip(COLUMN_ICON,tr("Right click to mute/unmute participants<br/>Double click to address this person<br/>")
-                                   +tr("This participant is not active since:")
-                                   +qtLastAct.toString()
-                                   +tr(" seconds")
-                                   );
+//            widgetitem->setToolTip(COLUMN_ICON,tr("Right click to mute/unmute participants<br/>Double click to address this person<br/>")
+//                                   +tr("This participant is not active since:")
+//                                   +qtLastAct.toString()
+//                                   +tr(" seconds")
+//                                   );
         }
 
     }

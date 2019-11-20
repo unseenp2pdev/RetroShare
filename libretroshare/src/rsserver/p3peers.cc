@@ -838,12 +838,15 @@ bool 	p3Peers::setLocation(const RsPeerId &ssl_id, const std::string &location)
 
 bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &port)
 {
+#ifdef P3PEERS_DEBUG
         std::cerr << "splitAddressString() Input: " << addr << std::endl;
-
+#endif
 	size_t cpos = addr.rfind(':');
 	if (cpos == std::string::npos)
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString Failed to parse (:)";
+#endif
 		std::cerr << std::endl;
 		return false;
 	}
@@ -851,8 +854,10 @@ bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &
 	int lenport = addr.length() - (cpos + 1); // +1 to skip over : char.
 	if (lenport <= 0)
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString() Missing Port ";
 		std::cerr << std::endl;
+#endif
 		return false;
 	}
 
@@ -862,14 +867,17 @@ bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &
 
 	if ((portint < 0) || (portint > 65535))
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString() Invalid Port";
 		std::cerr << std::endl;
+#endif
 		return false;
 	}
 	port = portint;
-
+#ifdef P3PEERS_DEBUG
         std::cerr << "splitAddressString() Domain: " << domain << " Port: " << port;
 	std::cerr << std::endl;
+#endif
 	return true;
 }
 
