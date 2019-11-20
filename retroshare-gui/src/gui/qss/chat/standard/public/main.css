@@ -52,12 +52,12 @@
 	font-weight: bold;
 }
 .hincomingMsg, .incomingMsg{
-    background-color: #dbdbdb;
+    background-color: #ececec;
     display: inline-block;
     font-size: 1pt;
 }
 .houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
-    background-color: #ade7ff;
+    background-color: #bbebff;
     padding: 10px 18px;
     font-size: 1pt;
 }
