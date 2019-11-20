@@ -679,6 +679,7 @@ void ChatLobbyDialog::updateParticipantsList()
                     break;
                 }
             }
+            else widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
 
 //            if(isParticipantMuted(it2->first))
 //                widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
