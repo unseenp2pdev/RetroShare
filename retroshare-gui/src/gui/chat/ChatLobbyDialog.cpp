@@ -46,6 +46,7 @@
 #include "gui/settings/rsharesettings.h"
 #include "util/HandleRichText.h"
 #include "util/QtVersion.h"
+#include "gui/common/AvatarDefs.h"
 
 #include "retroshare/rsnotify.h"
 #include "util/rstime.h"
@@ -412,6 +413,9 @@ void ChatLobbyDialog::init(const ChatId &/*id*/, const QString &/*title*/)
     /** List of muted Participants */
     mutedParticipants.clear() ;
 
+    //try to update the member status on member list
+    updateParticipantsList();
+
     // load settings
     processSettings(true);
 }
@@ -584,8 +588,8 @@ void ChatLobbyDialog::updateParticipantsList()
 //        std::cerr << "   groupchat name: " << linfo.lobby_name << std::endl;
 //        std::cerr << "   Participating nick names (rsgxsId): " << std::endl;
 
-        for(std::map<RsGxsId,rstime_t>::const_iterator it2(linfo.gxs_ids.begin());it2!=linfo.gxs_ids.end();++it2)
-            std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
+//        for(std::map<RsGxsId,rstime_t>::const_iterator it2(linfo.gxs_ids.begin());it2!=linfo.gxs_ids.end();++it2)
+//            std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
 
         ChatLobbyInfo cliInfo=linfo;
         QList<QTreeWidgetItem*>  qlOldParticipants=ui.participantsList->findItems("*",Qt::MatchWildcard,COLUMN_ID);
@@ -629,23 +633,65 @@ void ChatLobbyDialog::updateParticipantsList()
                 widgetitem->setTextColor(COLUMN_NAME,ui.participantsList->palette().color(QPalette::Active, QPalette::Text));
             }
 
+            //try to update the avatar
+            widgetitem->forceUpdate();
+
             time_t tLastAct=widgetitem->text(COLUMN_ACTIVITY).toInt();
             time_t now = time(NULL);
 
-                widgetitem->setSizeHint(COLUMN_ICON, QSize(20,20));
+            widgetitem->setSizeHint(COLUMN_ICON, QSize(20,20));
 
+            //Change the member status using ssl connection here
+            RsIdentityDetails details;
+            RsPeerId sslId;
+            if (rsIdentity->getIdDetails(it2->first, details ))
+            {
+                RsPeerDetails detail;
+                if (rsPeers->getGPGDetails(details.mPgpId, detail))
+                {
+                    std::list<RsPeerId> sslIds;
+                    rsPeers->getAssociatedSSLIds(detail.gpg_id, sslIds);
+                    if (sslIds.size() >= 1) {
+                        sslId = sslIds.front();
+                    }
+                }
+            }
 
-            if(isParticipantMuted(it2->first))
-                widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
-            else if (tLastAct + timeToInactivity < now)
-                widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
-            else
-                widgetitem->setIcon(COLUMN_ICON, bullet_green_128);
+            if (!sslId.isNull())
+            {
+                StatusInfo statusContactInfo;
+                rsStatus->getStatus(sslId,statusContactInfo);
+                switch (statusContactInfo.status)
+                {
+                case RS_STATUS_OFFLINE:
+                case RS_STATUS_INACTIVE:
+                    widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
+                    break;
+                case RS_STATUS_ONLINE:
+                    widgetitem->setIcon(COLUMN_ICON, bullet_green_128);
+                    break;
+                case RS_STATUS_AWAY:
+                    widgetitem->setIcon(COLUMN_ICON, bullet_yellow_128);
+                    break;
+                case RS_STATUS_BUSY:
+
+                    widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
+                    break;
+                }
+            }
+
+//            if(isParticipantMuted(it2->first))
+//                widgetitem->setIcon(COLUMN_ICON, bullet_red_128);
+//            else if (tLastAct + timeToInactivity < now)
+//                widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
+//            else
+//                widgetitem->setIcon(COLUMN_ICON, bullet_green_128);
 
             RsGxsId gxs_id;
             rsMsgs->getIdentityForChatLobby(lobbyId, gxs_id);
 
-            if (RsGxsId(participant.toStdString()) == gxs_id) widgetitem->setIcon(COLUMN_ICON, bullet_yellow_128);
+            if (RsGxsId(participant.toStdString()) == gxs_id)
+                widgetitem->setIcon(COLUMN_ICON, bullet_green_128);
 
             widgetitem->updateBannedState();
 

@@ -57,7 +57,11 @@ CreateLobbyDialog::CreateLobbyDialog(const std::set<RsPeerId>& peer_list, int pr
 	connect( ui->lobbyName_LE, SIGNAL( textChanged ( QString ) ), this, SLOT( checkTextFields( ) ) );
 	connect( ui->lobbyTopic_LE, SIGNAL( textChanged ( QString ) ), this, SLOT( checkTextFields( ) ) );
     connect( ui->idChooser_CB, SIGNAL( currentIndexChanged ( int ) ), this, SLOT( checkTextFields( ) ) );
-    connect( ui->pgp_signed_CB, SIGNAL( toggled ( bool ) ), this, SLOT( checkTextFields( ) ) );
+
+    //unseenp2p - 0.6.9 version no need to use the PGP-signed identities - make users confused
+    ui->pgp_signed_CB->setHidden(true);
+    ui->pgp_signed_Lb->setHidden(true);
+    //connect( ui->pgp_signed_CB, SIGNAL( toggled ( bool ) ), this, SLOT( checkTextFields( ) ) );
 
 	/* initialize key share list */
 	ui->keyShareList->setHeaderText(tr("Contacts:"));

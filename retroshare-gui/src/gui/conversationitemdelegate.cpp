@@ -205,17 +205,21 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     //auto leftMargin = dx_ + sizeImage_ + dx_;
     auto leftMargin = sizeImage_;
-    auto rightMargin = dx_;
+    auto rightMargin = dx_ + 4;
 
     auto topMargin = 4;
     auto bottomMargin = 8;
 
     int rect1Width;
-    if (!isTemporary) {
-        rect1Width = rect.width() - leftMargin - infoTextWidth_ - infoTextWidthModifier - 8;
-    } else {
-        rect1Width = rect.width() - leftMargin - rightMargin;
-    }
+//    if (!isTemporary) {
+//        // ATTENTION from unseenp2p: this rect1Width need to be changed in future by another calculation
+//        // rect1Width is the width of the rectName1 (Display name or group name), so it can be calculated as: infoTextWidth
+//        // but not rect.width() - infoTextWidth_
+//        rect1Width = rect.width() - leftMargin - infoTextWidth_ - infoTextWidthModifier - 8;
+//    } else {
+//        rect1Width = rect.width() - leftMargin - rightMargin;
+//    }
+    rect1Width = rect.width() - leftMargin - 4*rightMargin - dx_;
 
     QRect rectName1(rect.left() + leftMargin,
                     rect.top()   + topMargin,
@@ -259,8 +263,12 @@ ConversationItemDelegate::paintConversationItem(QPainter* painter,
 
     QRect rectInfo1(rectName1.left() + rectName1.width(),
                     rect.top() + topMargin,
-                    infoTextWidth_ - rightMargin + infoTextWidthModifier + dx_,
+                    4*rightMargin,
                     rect.height() / 2 - 2);
+//    QRect rectInfo1(rectName1.left() + rectName1.width(),
+//                    rect.top() + topMargin,
+//                    infoTextWidth_ - rightMargin + infoTextWidthModifier + dx_,
+//                    rect.height() / 2 - 2);
 
     QRect rectInfo2(rectInfo1.left(),
                     rectInfo1.top() + rectInfo1.height() - infoText2HeightModifier,
