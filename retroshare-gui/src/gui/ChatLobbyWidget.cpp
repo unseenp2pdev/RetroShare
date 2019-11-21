@@ -148,6 +148,7 @@ ChatLobbyWidget::ChatLobbyWidget(QWidget *parent, Qt::WindowFlags flags)
 	// load settings
     processSettings(true);
     alreadyOpenLastChatWindow = false;
+    receiveGroupInvite = false;
     showBlankPage(0) ;
 
     int S = QFontMetricsF(font()).height();
@@ -462,6 +463,18 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
         _lobby_infos[id].dialog = d ;
         _lobby_infos[id].default_icon = QIcon() ;
         _lobby_infos[id].last_typing_event = time(NULL) ;
+
+        //get the selected groupchat or contact
+        QModelIndexList list = ui->lobbyTreeWidget->selectionModel()->selectedIndexes();
+        std::string selectedUId;
+        foreach (QModelIndex index, list)
+        {
+            if (index.row()!=-1)
+            {
+                selectedUId = rsMsgs->getSeletedUIdBeforeSorting(index.row());
+                break;
+            }
+        }
         //get the groupchat info
         std::string uId = std::to_string(id);
         if (!rsMsgs->isChatIdInConversationList(uId))
@@ -471,18 +484,37 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
             if(rsMsgs->getChatLobbyInfo(id,linfo))
             {
                 groupname = linfo.lobby_name.c_str();
-                rsMsgs->saveContactOrGroupChatToModelData(groupname, "", 0, current_time, "", true, 0, 1,"", id, uId );
+                bool is_private = !(linfo.lobby_flags & RS_CHAT_LOBBY_FLAGS_PUBLIC);
+                int groupChatType = (is_private? 1:0);
+                rsMsgs->saveContactOrGroupChatToModelData(groupname, "", 0, current_time, "", true, 0, groupChatType,"", id, uId );
 
                 //after open new window and add the new conversation item, need to sort and update the layout
                 rsMsgs->sortConversationItemListByRecentTime();
+                emit ui->lobbyTreeWidget->model()->layoutChanged();
             }
         }
-        // need to re-select the conversation item when we have new chat only
-        int seletedrow = rsMsgs->getIndexFromUId(uId);
-        QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
-        ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
-        emit ui->lobbyTreeWidget->model()->layoutChanged();
-        ui->lobbyTreeWidget->show();
+        //Here need to check whether this groupchat this member create or receive auto-accept group invite
+        // If this is this member create so no need to clearSelection and re-select, if not, no need to do these following
+        if (!receiveGroupInvite)
+        {
+            ui->lobbyTreeWidget->selectionModel()->clearSelection();
+            // need to re-select the conversation item when we have new chat only
+            int seletedrow = rsMsgs->getIndexFromUId(uId);
+            QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+            ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
+        }
+        else
+        {
+            //if receive the auto-accept group-invite, so after sort conversation items, the selection will go wrong,
+            // need to save the selected item and re-select again
+            ui->lobbyTreeWidget->selectionModel()->clearSelection();
+            int seletedrow = rsMsgs->getIndexFromUId(selectedUId);
+            QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+            ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+            emit ui->lobbyTreeWidget->model()->layoutChanged();
+        }
+        if (receiveGroupInvite) receiveGroupInvite = false;
 	}
 }
 
@@ -1209,7 +1241,6 @@ void ChatLobbyWidget::unsubscribeChatLobby(ChatLobbyId id)
         ui->stackedWidget->removeWidget(it->second.dialog) ;
         _lobby_infos.erase(it) ;
     }
-
     //remove item from conversations list, using the MVC now
     std::string uId = std::to_string(id);
     if (rsMsgs->isChatIdInConversationList(uId))
@@ -1221,9 +1252,55 @@ void ChatLobbyWidget::unsubscribeChatLobby(ChatLobbyId id)
     // Unsubscribe the chat lobby
     ChatDialog::closeChat(ChatId(id));
     rsMsgs->unsubscribeChatLobby(id);
-//    bool isAutoSubscribe = rsMsgs->getLobbyAutoSubscribe(id);
-//	if (isAutoSubscribe)
     rsMsgs->setLobbyAutoSubscribe(id, false );
+
+
+    //Re-select the chat item on the left, depend on the history of stackedWidget
+    //need to get the next dialog in the ui->stackedWidget
+    PopupChatDialog *cldCW=NULL ;
+    ChatLobbyDialog *groupChatCW = NULL;
+    std::string chatIdStr;
+
+    if (NULL != (cldCW = dynamic_cast<PopupChatDialog *>(ui->stackedWidget->currentWidget())))
+    {
+            //cldCW->getChatWidget()->scrollToAnchor(anchor);
+        ChatId chatId = cldCW->chatId();
+        chatIdStr= chatId.toPeerId().toStdString();
+
+    }
+    else
+    {
+        if (NULL != (groupChatCW = dynamic_cast<ChatLobbyDialog *>(ui->stackedWidget->currentWidget())))
+        {
+            //ChatId chatId = groupChatCW->id();
+            chatIdStr = std::to_string(groupChatCW->id());
+        }
+
+    }
+
+    if (chatIdStr.length() > 0)
+    {
+        //check if this is the filtered search mode, just return to normal mode and select on the normal mode of conversation list
+        if (rsMsgs->getConversationListMode() == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+        {
+            if (!ui->filterLineEdit->text().isEmpty())
+            {
+                ui->filterLineEdit->setText("");
+            }
+        }
+
+         //re-select the chat item again, at first find the index of the uId, then re-select
+         int seletedrow = rsMsgs->getIndexFromUId(chatIdStr);
+         if (seletedrow >= 0)
+         {
+             ui->lobbyTreeWidget->selectionModel()->clearSelection();
+             QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+             ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+             //emit ui->lobbyTreeWidget->model()->layoutChanged();
+         }
+
+    }
+
 
 }
 // Try to add selection of contact chat in the same tree widget
@@ -1463,7 +1540,8 @@ void ChatLobbyWidget::readChatLobbyInvites()
         //chosen_id = default_id;
         if(rsMsgs->acceptLobbyInvite((*it).lobby_id,default_id)) // before: chosen_id
         {
-            ChatDialog::chatFriend(ChatId((*it).lobby_id),true);
+            receiveGroupInvite = true;
+            ChatDialog::chatFriend(ChatId((*it).lobby_id),false); //before is true
             rsMsgs->setLobbyAutoSubscribe((*it).lobby_id, true);
             rsMsgs->joinVisibleChatLobby((*it).lobby_id, default_id); // before: chosen_id
         }
