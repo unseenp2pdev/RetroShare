@@ -206,5 +206,8 @@
         <file>home/img/Setting/youtube-play-button_x.png</file>
         <file>home/img/Setting/bull-horn-announcer_x.png</file>
         <file>home/img/Setting/comment-black-oval-bubble-shape_x.png</file>
+        <file>home/img/lotus1.jpg</file>
+        <file>home/img/mountain-2.jpg</file>
+        <file>home/img/mountain3.jpg</file>
     </qresource>
 </RCC>
