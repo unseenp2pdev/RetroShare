@@ -1386,7 +1386,9 @@ bool p3turtle::getTunnelServiceInfo(TurtleTunnelId tunnel_id,RsPeerId& vpid,RsFi
 
 		if(it == _incoming_file_hashes.end())
 		{
+#ifdef P3TURTLE_DEBUG
 			std::cerr << "p3turtle::handleRecvGenericTunnelItem(): hash " << hash << " for client side tunnel endpoint " << std::hex << tunnel_id << std::dec << " has been removed (probably a late response)! Dropping the item. " << std::endl;
+#endif
 			return false;
 		}
 
@@ -1398,7 +1400,9 @@ bool p3turtle::getTunnelServiceInfo(TurtleTunnelId tunnel_id,RsPeerId& vpid,RsFi
 
         if(it == _outgoing_tunnel_client_services.end())
 		{
+#ifdef P3TURTLE_DEBUG
             std::cerr << "p3turtle::handleRecvGenericTunnelItem(): hash " << tunnel.hash << " for server side tunnel endpoint " << std::hex << tunnel_id << std::dec << " has been removed (probably a late response)! Dropping the item. " << std::endl;
+#endif
 			return false;
 		}
 

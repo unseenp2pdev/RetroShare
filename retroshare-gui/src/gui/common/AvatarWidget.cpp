@@ -31,9 +31,35 @@
 #include "AvatarWidget.h"
 #include "ui_AvatarWidget.h"
 
+#include <QPixmap>
+#include <QImage>
+#include <QSize>
+#include <QPainter>
+
 #include <algorithm>
 
 //#define DEBUG_AVATAR_GUI 1
+
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
+}
 
 AvatarWidget::AvatarWidget(QWidget *parent) : QLabel(parent), ui(new Ui::AvatarWidget)
 {
@@ -282,6 +308,11 @@ void AvatarWidget::refreshAvatarImage()
     {
         QPixmap avatar;
         AvatarDefs::getOwnAvatar(avatar);
+
+        //make avatar circle for your own
+        QImage bestImage = avatar.toImage();
+        QImage bestImage2 = getCirclePhoto(bestImage,bestImage.size().width());
+        avatar.convertFromImage(bestImage2);
         setPixmap(avatar);
         return;
     }

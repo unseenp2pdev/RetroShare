@@ -46,15 +46,22 @@ private:
     constexpr static int dx_ = 12;
     constexpr static int fontSize_ = 11;
     constexpr static int infoTextWidth_ = 70; // 176;
-
+#elif linux
+    constexpr static int sizeImage_ = 58;
+    constexpr static int cellHeight_ = 68;
+    constexpr static int dy_ = 6;
+    constexpr static int dx_ = 12;
+    constexpr static int fontSize_ = 11;
+    constexpr static int infoTextWidth_ = 70;
 #else
     constexpr static int sizeImage_ = 58;
     constexpr static int cellHeight_ = 68;
     constexpr static int dy_ = 6;
     constexpr static int dx_ = 12;
     constexpr static int fontSize_ = 14;
-    constexpr static int infoTextWidth_ = 60; // 176;
+    constexpr static int infoTextWidth_ = 70; // 176;
 #endif
+
 
     QPixmap* searchIcon_;
 

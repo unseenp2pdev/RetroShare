@@ -617,6 +617,27 @@ static void getNameWidget(QTreeWidget *treeWidget, QTreeWidgetItem *item, Elided
     }
 }
 
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
+}
+
 /**
  * Get the list of peers from the RsIface.
  * Adds all friend gpg ids, with their nodes as children to the peerTreeWidget.
@@ -1170,6 +1191,11 @@ void FriendList::insertPeers()
             if (gpg_hasPrivateChat) {
                 gpgOverlayIcon = QPixmap(":/chat/img/chat_32.png");         //d
             }
+
+            //make avatar as circle avatar
+            QImage bestImage = bestAvatar.toImage();
+            QImage bestImage2 = getCirclePhoto(bestImage,bestImage.size().width());
+            bestAvatar.convertFromImage(bestImage2);
 
             gpgItem->setIcon(COLUMN_NAME, createAvatar(bestAvatar.isNull() ? QPixmap(AVATAR_DEFAULT_IMAGE) : bestAvatar, gpgOverlayIcon));
 

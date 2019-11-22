@@ -210,6 +210,6 @@ private:
 
     ChatId lastChatId;      //unseenp2p - for saving the current/last chat when user close the app
     bool alreadyOpenLastChatWindow;
-
+    bool receiveGroupInvite;
 };
 

@@ -78,7 +78,7 @@ void DistributedChatService::flush()
 
 	if(last_clean_time_lobby + LOBBY_CACHE_CLEANING_PERIOD < now)
 	{
-		cleanLobbyCaches() ;
+        //cleanLobbyCaches() ;
         last_clean_time_lobby = now ;
 
         // also make sure that the default identity is not null
@@ -291,50 +291,50 @@ bool DistributedChatService::getVirtualPeerId(const ChatLobbyId& id,ChatLobbyVir
 
 void DistributedChatService::locked_printDebugInfo() const
 {
-	std::cerr << "Recorded lobbies: " << std::endl;
+//	std::cerr << "Recorded lobbies: " << std::endl;
 	rstime_t now = time(NULL) ;
 
-	for( std::map<ChatLobbyId,ChatLobbyEntry>::const_iterator it(_chat_lobbys.begin()) ;it!=_chat_lobbys.end();++it)
-	{
-		std::cerr << "   Lobby id\t\t: " << std::hex << it->first << std::dec << std::endl;
-		std::cerr << "   Lobby name\t\t: " << it->second.lobby_name << std::endl;
-		std::cerr << "   Lobby topic\t\t: " << it->second.lobby_topic << std::endl;
-		std::cerr << "   nick name\t\t: " << it->second.gxs_id << std::endl;
-		std::cerr << "   Lobby type\t\t: " << ((IS_PUBLIC_LOBBY(it->second.lobby_flags))?"Public":"Private") << std::endl;
-		std::cerr << "   Lobby security\t\t: " << ((IS_PGP_SIGNED_LOBBY(it->second.lobby_flags))?"PGP-signed IDs required":"Anon IDs accepted") << std::endl;
-		std::cerr << "   Lobby peer id\t: " << it->second.virtual_peer_id << std::endl;
-		std::cerr << "   Challenge count\t: " << it->second.connexion_challenge_count << std::endl;
-		std::cerr << "   Last activity\t: " << now - it->second.last_activity << " seconds ago." << std::endl;
-		std::cerr << "   Cached messages\t: " << it->second.msg_cache.size() << std::endl;
+//	for( std::map<ChatLobbyId,ChatLobbyEntry>::const_iterator it(_chat_lobbys.begin()) ;it!=_chat_lobbys.end();++it)
+//	{
+//		std::cerr << "   Lobby id\t\t: " << std::hex << it->first << std::dec << std::endl;
+//		std::cerr << "   Lobby name\t\t: " << it->second.lobby_name << std::endl;
+//		std::cerr << "   Lobby topic\t\t: " << it->second.lobby_topic << std::endl;
+//		std::cerr << "   nick name\t\t: " << it->second.gxs_id << std::endl;
+//		std::cerr << "   Lobby type\t\t: " << ((IS_PUBLIC_LOBBY(it->second.lobby_flags))?"Public":"Private") << std::endl;
+//		std::cerr << "   Lobby security\t\t: " << ((IS_PGP_SIGNED_LOBBY(it->second.lobby_flags))?"PGP-signed IDs required":"Anon IDs accepted") << std::endl;
+//		std::cerr << "   Lobby peer id\t: " << it->second.virtual_peer_id << std::endl;
+//		std::cerr << "   Challenge count\t: " << it->second.connexion_challenge_count << std::endl;
+//		std::cerr << "   Last activity\t: " << now - it->second.last_activity << " seconds ago." << std::endl;
+//		std::cerr << "   Cached messages\t: " << it->second.msg_cache.size() << std::endl;
 
-		for(std::map<ChatLobbyMsgId,rstime_t>::const_iterator it2(it->second.msg_cache.begin());it2!=it->second.msg_cache.end();++it2)
-			std::cerr << "       " << std::hex << it2->first << std::dec << "  time=" << now - it2->second << " secs ago" << std::endl;
+//		for(std::map<ChatLobbyMsgId,rstime_t>::const_iterator it2(it->second.msg_cache.begin());it2!=it->second.msg_cache.end();++it2)
+//			std::cerr << "       " << std::hex << it2->first << std::dec << "  time=" << now - it2->second << " secs ago" << std::endl;
 
-		std::cerr << "   Participating friends: " << std::endl;
+//		//std::cerr << "   Participating friends: " << std::endl;
 
-		for(std::set<RsPeerId>::const_iterator it2(it->second.participating_friends.begin());it2!=it->second.participating_friends.end();++it2)
-			std::cerr << "       " << *it2 << std::endl;
+//		//for(std::set<RsPeerId>::const_iterator it2(it->second.participating_friends.begin());it2!=it->second.participating_friends.end();++it2)
+//		//	std::cerr << "       " << *it2 << std::endl;
 
-		std::cerr << "   Participating nick names: " << std::endl;
+//		//std::cerr << "   Participating nick names: " << std::endl;
 
-		for(std::map<RsGxsId,rstime_t>::const_iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();++it2)
-			std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
+////		for(std::map<RsGxsId,rstime_t>::const_iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();++it2)
+////			std::cerr << "       " << it2->first << ": " << now - it2->second << " secs ago" << std::endl;
 
-	}
+//	}
 
-	std::cerr << "Visible public lobbies: " << std::endl;
+//	std::cerr << "Visible public lobbies: " << std::endl;
 
-	for( std::map<ChatLobbyId,VisibleChatLobbyRecord>::const_iterator it(_visible_lobbies.begin()) ;it!=_visible_lobbies.end();++it)
-	{
-		std::cerr << "   " << std::hex << it->first << " name = " << std::dec << it->second.lobby_name << it->second.lobby_topic << std::endl;
-		for(std::set<RsPeerId>::const_iterator it2(it->second.participating_friends.begin());it2!=it->second.participating_friends.end();++it2)
-			std::cerr << "    With friend: " << *it2 << std::endl;
-	}
+//	for( std::map<ChatLobbyId,VisibleChatLobbyRecord>::const_iterator it(_visible_lobbies.begin()) ;it!=_visible_lobbies.end();++it)
+//	{
+//		std::cerr << "   " << std::hex << it->first << " name = " << std::dec << it->second.lobby_name << it->second.lobby_topic << std::endl;
+//		for(std::set<RsPeerId>::const_iterator it2(it->second.participating_friends.begin());it2!=it->second.participating_friends.end();++it2)
+//			std::cerr << "    With friend: " << *it2 << std::endl;
+//	}
 
-    std::cerr << "Chat lobby flags: " << std::endl;
+//    std::cerr << "Chat lobby flags: " << std::endl;
 
-    for( std::map<ChatLobbyId,ChatLobbyFlags>::const_iterator it(_known_lobbies_flags.begin()) ;it!=_known_lobbies_flags.end();++it)
-        std::cerr << "   \"" << std::hex << it->first << "\" flags = " << it->second << std::dec << std::endl;
+//    for( std::map<ChatLobbyId,ChatLobbyFlags>::const_iterator it(_known_lobbies_flags.begin()) ;it!=_known_lobbies_flags.end();++it)
+//        std::cerr << "   \"" << std::hex << it->first << "\" flags = " << it->second << std::dec << std::endl;
 }
 
 bool DistributedChatService::locked_bouncingObjectCheck(RsChatLobbyBouncingObject *obj,const RsPeerId& peer_id,uint32_t lobby_count)
@@ -789,6 +789,7 @@ void DistributedChatService::handleRecvChatLobbyEventItem(RsChatLobbyEventItem *
 			std::cerr << "  added nickname " << item->nick << " from lobby " << std::hex << item->lobby_id << std::dec << std::endl;
 #endif
 		}
+        triggerConfigSave();
 	}
 	else if(item->event_type == RS_CHAT_LOBBY_EVENT_KEEP_ALIVE)		// keep alive packet. 
 	{
@@ -808,6 +809,7 @@ void DistributedChatService::handleRecvChatLobbyEventItem(RsChatLobbyEventItem *
 #endif
 		}
 	}
+
     RsServer::notify()->notifyChatLobbyEvent(item->lobby_id,item->event_type,item->signature.keyId,item->string1) ;
 }
 void DistributedChatService::getListOfNearbyChatLobbies(std::vector<VisibleChatLobbyRecord>& visible_lobbies)
@@ -901,7 +903,7 @@ bool DistributedChatService::bounceLobbyObject(RsChatLobbyBouncingObject *item,c
 	if(!locked_bouncingObjectCheck(item,peer_id,lobby.participating_friends.size()))
 		return false;
 
-	// Forward to allparticipating friends, except this peer.
+    // Forward to all participating friends, except this peer.
 
 	for(std::set<RsPeerId>::const_iterator it(lobby.participating_friends.begin());it!=lobby.participating_friends.end();++it)
 		if((*it)!=peer_id && mServControl->isPeerConnected(mServType, *it)) 
@@ -1586,7 +1588,7 @@ bool DistributedChatService::joinVisibleChatLobby(const ChatLobbyId& lobby_id,co
 
         ChatLobbyEntry entry ;
 
-        entry.lobby_flags = it->second.lobby_flags ;//RS_CHAT_LOBBY_PRIVACY_LEVEL_PUBLIC ;
+        entry.lobby_flags = it->second.lobby_flags ;
 		entry.participating_friends.clear() ;
         entry.gxs_id = gxs_id ;
 		entry.lobby_id = lobby_id ;
@@ -1685,21 +1687,22 @@ void DistributedChatService::handleFriendUnsubscribeLobby(RsChatLobbyUnsubscribe
 				it->second.participating_friends.erase(it2) ;
 				break ;
 			}
-//        RsPgpId pgpId = rsPeers->getGPGId(item->PeerId());
-//        RsPeerId leaveMemberId = item->PeerId();
-//        RsGxsId gxsId = RsGxsId(leaveMemberId);
-//        for(std::map<RsGxsId, rstime_t>::iterator it3(it->second.gxs_ids.begin());it3!=it->second.gxs_ids.end();++it3)
-//            if((*it3).first == gxsId)
-//            {
-//#ifdef DEBUG_CHAT_LOBBIES
-//                std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
-//#endif
-//                std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
-//                it->second.gxs_ids.erase((*it3).first) ;
-//                break ;
-//            }
+        RsPgpId pgpId = rsPeers->getGPGId(item->PeerId());
+        RsPeerId leaveMemberId = item->PeerId();
+        RsGxsId gxsId = RsGxsId(leaveMemberId);
+        for(std::map<RsGxsId, rstime_t>::iterator it3(it->second.gxs_ids.begin());it3!=it->second.gxs_ids.end();++it3)
+            if((*it3).first == gxsId)
+            {
+#ifdef DEBUG_CHAT_LOBBIES
+                std::cerr << "  removing peer id " << item->PeerId() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+#endif
+                std::cerr << "  removing peer id " << item->PeerId() << ", gxsId:" << gxsId.toStdString() << " from participant list of lobby " << std::hex << item->lobby_id << std::dec << std::endl;
+                it->second.gxs_ids.erase((*it3).first) ;
+                break ;
+            }
 	}
-
+    //save immediately for
+    saveGroupChatInfo();
 
 	RsServer::notify()->notifyListChange(NOTIFY_LIST_CHAT_LOBBY_LIST, NOTIFY_TYPE_MOD) ;
 }
@@ -1931,21 +1934,21 @@ void DistributedChatService::cleanLobbyCaches()
 			bool changed = false ;
 
             //unseenp2p - remove all cases that remove the member from member list
-//            for(std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();)
-//				if(it2->second + MAX_KEEP_INACTIVE_NICKNAME < now)
-//				{
-//#ifdef DEBUG_CHAT_LOBBIES
-//					std::cerr << "  removing inactive nickname 0x" << std::hex << it2->first << ", time=" << std::dec << now - it2->second << " secs ago" << std::endl;
-//#endif
+            for(std::map<RsGxsId,rstime_t>::iterator it2(it->second.gxs_ids.begin());it2!=it->second.gxs_ids.end();)
+                if(it2->second + MAX_KEEP_INACTIVE_NICKNAME < now)
+                {
+#ifdef DEBUG_CHAT_LOBBIES
+                    std::cerr << "  removing inactive nickname 0x" << std::hex << it2->first << ", time=" << std::dec << now - it2->second << " secs ago" << std::endl;
+#endif
 
-//                    std::map<RsGxsId,rstime_t>::iterator tmp(it2) ;
-//					++tmp ;
-//                    it->second.gxs_ids.erase(it2) ;
-//					it2 = tmp ;
-//					changed = true ;
-//				}
-//				else
-//					++it2 ;
+                    std::map<RsGxsId,rstime_t>::iterator tmp(it2) ;
+                    ++tmp ;
+                    it->second.gxs_ids.erase(it2) ;
+                    it2 = tmp ;
+                    changed = true ;
+                }
+                else
+                    ++it2 ;
 
 			if(changed)
 				changed_lobbies.push_back(it->first) ;

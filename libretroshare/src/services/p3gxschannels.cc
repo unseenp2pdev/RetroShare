@@ -460,10 +460,12 @@ bool p3GxsChannels::getPostData(const uint32_t &token, std::vector<RsGxsChannelP
 						//const uint16_t RS_SERVICE_GXS_TYPE_CHANNELS    = 0x0217;
 						//const uint8_t RS_PKT_SUBTYPE_GXSCHANNEL_POST_ITEM = 0x03;
 						//const uint8_t RS_PKT_SUBTYPE_GXSCOMMENT_COMMENT_ITEM = 0xf1;
+#ifdef GXSCHANNEL_DEBUG
 						std::cerr << "Not a GxsChannelPostItem neither a RsGxsCommentItem"
 											<< " PacketService=" << std::hex << (int)msg->PacketService() << std::dec
 											<< " PacketSubType=" << std::hex << (int)msg->PacketSubType() << std::dec
 											<< " , deleting!" << std::endl;
+#endif
 						delete *vit;
 					}
 				}

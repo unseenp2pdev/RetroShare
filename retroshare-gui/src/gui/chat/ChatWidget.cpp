@@ -98,6 +98,7 @@ ChatWidget::ChatWidget(QWidget *parent)
 	ui->emoteiconButton->setIconSize(iconSize);
 	ui->attachPictureButton->setFixedSize(buttonSize);
 	ui->attachPictureButton->setIconSize(iconSize);
+    ui->attachPictureButton->hide();    //hide Search image Button
 	ui->addFileButton->setFixedSize(buttonSize);
 	ui->addFileButton->setIconSize(iconSize);
 	ui->pushtoolsButton->setFixedSize(buttonSize);
@@ -1285,6 +1286,13 @@ void ChatWidget::sendChat()
         long long current_time = QDateTime::currentSecsSinceEpoch();
         std::string nickInGroupChat = "You";
         emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
+
+        //we can check the scroll position here, if it now at the end, so update it to the end
+        QScrollBar *scrollbar = ui->textBrowser->verticalScrollBar();
+        bool is_scrollbar_at_end = scrollbar->value() == scrollbar->maximum();
+        if (!is_scrollbar_at_end ) {
+            scrollbar->setValue(scrollbar->maximum());
+        }
     }
 }
 

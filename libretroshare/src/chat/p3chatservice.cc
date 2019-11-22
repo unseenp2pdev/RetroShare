@@ -48,7 +48,7 @@
   #define CHAT_DEBUG 1
 ****/
 
-static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 6000 ; // Max message size to forward other friends
+static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 43000 ; // Max message size to forward other friends
 static const uint32_t MAX_AVATAR_JPEG_SIZE              = 32767; // Maximum size in bytes for an avatar. Too large packets 
                                                                  // don't transfer correctly and can kill the system.
 																					  // Images are 96x96, which makes approx. 27000 bytes uncompressed.
@@ -866,7 +866,7 @@ bool p3ChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
     cm.incoming = true;
     cm.online = true;
     cm.unread = true; //need to update this field when user already read the msg
-    std::cerr << "Msg go here first? " << std::endl;
+    //std::cerr << "Msg go here first? " << std::endl;
     RsServer::notify()->notifyChatMessage(cm);
     
     // cyril: history is temporarily diabled for distant chat, since we need to store the full tunnel ID, but then

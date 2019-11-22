@@ -44,7 +44,9 @@ bool RsGxsDataAccess::requestGroupInfo(uint32_t &token, uint32_t ansType, const 
 {
     if(groupIds.empty())
     {
+#ifdef DATA_DEBUG
     	std::cerr << "(WW) Group Id list is empty" << std::endl;
+#endif
         return false;
     }
 
@@ -1913,19 +1915,23 @@ bool RsGxsDataAccess::checkMsgFilter(const RsTokReqOptions& opts, const RsGxsMsg
 		// Exact Flags match required.
  		if ((opts.mStatusMask & opts.mStatusFilter) == (opts.mStatusMask & meta->mMsgStatus))
 		{
-			std::cerr << "checkMsgFilter() Accepting Msg as StatusMatches: ";
+#ifdef DATA_DEBUG
+            std::cerr << "checkMsgFilter() Accepting Msg as StatusMatches: ";
 			std::cerr << " Mask: " << opts.mStatusMask << " StatusFilter: " << opts.mStatusFilter;
 			std::cerr << " MsgStatus: " << meta->mMsgStatus << " MsgId: " << meta->mMsgId;
 			std::cerr << std::endl;
+#endif
 
 			statusMatch = true;
 		}
 		else
 		{
+#ifdef DATA_DEBUG
 			std::cerr << "checkMsgFilter() Dropping Msg due to !StatusMatch ";
 			std::cerr << " Mask: " << opts.mStatusMask << " StatusFilter: " << opts.mStatusFilter;
 			std::cerr << " MsgStatus: " << meta->mMsgStatus << " MsgId: " << meta->mMsgId;
 			std::cerr << std::endl;
+#endif
 		}
 	}
 	else
