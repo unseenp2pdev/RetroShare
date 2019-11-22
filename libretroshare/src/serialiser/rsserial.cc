@@ -42,7 +42,7 @@
 ***/
 
 // As these represent SERIOUS ERRORs, this debug should be left one.
-//#define RSSERIAL_ERROR_DEBUG		1
+#define RSSERIAL_ERROR_DEBUG		1
 
 
 #if defined(RSSERIAL_DEBUG) || defined(RSSERIAL_ERROR_DEBUG)
