@@ -204,8 +204,8 @@ RsCertificate::RsCertificate(const RsPeerDetails& Detail, const unsigned char *b
 			}
 			catch(...)
 			{
-				std::cerr << "RsCertificate::Invalid LocalAddress: "
-				          << Detail.localAddr << std::endl;
+//				std::cerr << "RsCertificate::Invalid LocalAddress: "
+//				          << Detail.localAddr << std::endl;
 				memset(ipv4_internal_ip_and_port,0,6);
 			}
 
@@ -216,8 +216,8 @@ RsCertificate::RsCertificate(const RsPeerDetails& Detail, const unsigned char *b
 			}
 			catch(...)
 			{
-				std::cerr << "RsCertificate::Invalid ExternalAddress: "
-				          << Detail.extAddr << std::endl;
+//				std::cerr << "RsCertificate::Invalid ExternalAddress: "
+//				          << Detail.extAddr << std::endl;
 				memset(ipv4_external_ip_and_port,0,6) ;
 			}
 
