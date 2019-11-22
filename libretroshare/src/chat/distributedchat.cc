@@ -1588,7 +1588,7 @@ bool DistributedChatService::joinVisibleChatLobby(const ChatLobbyId& lobby_id,co
 
         ChatLobbyEntry entry ;
 
-        entry.lobby_flags = it->second.lobby_flags ;//RS_CHAT_LOBBY_PRIVACY_LEVEL_PUBLIC ;
+        entry.lobby_flags = it->second.lobby_flags ;
 		entry.participating_friends.clear() ;
         entry.gxs_id = gxs_id ;
 		entry.lobby_id = lobby_id ;
