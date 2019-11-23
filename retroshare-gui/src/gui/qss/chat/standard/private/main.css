@@ -41,8 +41,9 @@
 }
 
 .time {
-    color: #9a9ab4;
-    font-size: 13pt;
+    color: #4d4d5e;
+    font-size: 9pt;
+    padding: 0px 0px;
 }
 .cin {
 background-color: #ececec;
