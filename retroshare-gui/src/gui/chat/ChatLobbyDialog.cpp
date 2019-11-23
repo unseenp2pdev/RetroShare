@@ -375,7 +375,7 @@ void ChatLobbyDialog::init(const ChatId &/*id*/, const QString &/*title*/)
     {
         title = QString::fromUtf8(linfo.lobby_name.c_str());
 
-        QString msg = tr("Welcome to group chat %1").arg(RsHtml::plainText(linfo.lobby_name));
+        QString msg = tr("Welcome to group chat: %1").arg(RsHtml::plainText(linfo.lobby_name));
         _lobby_name = QString::fromUtf8(linfo.lobby_name.c_str()) ;
         if (!linfo.lobby_topic.empty()) {
             msg += "\n" + tr("Topic: %1").arg(RsHtml::plainText(linfo.lobby_topic));
