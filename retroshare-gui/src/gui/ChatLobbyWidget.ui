@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
+    <width>890</width>
     <height>580</height>
    </rect>
   </property>
@@ -382,8 +382,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../Unseengui/unseengui.qrc"/>
   <include location="icons.qrc"/>
+  <include location="../Unseengui/unseengui.qrc"/>
  </resources>
  <connections/>
 </ui>

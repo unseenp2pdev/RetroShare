@@ -164,7 +164,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="../images.qrc">:/images/info16.png</pixmap>
+              <pixmap>:/images/info16.png</pixmap>
              </property>
              <property name="alignment">
               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -241,8 +241,8 @@ border-image: url(:/images/closepressed.png)
            </property>
            <property name="maximumSize">
             <size>
-             <width>1100</width>
-             <height>1100</height>
+             <width>4000</width>
+             <height>4000</height>
             </size>
            </property>
            <property name="font">
@@ -268,6 +268,9 @@ p, li { white-space: pre-wrap; }
             </property>
             <item>
              <layout class="QHBoxLayout" name="typingHLayout">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetFixedSize</enum>
+              </property>
               <item>
                <widget class="QLabel" name="typingPixmapLabel">
                 <property name="minimumSize">
@@ -569,6 +572,12 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="HashBox" name="hashBox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>71</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>13</pointsize>
@@ -776,7 +785,7 @@ p, li { white-space: pre-wrap; }
            <enum>Qt::NoFocus</enum>
           </property>
           <property name="icon">
-           <iconset resource="../images.qrc">
+           <iconset resource="../WikiPoos/Wiki_images.qrc">
             <normaloff>:/images/arrow-left.png</normaloff>:/images/arrow-left.png</iconset>
           </property>
           <property name="autoRaise">
@@ -802,7 +811,7 @@ p, li { white-space: pre-wrap; }
            <enum>Qt::NoFocus</enum>
           </property>
           <property name="icon">
-           <iconset resource="../images.qrc">
+           <iconset resource="../WikiPoos/Wiki_images.qrc">
             <normaloff>:/images/arrow-right.png</normaloff>:/images/arrow-right.png</iconset>
           </property>
           <property name="autoRaise">
@@ -885,7 +894,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionClearChatHistory">
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/edit-clear-history.png</normaloff>:/images/edit-clear-history.png</iconset>
    </property>
    <property name="text">
@@ -902,7 +911,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSaveChatHistory">
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/document_save.png</normaloff>:/images/document_save.png</iconset>
    </property>
    <property name="text">
@@ -922,7 +931,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionDeleteChatHistory">
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/edit-clear-history.png</normaloff>:/images/edit-clear-history.png</iconset>
    </property>
    <property name="text">
@@ -1006,7 +1015,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSave_image">
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/document_save.png</normaloff>:/images/document_save.png</iconset>
    </property>
    <property name="text">
@@ -1018,7 +1027,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/SimpleText.png</normaloff>:/images/SimpleText.png</iconset>
    </property>
    <property name="text">
@@ -1033,7 +1042,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../images.qrc">
+    <iconset>
      <normaloff>:/images/SmileyText.png</normaloff>:/images/SmileyText.png</iconset>
    </property>
    <property name="text">
@@ -1093,8 +1102,8 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../images.qrc"/>
   <include location="../icons.qrc"/>
+  <include location="../WikiPoos/Wiki_images.qrc"/>
  </resources>
  <connections/>
 </ui>
