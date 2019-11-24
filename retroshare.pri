@@ -617,7 +617,7 @@ macx-* {
 #	LIB_DIR += "/usr/local/Cellar/opencv/4.1.0_2/lib"
 
         CONFIG += c++11
-        INCLUDEPATH += "/usr/local/include"
+        INCLUDEPATH += /usr/local/include
         RS_UPNP_LIB = miniupnpc
         QT += macextras
 }
