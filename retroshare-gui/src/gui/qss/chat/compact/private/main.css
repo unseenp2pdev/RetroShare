@@ -33,17 +33,20 @@
 .message {
     color: #000000;
     font-size: 13pt;
+    font-family: "Segoe UI";
 }
 
 .name{
     font-weight: bold;
     font-size: 13pt;
+    font-family: "Segoe UI Semibold";
 }
 
 .time {
     color: #4d4d5e;
     font-size: 9pt;
     padding: 0px 0px;
+    font-family: "Segoe UI";
 }
 .cin {
 background-color: #ececec;
