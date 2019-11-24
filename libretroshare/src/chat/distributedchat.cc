@@ -411,7 +411,7 @@ void DistributedChatService::checkSizeAndSendLobbyMessage(RsChatItem *msg)
     //    3 - it is unreliable since items are not guarrantied to all arrive in the end (cannot be fixed)
     //    4 - large objects can be used to corrupt end peers (cannot be fixed)
     //
-    static const uint32_t MAX_ITEM_SIZE = 32000 ;
+    static const uint32_t MAX_ITEM_SIZE = 100000 ;
 
     if(RsChatSerialiser().size(msg) > MAX_ITEM_SIZE)
     {
