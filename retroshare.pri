@@ -618,6 +618,7 @@ macx-* {
 
         CONFIG += c++11
 
+        INCLUDEPATH += "/usr/local/Cellar/openssl/include"
         INCLUDEPATH += "/usr/include"
         INCLUDEPATH += "/usr/local/include"
         INCLUDEPATH += "/opt/local/include"
