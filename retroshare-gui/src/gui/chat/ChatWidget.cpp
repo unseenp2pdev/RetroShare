@@ -83,7 +83,6 @@ ChatWidget::ChatWidget(QWidget *parent)
   , ui(new Ui::ChatWidget)
 {
 	ui->setupUi(this);
-
 	int iconHeight = QFontMetricsF(font()).height();
 	double fmm = iconHeight > FMM_THRESHOLD ? FMM : FMM_SMALLER;
 	iconHeight *= fmm;
@@ -238,6 +237,7 @@ ChatWidget::ChatWidget(QWidget *parent)
     ui->chatTextEdit->setCompleter(completer);
     ui->chatTextEdit->setCompleterKeyModifiers(Qt::ControlModifier);
     ui->chatTextEdit->setCompleterKey(Qt::Key_Space);
+    ui->chatVSplitter->setSizes((QList<int>() << 800 << 40));
 
 //#ifdef ENABLE_DISTANT_CHAT_AND_MSGS
 //	contextMnu->addSeparator();
@@ -458,7 +458,8 @@ void ChatWidget::processSettings(bool load)
 		// load settings
 
 		// state of splitter
-		ui->chatVSplitter->restoreState(Settings->value("ChatSplitter").toByteArray());
+        //ui->chatVSplitter->restoreState(Settings->value("ChatSplitter").toByteArray());
+        ;
 	} else {
 		// save settings
 
