@@ -8,7 +8,7 @@
         <License name="GPL Public License Agreement" file="LICENSE.txt" />
     </Licenses>
     <Default>true</Default>
-    <Required>true</Required>
+    <Required>false</Required>
     <Script>installscript.qs</Script>
     <UserInterfaces>
         <UserInterface>targetwidget.ui</UserInterface>
