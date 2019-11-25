@@ -209,7 +209,7 @@ ChatWidget QTextBrowser#textBrowser {
         border-radius: 6px;
         background-size: contain;
         background-attachment: fixed;
-        background-image: url(:/home/img/mountain3-2.jpg);
+        background-image: url(:/home/img/mountain3-1.jpg);
 
         background-repeat: no-repeat;
         background-position: center;
