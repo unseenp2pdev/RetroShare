@@ -46,6 +46,10 @@ Component.prototype.createOperations = function()
     }
     else if (systemInfo.productType === "osx") {
 	maintenanceToolPath = installer.value("TargetDir") + "/MaintenanceTool";
+        var users = installer.value("HomeDir").split("\/");
+        var targetDir = installer.value("TargetDir");
+        component.addOperation("Execute", "sudo", ["chown", "-R", users[2], targetDir]);
+
     }
     else {
 	var desktopFileTarget = installer.value("HomeDir") + "/.local/share/applications";
@@ -67,7 +71,7 @@ Component.prototype.createOperations = function()
 
 	var users = installer.value("HomeDir").split("\/");
 
-	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/.config/autostart");
+	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/.config/autostart"]);
 	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/Desktop/unseenp2p.desktop"]);
 	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], targetDir + "/unseenp2p.desktop"]);
 	
