@@ -27,7 +27,6 @@
 #include "GxsChatDialog.h"
 #include "GxsChatGroupDialog.h"
 #include "GxsChatPostsWidget.h"
-#include "GxsChatWidget.h"
 #include "CreateGxsChatMsg.h"
 #include "GxsChatUserNotify.h"
 #include "gui/gxs/GxsGroupShareKey.h"
@@ -166,7 +165,6 @@ GxsMessageFrameWidget *GxsChatDialog::createMessageFrameWidget(const RsGxsGroupI
 {
     //rsGxsChats->setSyncPeriod(groupId,300.0);   //reset sync message in 5min for this group
     return new GxsChatPostsWidget(groupId);
-    //return new GxsChatWidget(groupId);
 }
 
 void GxsChatDialog::setDefaultDirectory()
