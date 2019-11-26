@@ -128,12 +128,24 @@ ChatWidget::ChatWidget(QWidget *parent)
 	ui->markButton->setVisible(false);
 	ui->leSearch->setVisible(false);
 	ui->searchBefore->setVisible(false);
-	ui->searchBefore->setToolTip(tr("<b>Find Previous </b><br/><i>Ctrl+Shift+G</i>"));
-	ui->searchAfter->setVisible(false);
-	ui->searchAfter->setToolTip(tr("<b>Find Next </b><br/><i>Ctrl+G</i>"));
-	ui->searchButton->setCheckable(true);
-	ui->searchButton->setChecked(false);
-	ui->searchButton->setToolTip(tr("<b>Find </b><br/><i>Ctrl+F</i>"));
+#ifdef WINDOWS_SYS || linux
+    ui->searchBefore->setToolTip(tr("<b>Find Previous </b><br/><i>Ctrl+Shift+G</i>"));
+#else
+    ui->searchBefore->setToolTip(tr("<b>Find Previous </b><br/><i>Command+Shift+G</i>"));
+#endif
+    ui->searchAfter->setVisible(false);
+#ifdef WINDOWS_SYS || linux
+    ui->searchAfter->setToolTip(tr("<b>Find Next </b><br/><i>Ctrl+G</i>"));
+#else
+    ui->searchAfter->setToolTip(tr("<b>Find Next </b><br/><i>Command+G</i>"));
+#endif
+    ui->searchButton->setCheckable(true);
+    ui->searchButton->setChecked(false);
+#ifdef WINDOWS_SYS || linux
+    ui->searchButton->setToolTip(tr("<b>Find </b><br/><i>Ctrl+F</i>"));
+#else
+    ui->searchButton->setToolTip(tr("<b>Find </b><br/><i>Command+F</i>"));
+#endif
 	ui->leSearch->installEventFilter(this);
 
 	connect(ui->actionFindCaseSensitively, SIGNAL(triggered()), this, SLOT(toogle_FindCaseSensitively()));
