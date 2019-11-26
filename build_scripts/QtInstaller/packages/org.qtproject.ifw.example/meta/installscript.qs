@@ -52,24 +52,26 @@ Component.prototype.createOperations = function()
 
         component.addOperation("CreateDesktopEntry", 
                                   targetDir + "/unseenp2p.desktop", 
-                                  "Type=Application\nTerminal=false\nExec= " + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon= " + targetDir + "/unseenp2p.xpm");
+                                  "Type=Application\nTerminal=false\nExec=" + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon=" + targetDir + "/unseenp2p.xpm");
 
     	component.addOperation("CreateDesktopEntry", 
                                   homeDir + "/Desktop/unseenp2p.desktop", 
-                                  "Type=Application\nTerminal=false\nExec= " + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon= " + targetDir + "/unseenp2p.xpm");
+                                  "Type=Application\nTerminal=false\nExec=" + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon=" + targetDir + "/unseenp2p.xpm");
 
 	// in case autostart is not exist.
 	component.addOperation("Mkdir", homeDir + "/.config/autostart");
 
     	component.addOperation("CreateDesktopEntry", 
                                   homeDir + "/.config/autostart/unseenp2p.desktop", 
-                                  "Type=Application\nTerminal=false\nExec= " + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon= " + targetDir + "/unseenp2p.xpm");
+                                  "Type=Application\nTerminal=false\nExec=" + targetDir + "/unseenp2p.app\nName=unseenp2p\nIcon=" + targetDir + "/unseenp2p.xpm");
 
 	var users = installer.value("HomeDir").split("\/");
 
-	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/.config/autostart");
+	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/.config/autostart"]);
 	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], homeDir + "/Desktop/unseenp2p.desktop"]);
 	component.addOperation("Execute", "sudo", ["chown", users[2] + ":" + users[2], targetDir + "/unseenp2p.desktop"]);
+	component.addOperation("Execute", "sudo", ["cp", targetDir + "/unseenp2p.desktop", "/usr/share/applications/unseenp2p.desktop"]);
+	
 	
     }
 }
