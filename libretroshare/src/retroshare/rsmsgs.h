@@ -269,6 +269,10 @@ public:
 #define RS_DISTANT_CHAT_CONTACT_PERMISSION_FLAG_FILTER_NON_CONTACTS   0x0001 
 #define RS_DISTANT_CHAT_CONTACT_PERMISSION_FLAG_FILTER_EVERYBODY      0x0002 
 
+//unseenp2p
+#define CONVERSATION_MODE_WITHOUT_FILTER                    0x0000
+#define CONVERSATION_MODE_WITH_SEARCH_FILTER                0x0001
+
 struct DistantChatPeerInfo
 {
 	RsGxsId to_id ;
@@ -277,6 +281,30 @@ struct DistantChatPeerInfo
 	uint32_t status ;		// see the values in rsmsgs.h
 };
 
+//unseenp2p - for Model-view
+struct conversationInfo
+{
+
+    std::string displayName;            //group name or contact name
+    std::string nickInGroupChat;        // only in groupchat
+    unsigned int UnreadMessagesCount = 0;
+    std::string LastInteractionDate;    // date for last message
+    long long lastMsgDatetime;               // QDateTime::currentDateTime().toTime_t()
+    std::string lastMessage;
+    bool isOtherLastMsg;            // true if receiving msg, false if sending msg
+    int contactType;                // 0 - groupchat, 1 - contact chat
+    int groupChatType;              // 0 - public, 1: private
+    std::string rsPeerIdStr;            // for contact (chatId.toPeerId) and groupchat (chatId.toLobbyId)
+    ChatLobbyId chatLobbyId;
+    std::string uId;                    // unique Id: this will take groupId or chatId for Id for all list
+
+    conversationInfo(std::string displayName, std::string nickInGroupChat,
+         unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+         int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId): displayName(displayName),nickInGroupChat(nickInGroupChat),
+           UnreadMessagesCount(UnreadMessagesCount), lastMsgDatetime(lastMsgDatetime),
+            lastMessage(lastMessage), isOtherLastMsg(isOtherLastMsg), contactType(contactType), groupChatType(groupChatType), rsPeerIdStr(rsPeerIdStr), chatLobbyId(chatLobbyId), uId(uId) {}
+
+};
 // Identifier for an chat endpoint like
 // neighbour peer, distant peer, chatlobby, broadcast
 class ChatId : RsSerializable
@@ -524,6 +552,24 @@ virtual bool resetMessageStandardTagTypes(Rs::Msgs::MsgTagType& tags) = 0;
 	 */
 	virtual void clearChatLobby(const ChatId &id) = 0;
 
+
+    //unseenp2p - for MVC
+    virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                                   unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                                   int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId) = 0;
+    virtual void removeContactOrGroupChatFromModelData(std::string uId) = 0;
+    virtual std::vector<conversationInfo> getConversationItemList() = 0;
+    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg ) = 0;
+    virtual void sortConversationItemListByRecentTime() = 0;
+    virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset) = 0;
+    virtual std::string getSeletedUIdBeforeSorting(int row) = 0;
+    virtual int getIndexFromUId(std::string uId) = 0;
+    virtual bool isChatIdInConversationList(std::string uId) = 0;
+    virtual void setConversationListMode(uint32_t mode) = 0;
+    virtual uint32_t getConversationListMode() = 0;
+    virtual void setSearchFilter(std::string text) = 0;
+    virtual std::vector<conversationInfo> getSearchFilteredConversationItemList() = 0;
+
 	/**
 	 * @brief setCustomStateString set your custom status message
 	 * @jsonapi{development}
@@ -587,6 +633,7 @@ virtual void getOwnAvatarData(unsigned char *& data,int& size) = 0 ;
 	virtual void getListOfNearbyChatLobbies(std::vector<VisibleChatLobbyRecord> &public_lobbies) = 0 ;
 
 
+    //unseenp2p
     /**
 
      * @brief getGroupChatInfoList get info about all group chats
@@ -595,6 +642,18 @@ virtual void getOwnAvatarData(unsigned char *& data,int& size) = 0 ;
      */
     virtual void getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo>& _groupchats) = 0 ;
 
+    /**
+
+     * @brief getGroupChatInfoList get info about all group chats
+     * @jsonapi{development}
+     * @param[out] public_lobbies list of all visible lobbies
+     */
+
+    //unseenp2p
+    virtual void saveGroupChatInfo() = 0;
+
+    virtual void locked_printDebugInfo() const = 0 ;
+    //end of unseenp2p
 
 	/**
 	 * @brief invitePeerToLobby invite a peer to join a lobby

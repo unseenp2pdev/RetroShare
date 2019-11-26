@@ -20,11 +20,8 @@ libresapihttpserver {
 !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 
 FORMS   += TorControl/TorControlWindow.ui
-
 SOURCES += TorControl/TorControlWindow.cpp
-
 HEADERS += TorControl/TorControlWindow.h
-
 
 
 #QMAKE_CFLAGS += -fmudflap 
@@ -577,13 +574,23 @@ HEADERS +=  rshare.h \
             gui/connect/ConnectProgressDialog.h \
             gui/groups/CreateGroup.h \
             gui/GetStartedDialog.h \
-        gui/statistics/BWGraph.h \
-    util/RsSyntaxHighlighter.h \
-    util/imageutil.h \
-    gui/NetworkDialog/pgpid_item_model.h \
-    gui/NetworkDialog/pgpid_item_proxy.h \
-    gui/common/RsCollection.h \
-    util/retroshareWin32.h
+            gui/statistics/BWGraph.h \
+            util/RsSyntaxHighlighter.h \
+            util/imageutil.h \
+            gui/NetworkDialog/pgpid_item_model.h \
+            gui/NetworkDialog/pgpid_item_proxy.h \
+            gui/common/RsCollection.h \
+            util/retroshareWin32.h \
+            gui/smartlistview.h \
+            gui/smartlistmodel.h \
+            gui/conversationitemdelegate.h\
+            gui/models/typedefs.h \
+            gui/models/behaviorcontroller.h \
+            gui/models/conversation.h \
+            gui/models/conversationmodel.h \
+            gui/models/interaction.h \
+            gui/models/profile.h
+
 #            gui/ForumsDialog.h \
 #            gui/forums/ForumDetails.h \
 #            gui/forums/EditForumDetails.h \
@@ -945,12 +952,18 @@ SOURCES +=  main.cpp \
             gui/statistics/BwCtrlWindow.cpp \
             gui/statistics/RttStatistics.cpp \
             gui/statistics/BWGraph.cpp \
-    util/RsSyntaxHighlighter.cpp \
-    util/imageutil.cpp \
-    gui/NetworkDialog/pgpid_item_model.cpp \
-    gui/NetworkDialog/pgpid_item_proxy.cpp \
-    gui/common/RsCollection.cpp \
-    util/retroshareWin32.cpp
+            util/RsSyntaxHighlighter.cpp \
+            util/imageutil.cpp \
+            gui/NetworkDialog/pgpid_item_model.cpp \
+            gui/NetworkDialog/pgpid_item_proxy.cpp \
+            gui/common/RsCollection.cpp \
+            util/retroshareWin32.cpp    \
+            gui/smartlistmodel.cpp \
+            gui/conversationitemdelegate.cpp \
+            gui/smartlistview.cpp \
+            gui/models/behaviorcontroller.cpp \
+            gui/models/conversationmodel.cpp
+
 #            gui/ForumsDialog.cpp \
 #            gui/forums/ForumDetails.cpp \
 #            gui/forums/EditForumDetails.cpp \
@@ -1290,7 +1303,6 @@ gxschats {
         HEADERS += gui/gxschats/GxsChatDialog.h \
                 gui/gxschats/GxsChatGroupDialog.h \
                 gui/gxschats/CreateGxsChatMsg.h \
-                gui/gxschats/GxsChatWidget.h \
                 gui/gxschats/GxsChatPostsWidget.h \
                 gui/gxschats/GxsChatFilesWidget.h \
                 gui/gxschats/GxsChatFilesStatusWidget.h \
@@ -1298,7 +1310,7 @@ gxschats {
                 gui/feeds/GxsChatPostItem.h \
                 gui/gxschats/GxsChatUserNotify.h
 
-        FORMS += gui/gxschats/GxsChatWidget.ui \
+        FORMS += \
                 gui/gxschats/GxsChatPostsWidget.ui \
                 gui/gxschats/GxsChatFilesWidget.ui \
                 gui/gxschats/GxsChatFilesStatusWidget.ui \
@@ -1307,7 +1319,6 @@ gxschats {
                 gui/feeds/GxsChatPostItem.ui
 
         SOURCES += gui/gxschats/GxsChatDialog.cpp \
-                gui/gxschats/GxsChatWidget.cpp \
                 gui/gxschats/GxsChatPostsWidget.cpp \
                 gui/gxschats/GxsChatFilesWidget.cpp \
                 gui/gxschats/GxsChatFilesStatusWidget.cpp \
@@ -1317,6 +1328,7 @@ gxschats {
                 gui/feeds/GxsChatPostItem.cpp \
                 gui/gxschats/GxsChatUserNotify.cpp
 }
+	
 	
 posted {
 	

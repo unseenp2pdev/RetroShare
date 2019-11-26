@@ -25,6 +25,8 @@
 #include <QtNetwork>
 #include  <iostream>
 
+//unseenp2p
+#include <retroshare/rsdisc.h>
 
 #include <rshare.h>
 #include "gui/FriendsDialog.h"
@@ -52,6 +54,7 @@
 
 //unseenp2p - meiyousixin - add cert exchange module for new node
 #include "httpclient/cert_exchange.h"
+#include <array>
 
 #ifdef ENABLE_WEBUI
 #	include "gui/settings/WebuiPage.h"
@@ -514,23 +517,83 @@ feenableexcept(FE_INVALID | FE_DIVBYZERO);
                  splashScreen2.showMessage(rshare.translate("SplashScreen", "Waiting to key exchange with supernodes..."), Qt::AlignHCenter | Qt::AlignBottom);
                 std::map<std::string, std::string> ip_port_list = certEx->getIP_Port();
                 std::list<std::string> supernodeList = certEx->getSupernodeList();
+
+                std::cerr << "all supernode List by order list: " << std::endl;
+                int supernodeNumber=  (int) supernodeList.size(); //N = supernodeNumber
                 int exchangeCount = 0;
-                std::map<std::string, std::string>::iterator ipPortIt;
-
-                for(ipPortIt = ip_port_list.begin(); ipPortIt != ip_port_list.end(); ipPortIt++)
+                // if all the supernode number is less than or 3, just run without ramdom
+                if (supernodeNumber <=3)
                 {
-                    // Need to send certificate of this peer to some supernode from list
-                    if (certEx->submitCertToSuperNode(ipPortIt->first,ipPortIt->second, cert ) > 0)
+                    std::map<std::string, std::string>::iterator ipPortIt;
+
+                    for(ipPortIt = ip_port_list.begin(); ipPortIt != ip_port_list.end(); ipPortIt++)
                     {
-                        //Need to get the certificate of this supernode for adding supernode as friend then
-                        std::string supernodeCert = certEx->getSupernodeCert(ipPortIt->first,ipPortIt->second);
+                        // Need to send certificate of this peer to some supernode from list
+                        if (certEx->submitCertToSuperNode(ipPortIt->first,ipPortIt->second, cert ) > 0)
+                        {
+                            //Need to get the certificate of this supernode for adding supernode as friend then
+                            std::string supernodeCert = certEx->getSupernodeCert(ipPortIt->first,ipPortIt->second);
 
-                        //And save to rsPeers object for later adding supernode as friend
-                        rsPeers->saveSupernodeCert(supernodeCert);
+                            //And save to rsPeers object for later adding supernode as friend
+                            rsPeers->saveSupernodeCert(supernodeCert);
 
-                        // if we already exchange 3 of supernode, then we can stop
-                        exchangeCount++;
-                        if (exchangeCount >= 3) break;
+                            // if we already exchange 3 of supernode, then we can stop
+                            exchangeCount++;
+                            if (exchangeCount >= supernodeNumber) break;
+                        }
+                    }
+                }
+                else
+                {
+
+                    std::list<std::string>::iterator snodeIt;
+                    int i = 0;
+                    QString snodeArray[supernodeNumber];
+
+                    for (snodeIt = supernodeList.begin(); snodeIt != supernodeList.end(); snodeIt++)
+                    {
+
+                        std::cerr << " supernode number :  " << i << ": "  << (*snodeIt) << std::endl;
+                        snodeArray[i] = QString::fromStdString(*snodeIt);
+                        i++;
+                    }
+
+                    srand (time(NULL));
+                    int iChoice;
+                    int chosenCount = 0;
+                    std::set<int> chosenSnodeSet;
+                    std::set<int>::iterator it;
+
+                    while (exchangeCount < 3)
+                    {
+                        /* generate secret number between 0 and (supernodeNumber-1): */
+                          iChoice = rand() % supernodeNumber;
+                          if (chosenSnodeSet.count(iChoice)==0)
+                          {
+                              chosenCount +=1;
+                              chosenSnodeSet.insert(iChoice);
+
+                              std::string chosenSnode = snodeArray[iChoice].toStdString();
+                              std::cerr << " Chosen supernode -  " << chosenCount <<": " << chosenSnode << std::endl;
+                              std::map<std::string, std::string>::iterator ipPortIt = ip_port_list.find(chosenSnode);
+                              if (ipPortIt != ip_port_list.end())
+                              {
+                                  if (certEx->submitCertToSuperNode(ipPortIt->first,ipPortIt->second, cert ) > 0)
+                                  {
+                                      //Need to get the certificate of this supernode for adding supernode as friend then
+                                      std::string supernodeCert = certEx->getSupernodeCert(ipPortIt->first,ipPortIt->second);
+
+                                      //And save to rsPeers object for later adding supernode as friend
+                                      rsPeers->saveSupernodeCert(supernodeCert);
+
+                                      // if we already exchange 3 of supernode, then we can stop
+                                      exchangeCount++;
+                                      if (exchangeCount >= 3) break;
+                                  }
+                              }
+                          }
+                          // If randomly choose more than supernodeNumber, but almost they are not available, so need to quit.
+                          if (chosenCount >= supernodeNumber ) break;
                     }
                 }
                 splashScreen2.hide();

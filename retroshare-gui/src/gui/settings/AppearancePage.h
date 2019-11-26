@@ -37,7 +37,7 @@ public:
 	/** Loads the settings for this page */
 	virtual void load();
 
-    virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/tint-drop_x.svg") ; }
+    virtual QPixmap iconPixmap() const { return QPixmap(":/home/img/Setting/tint-drop_x.png") ; }
     virtual QString pageName() const { return tr("Appearance"); }
 	virtual QString helpText() const { return ""; }
 

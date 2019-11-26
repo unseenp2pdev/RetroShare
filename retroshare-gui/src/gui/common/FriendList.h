@@ -98,6 +98,8 @@ public slots:
     void setShowGroups(bool show);
     void setHideUnconnected(bool hidden);
     void setShowState(bool show);
+    void exportFriendlistClicked();
+    void importFriendlistClicked();
 signals:
     void configChanged();
 
@@ -175,8 +177,7 @@ private slots:
     void editGroup();
     void removeGroup();
 
-    void exportFriendlistClicked();
-    void importFriendlistClicked();
+
 
 //	 void inviteToLobby();
 //	 void createchatlobby();

@@ -122,18 +122,50 @@ void PGPKeyDialog::loadAll()
     for(QMap<RsPgpId , PGPKeyDialog*>::iterator it = instances_pgp.begin(); it != instances_pgp.end(); ++it)  it.value()->load();
 }
 
+static void populateFromNetworkContactToRsPeerDetails(const UnseenNetworkContactsItem &contactItem,  RsPeerDetails *detail )
+{
+    detail->name = contactItem.name;
+    detail->gpg_id = contactItem.gpg_id;
+    detail->id = contactItem.id;
+
+    detail->accept_connection = contactItem.accept_connection;
+    detail->ownsign = contactItem.ownsign;
+    detail->hasSignedMe = contactItem.hasSignedMe;
+    detail->trustLvl = contactItem.trustLvl;
+
+    detail->hiddenType = contactItem.hiddenType;
+    detail->lastConnect = contactItem.lastConnect;
+    detail->lastUsed = contactItem.lastUsed;
+
+    detail->hiddenNodeAddress = contactItem.hiddenNodeAddress;
+    detail->hiddenNodePort = contactItem.hiddenNodePort;
+
+}
+
 void PGPKeyDialog::load()
 {
     RsPeerDetails detail;
 
     if(!rsPeers->getGPGDetails(pgpId, detail))
     {
-        QMessageBox::information(this,
-                                 tr("UnseenP2P"),
-                                 tr("Error : cannot get peer details."));
-        close();
-        return;
+
+        //here we can use the UnseenNetworkContactsItem and update back to detail
+        UnseenNetworkContactsItem contactItem;
+        if (rsPeers->getPeerDetailsFromNetworkContacts(pgpId, contactItem))
+        {
+            populateFromNetworkContactToRsPeerDetails(contactItem, &detail);
+            std::cerr << "We try to copy from network contact item to peer detail, now name is: " << detail.name << std::endl;
+        }
+        else
+        {
+            QMessageBox::information(this,
+                                     tr("UnseenP2P"),
+                                     tr("Error : cannot get peer details."));
+            close();
+            return;
+        }
     }
+
 
     if(!rsPeers->isKeySupported(pgpId))
     {
@@ -375,21 +407,38 @@ void PGPKeyDialog::makeFriend()
 
     //Add friend first, then set location, ip go after
     //we can get peerId here for add friend!!!
-    std::map<RsPgpId, RsPeerId> list = rsPeers->friendListOfContact();
-    std::map<RsPgpId, RsPeerId>::iterator it;
-    it = list.find(pgpId);
-    if (it != list.end())
-    {
-        peerId = it->second;
-        std::cerr << "we can find you sslId: " << peerId << ") is Friend of contact  ";
-        std::cerr << std::endl;
+    //std::map<RsPgpId, RsPeerId> list = rsPeers->friendListOfContact();
+    //std::map<RsPgpId, RsPeerId>::iterator it;
 
+    std::map<RsPgpId, UnseenNetworkContactsItem> rsDetailsList = rsPeers->networkContacts();
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+
+    itDetails = rsDetailsList.find(pgpId);
+    if (itDetails != rsDetailsList.end() )
+    {
+        peerId = itDetails->second.id;
+        std::cerr << "we can find you sslId from RsPeerDetails network contact map: " << peerId << std::endl;;
     }
     else
     {
-        std::cerr << "we CAN NOT find you is Friend of contact  ";
-        std::cerr << std::endl;
+        std::cerr << "we CAN NOT find you in RsPeerDetails network contact map " << std::endl; ;
     }
+//    it = list.find(pgpId);
+//    if (it != list.end())
+//    {
+//        peerId = it->second;
+//        std::cerr << "we can find you sslId: " << peerId << ") is Friend of contact  ";
+//        std::cerr << std::endl;
+
+//    }
+//    else
+//    {
+//        std::cerr << "we CAN NOT find you is Friend of contact  ";
+//        std::cerr << std::endl;
+//    }
+
+    //unseenp2p - set option of addFriend when user click on Make Friend button, do not broadcast this anymore
+    rsPeers->setAddFriendOption(ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND);
 
     rsPeers->addFriend(peerId, pgpId);
 

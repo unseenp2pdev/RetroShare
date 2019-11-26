@@ -838,12 +838,15 @@ bool 	p3Peers::setLocation(const RsPeerId &ssl_id, const std::string &location)
 
 bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &port)
 {
+#ifdef P3PEERS_DEBUG
         std::cerr << "splitAddressString() Input: " << addr << std::endl;
-
+#endif
 	size_t cpos = addr.rfind(':');
 	if (cpos == std::string::npos)
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString Failed to parse (:)";
+#endif
 		std::cerr << std::endl;
 		return false;
 	}
@@ -851,8 +854,10 @@ bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &
 	int lenport = addr.length() - (cpos + 1); // +1 to skip over : char.
 	if (lenport <= 0)
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString() Missing Port ";
 		std::cerr << std::endl;
+#endif
 		return false;
 	}
 
@@ -862,14 +867,17 @@ bool	splitAddressString(const std::string &addr, std::string &domain, uint16_t &
 
 	if ((portint < 0) || (portint > 65535))
 	{
+#ifdef P3PEERS_DEBUG
         	std::cerr << "splitAddressString() Invalid Port";
 		std::cerr << std::endl;
+#endif
 		return false;
 	}
 	port = portint;
-
+#ifdef P3PEERS_DEBUG
         std::cerr << "splitAddressString() Domain: " << domain << " Port: " << port;
 	std::cerr << std::endl;
+#endif
 	return true;
 }
 
@@ -1141,7 +1149,10 @@ bool p3Peers::acceptInvite( const std::string& invite,
 	if(peerDetails.gpg_id.isNull())
 		return false;
 
-	addFriend(peerDetails.id, peerDetails.gpg_id, flags);
+    //unseenp2p - only for supernode, set the case addFriend
+    setAddFriendOption(ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE);
+
+    addFriend(peerDetails.id, peerDetails.gpg_id, flags);
 
 	if (!peerDetails.location.empty())
 		setLocation(peerDetails.id, peerDetails.location);
@@ -1171,7 +1182,6 @@ bool p3Peers::acceptInvite( const std::string& invite,
 			            peerDetails.id,
 			            RsUrl(ipr.substr(0, ipr.find(' '))) );
 	}
-
 	return true;
 }
 
@@ -1493,6 +1503,17 @@ RsPeerDetails::RsPeerDetails()
 {
 }
 
+UnseenNetworkContactsItem::UnseenNetworkContactsItem()
+        : name(""),
+          trustLvl(0), ownsign(false),
+          hasSignedMe(false),accept_connection(false),
+          isHiddenNode(true),
+          hiddenNodePort(0),
+          hiddenType(RS_HIDDEN_TYPE_TOR),
+          lastConnect(0),lastUsed(0),full_cert("")
+{
+}
+
 std::ostream &operator<<(std::ostream &out, const RsPeerDetails &detail)
 {
 	out << "RsPeerDetail: " << detail.name << "  <" << detail.id << ">";
@@ -1560,18 +1581,27 @@ void p3Peers::setServicePermissionFlags(const RsPgpId& gpg_id,const ServicePermi
 	mPeerMgr->setServicePermissionFlags(gpg_id,flags) ;
 }
 
-std::map<RsPgpId, RsPeerId> p3Peers::friendListOfContact()
+std::map<RsPgpId, UnseenNetworkContactsItem> p3Peers::networkContacts()
 {
-    return	mPeerMgr->friendListOfContact() ;
+    return mPeerMgr->networkContacts();
 }
 
 std::map<RsPgpId, std::string> p3Peers::certListOfContact()
 {
     return mPeerMgr->certListOfContact();
 }
-void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert)
+std::list<RsPgpId> p3Peers::getNetworkContactsPgpIdList()
 {
-    mPeerMgr->addFriendOfContact(rsPgpId, sslId, cert);
+    return mPeerMgr->getNetworkContactsPgpIdList();
+}
+bool p3Peers::getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d)
+{
+    return mPeerMgr->getPeerDetailsFromNetworkContacts(pgp_id,d);
+}
+
+void p3Peers::addFriendOfContact( const RsPgpId& rsPgpId,const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem)
+{
+    mPeerMgr->addFriendOfContact(rsPgpId, sslId, cert, dcItem);
 }
 
 bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)
@@ -1579,12 +1609,22 @@ bool p3Peers::isFriendOfContact( const RsPgpId& rsPgpId)
     return mPeerMgr->isFriendOfContact(rsPgpId);
 }
 
+std::string p3Peers::getAddFriendOption()
+{
+    return mPeerMgr->getAddFriendOption();
+}
+void p3Peers::setAddFriendOption(const std::string&  option)
+{
+    mPeerMgr->setAddFriendOption(option);
+}
+
+//unseenp2p: only for client
 void p3Peers::saveSupernodeCert(const std::string& cert)
 {
     mPeerMgr->saveSupernodeCert(cert);
 }
 
- std::list<std::string> p3Peers::getSupernodeCertList()
+std::list<std::string> p3Peers::getSupernodeCertList()
 {
     return mPeerMgr->getSupernodeCertList();
 }

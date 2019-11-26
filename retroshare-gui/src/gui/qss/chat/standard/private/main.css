@@ -1,40 +1,56 @@
-.name{
-	font-weight: bold;
-}
-
-.time {
-}
 
 .incomingHeader {
-	background-color:#dfedff;
-	border-color:#fafafa #d1dfef #d1dfef #fafafa;
-	color: #91968f;
+
 }
 
 .outgoingHeader {
-	background-color:#f5f5f5;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #244578;
+
 }
 
 .hincomingHeader {
-	background-color:#dfedff;
-	border-color:#fafafa #d1dfef #d1dfef #fafafa;
-	color: #7F837D;
+
 }
 
 .houtgoingHeader {
-	background-color:#f5f5f5;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #6491d2;
+
 }
 
 .ooutgoingHeader {
-	background-color:#ffbebe;
-	border-color:#fafafa #e3e3e3 #e3e3e3 #fafafa;
-	color: #244578;
+
 }
 
 .systemHeader {
-  background-color: rgba(241,231,103,1);
+
+}
+.hincomingMsg, .incomingMsg{
+    display: inline-block;
+    font-size: 1pt;
+}
+.houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
+    padding: 10px 18px;
+    font-size: 1pt;
+}
+.message {
+    color: #000000;
+    font-size: 13pt;
+    font-family: "Segoe UI";
+}
+
+.name{
+    font-weight: bold;
+    font-size: 13pt;
+    font-family: "Segoe UI Semibold";
+}
+
+.time {
+    color: #4d4d5e;
+    font-size: 9pt;
+    padding: 0px 0px;
+    font-family: "Segoe UI";
+}
+.cin {
+background-color: #ececec;
+}
+.cout {
+background-color: #bbebff;
 }

@@ -350,8 +350,8 @@ void GxsGroupDialog::setupDefaults()
         
 #ifndef RS_USE_CIRCLES
     ui.typeGroup->setEnabled(false);
-    ui.typeGroup_3->setEnabled(false);
-    ui.typeLocal_3->setEnabled(false);
+//    ui.typeGroup_3->setEnabled(false);
+//    ui.typeLocal_3->setEnabled(false);
 #endif
 }
 

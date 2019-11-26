@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>531</width>
+    <width>612</width>
     <height>445</height>
    </rect>
   </property>
@@ -31,6 +31,9 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="handleWidth">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QHBoxLayout" name="chatLayout">
        <property name="topMargin">
@@ -43,6 +46,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>370</width>
+           <height>0</height>
+          </size>
          </property>
         </widget>
        </item>

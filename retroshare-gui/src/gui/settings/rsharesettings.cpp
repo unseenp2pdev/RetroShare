@@ -113,18 +113,20 @@ void RshareSettings::initSettings()
 #else
 	static QStringList styles = QStyleFactory::keys();
 #if defined(Q_OS_WIN)
-    if (styles.contains("windowsvista", Qt::CaseInsensitive))
-        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
-    else if (styles.contains("windowsxp", Qt::CaseInsensitive))
-        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
-    else
-        setDefault(SETTING_STYLE, "Fusion");
+    setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    if (styles.contains("windowsvista", Qt::CaseInsensitive))
+//        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    else if (styles.contains("windowsxp", Qt::CaseInsensitive))
+//        setDefault(SETTING_STYLE, "Fusion");        //d: Fusion is default style
+//    else
+//        setDefault(SETTING_STYLE, "Fusion");
 #endif
 	{
-		if (styles.contains("cleanlooks", Qt::CaseInsensitive))
-			setDefault(SETTING_STYLE, "cleanlooks");
-		else
-			setDefault(SETTING_STYLE, "plastique");
+        setDefault(SETTING_STYLE, "Fusion");
+//		if (styles.contains("cleanlooks", Qt::CaseInsensitive))
+//			setDefault(SETTING_STYLE, "cleanlooks");
+//		else
+//			setDefault(SETTING_STYLE, "plastique");
 	}
 #endif
 #endif
@@ -662,10 +664,10 @@ void RshareSettings::setChatScreenFont(const QString &font)
 
 void RshareSettings::getPublicChatStyle(QString &stylePath, QString &styleVariant)
 {
-	stylePath = valueFromGroup("Chat", "StylePublic", ":/qss/chat/compact/public").toString();
+    stylePath = valueFromGroup("Chat", "StylePublic", ":/qss/chat/compact/public").toString();
     // Correct changed standard path for older UnseenP2P versions before 31.01.2012 (can be removed later)
 	if (stylePath == ":/qss/chat/public") {
-		stylePath = ":/qss/chat/standard/public";
+        stylePath = ":/qss/chat/standard/public";
 	}
 	styleVariant = valueFromGroup("Chat", "StylePublicVariant", "Colored").toString();
 }

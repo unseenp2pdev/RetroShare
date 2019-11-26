@@ -564,8 +564,8 @@ void GxsForumThreadWidget::threadListCustomPopupMenu(QPoint /*point*/)
 	QAction *markMsgAsUnreadChildren = new QAction(QIcon(":/images/message-mail.png"), tr("Mark as unread") + " (" + tr ("with children") + ")", &contextMnu);
 	connect(markMsgAsUnreadChildren, SIGNAL(triggered()), this, SLOT(markMsgAsUnreadChildren()));
 
-	QAction *showinpeopleAct = new QAction(QIcon(":/images/info16.png"), tr("Show author in people tab"), &contextMnu);
-	connect(showinpeopleAct, SIGNAL(triggered()), this, SLOT(showInPeopleTab()));
+    //QAction *showinpeopleAct = new QAction(QIcon(":/images/info16.png"), tr("Show author in people tab"), &contextMnu);
+    //connect(showinpeopleAct, SIGNAL(triggered()), this, SLOT(showInPeopleTab()));
 
 	if (IS_GROUP_SUBSCRIBED(mSubscribeFlags)) {
 		QList<QTreeWidgetItem*> rows;
@@ -684,7 +684,7 @@ void GxsForumThreadWidget::threadListCustomPopupMenu(QPoint /*point*/)
 					submenu1->addAction(flagasnegativeAct);
 			}
 
-			contextMnu.addAction(showinpeopleAct);
+            //contextMnu.addAction(showinpeopleAct);
 			contextMnu.addAction(replyauthorAct);
 		}
 

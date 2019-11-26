@@ -49,7 +49,7 @@ typedef RsPeerId ChatLobbyVirtualPeerId ;
   * This service uses rsnotify (callbacks librs clients (e.g. rs-gui))
   * @see NotifyBase
   */
-class p3ChatService :
+class   p3ChatService :
         public p3Service, public DistantChatService, public DistributedChatService, public p3Config,
         public pqiServiceMonitor, GxsTransClient
 {
@@ -105,6 +105,25 @@ public:
 	 * @param id: Chat id cleared.
 	 */
 	virtual void clearChatLobby(const ChatId& id);
+
+    //unseenp2p - for MVC
+    virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                                   unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage,bool isOtherLastMsg,
+                                                   int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId);
+    virtual void removeContactOrGroupChatFromModelData(std::string uId);
+    virtual std::vector<conversationInfo> getConversationItemList();
+
+    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg );
+    virtual void sortConversationItemListByRecentTime();
+    virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset);
+    virtual std::string getSeletedUIdBeforeSorting(int row);
+    virtual int getIndexFromUId(std::string uId);
+    virtual bool isChatIdInConversationList(std::string uId);
+    virtual void setConversationListMode(uint32_t mode);
+    virtual uint32_t getConversationListMode();
+    virtual void setSearchFilter(const std::string &filtertext);
+    virtual std::vector<conversationInfo> getSearchFilteredConversationItemList();
+
 
 	/*!
 		 * send to all peers online
@@ -194,8 +213,8 @@ protected:
 	// accepts virtual peer id
 	bool isOnline(const RsPeerId &pid) ;
 
-	/// This is to be used by subclasses/parents to call IndicateConfigChanged()
-	virtual void triggerConfigSave()  { IndicateConfigChanged() ; }
+    /// This is to be used by subclasses/parents to call IndicateConfigChanged()
+    virtual void triggerConfigSave()  { IndicateConfigChanged() ; }
 
 	/// Same, for storing messages in incoming list
 	RS_DEPRECATED virtual void locked_storeIncomingMsg(RsChatMsgItem *) ;
@@ -270,6 +289,13 @@ private:
 	RsMutex mDGMutex;
 
 	p3GxsTrans& mGxsTransport;
+
+    //unseenp2p - for MVC
+    std::vector<conversationInfo> conversationItemList;
+    std::vector<conversationInfo> filtererConversationItemList;
+    uint32_t conversationListMode ; // CONVERSATION_MODE_WITHOUT_FILTER  or
+                                    // CONVERSATION_MODE_WITH_SEARCH_FILTER
+    std::string filter_text;
 };
 
 class p3ChatService::StateStringInfo

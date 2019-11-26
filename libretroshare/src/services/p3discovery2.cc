@@ -31,6 +31,9 @@
 // Interface pointer.
 RsDisc *rsDisc = NULL;
 
+static const std::string  ONLINE_BROADCAST_CERT_REQ_SYNC = "BROADCAST_CERT_TO_ALL_FRIENDLIST";
+static const std::string  ONLINE_SEND_ME_CERT_REQ_SYNC  =  "SEND_ME_CERT";
+static const std::string  ONLINE_NO_REQ_SYNC            =  "NO_REQUEST";
 /****
  * #define P3DISC_DEBUG	1
  ****/
@@ -41,6 +44,7 @@ static bool populateContactInfo( const peerState &detail,
 {
 	pkt->clear();
 
+    pkt->name = detail.name;
 	pkt->pgpId = detail.gpg_id;
 	pkt->sslId = detail.id;
 	pkt->location = detail.location;
@@ -84,6 +88,93 @@ static bool populateContactInfo( const peerState &detail,
 	return true;
 }
 
+//from RsPeerDetails to RsDiscContactItem
+static bool populateContactInfoFromRsPeerDetails( const RsPeerDetails &detail,
+                                 RsDiscContactItem *pkt,
+                                 bool include_ip_information )
+{
+    pkt->clear();
+
+    pkt->name = detail.name;
+    pkt->pgpId = detail.gpg_id;
+    pkt->sslId = detail.id;
+    pkt->location = detail.location;
+    pkt->version = "";
+    pkt->netMode = detail.netMode;
+    pkt->vs_disc = detail.vs_disc;
+    pkt->vs_dht = detail.vs_dht;
+    //when broadcasting, we do not know how its friendship: for both client and supernode
+    pkt->accept_connection = false;
+    pkt->ownsign = false;
+    pkt->hasSignedMe = false;
+    pkt->trustLvl = 0;
+
+    pkt->hiddenType = detail.hiddenType;
+    pkt->lastConnect = detail.lastConnect;
+    pkt->lastUsed = detail.lastUsed;
+
+    pkt->lastContact = time(NULL);
+
+    if (detail.isHiddenNode)
+    {
+        pkt->isHidden = true;
+        pkt->hiddenAddr = detail.hiddenNodeAddress;
+        pkt->hiddenPort = detail.hiddenNodePort;
+    }
+    else
+    {
+        pkt->isHidden = false;
+
+        if(include_ip_information)
+        {
+            sockaddr_storage_clear(pkt->localAddrV6.addr);
+            sockaddr_storage_clear(pkt->extAddrV6.addr);
+
+            pkt->dyndns = detail.dyndns;
+        }
+        else
+        {
+            sockaddr_storage_clear(pkt->localAddrV6.addr);
+            sockaddr_storage_clear(pkt->extAddrV6.addr);
+            sockaddr_storage_clear(pkt->localAddrV4.addr);
+            sockaddr_storage_clear(pkt->extAddrV4.addr);
+        }
+    }
+
+    return true;
+}
+
+//from RsPeerDetails to RsDiscContactItem
+static bool populateUnseenNetworkContactsItemFromContactInfo( const RsDiscContactItem &pkt,
+                                 UnseenNetworkContactsItem *contactItem )
+{
+
+
+    contactItem->name = pkt.name;
+    contactItem->gpg_id = pkt.pgpId;
+    contactItem->id = pkt.sslId;
+    contactItem->accept_connection = pkt.accept_connection;
+    contactItem->ownsign = pkt.ownsign;
+    contactItem->hasSignedMe = pkt.hasSignedMe;
+    contactItem->trustLvl = pkt.trustLvl;
+    contactItem->hiddenType = pkt.hiddenType;
+    contactItem->lastConnect = pkt.lastConnect;
+    contactItem->lastUsed = pkt.lastUsed;
+
+    if (pkt.isHidden)
+    {
+        contactItem->isHiddenNode = true;
+        contactItem->hiddenNodeAddress = pkt.hiddenAddr;
+        contactItem->hiddenNodePort = pkt.hiddenPort;
+    }
+    else
+    {
+        contactItem->isHiddenNode = false;
+    }
+
+    return true;
+}
+
 void DiscPgpInfo::mergeFriendList(const std::set<PGPID> &friends)
 {
     std::set<PGPID>::const_iterator it;
@@ -111,7 +202,7 @@ p3discovery2::p3discovery2(p3PeerMgr *peerMgr, p3LinkMgr *linkMgr, p3NetMgr *net
 	// Add self into PGP FriendList.
 	mFriendList[AuthGPG::getAuthGPG()->getGPGOwnId()] = DiscPgpInfo();
 	
-	return;
+    return;
 }
 
 
@@ -935,6 +1026,13 @@ std::cerr << "Yes, you send info about friend of contact and I receive your SSL 
         return;
     }
 
+    // if nodes broadcast friend of contact cert to me, and friend of contact is my friend too, so DO nothing.
+    if (item->requestAboutCert == ONLINE_BROADCAST_CERT_REQ_SYNC)
+    {
+        std::cerr << "Yes I receive the item with requestAboutCert == BROADCAST_CERT_TO_ALL_FRIENDLIST!!!"  << std::endl;
+        return;
+    }
+
 	std::map<PGPID, DiscPgpInfo>::iterator it;
     it = mFriendList.find(item->pgpId);
 	if (it == mFriendList.end())
@@ -1039,17 +1137,11 @@ void p3discovery2::convertFromItemInfoToPeerState(const RsDiscContactItem* item,
         pState.localaddr = item->localAddrV4.addr;
         pState.serveraddr = item->extAddrV4.addr;
 
-//        pState.ipAddrs.mLocal.loadTlv(item->localAddrList);
-//        pState.ipAddrs.mExt.loadTlv(item->extAddrList);
-
     }
-
-    //How to add currentConnectAddress to ipAddrs ?
-    //pState.ipAddrs = item->currentConnectAddress ;	// used to check!
-
 
 }
 
+// This function process receiving side when node begin to exchange friends' certs or broadcast new-comer cert
 void p3discovery2::processFriendsOfContactInfo(const SSLID &fromId, const RsDiscContactItem *item)
 {
 //    (void) fromId; // remove unused parameter warnings, debug only
@@ -1064,6 +1156,8 @@ void p3discovery2::processFriendsOfContactInfo(const SSLID &fromId, const RsDisc
         std::cerr << std::endl;
 #endif
 
+    // This will check for both cases: when user send SEND_ME_CERT and ONLINE_BROADCAST_CERT_REQ_SYNC
+    // Because before go here, the app already check isFriend, go here, that mean this item is not friend
     if (!rsPeers->isFriendOfContact(item->pgpId))
     {
 #ifdef P3DISC_DEBUG
@@ -1071,19 +1165,28 @@ void p3discovery2::processFriendsOfContactInfo(const SSLID &fromId, const RsDisc
         std::cerr << std::endl;
 #endif
 
-        // convert item info to peerstate ...
-        peerState pState;
-        convertFromItemInfoToPeerState(item, pState);
-        // ...then add to friend of contact list
-        //rsPeers->getFriendList()
-        rsPeers->addFriendOfContact(item->pgpId, item->sslId, item->full_cert); // mFriendOfContactList
+        // ...then add to friend of contact list,
+        // this addFriendOfContact not only add to friend of contact, but add all network contact, it saves all here.
+        UnseenNetworkContactsItem *netContactItem = new UnseenNetworkContactsItem();
+        //RsDiscContactItem *pkt = new RsDiscContactItem();
+        populateUnseenNetworkContactsItemFromContactInfo(*item, netContactItem);
+        rsPeers->addFriendOfContact(item->pgpId, item->sslId, item->full_cert, *netContactItem);
 
-        if (item->requestAboutCert == "SEND_ME_CERT")
+        if (item->requestAboutCert == ONLINE_SEND_ME_CERT_REQ_SYNC)
         {
+            // when node send request SEND_ME_CERT, need to answer my friendlist to them.
             sendAllMyFriendsInfo(fromId, false);
         }
+        else if (item->requestAboutCert == ONLINE_BROADCAST_CERT_REQ_SYNC)
+        {
+            // when node broadcast new-comer cert to all friends, and I receive
+            // at first, i will check if it exist in friend list or network contact list (this already checked before go here)
+            // , if yes, then DO Nothing, if no, need to add and save to network contact list, then broadcast this cert to all friends
+            // to this point [of code], that mean this new-comer is a network contact, so just broadcast to other
+            broadcastThisCertToAllFriendList(item->sslId);
 
-        //mPeerMgr->addFriendOfContact(item->pgpId, pState);
+        }
+
         /* THESE ARE OUR FRIEND OF FRIENDS ... pass this information along to
          * NetMgr & DHT...
          * as we can track FOF and use them as potential Proxies / Relays
@@ -1212,7 +1315,7 @@ void p3discovery2::recvPGPCertificate(const SSLID &/*fromId*/, RsDiscPgpCertItem
 	mPendingDiscPgpCertInList.push_back(item);
 }
 
-void p3discovery2::createPGPCertForSupernode(const RsPgpId &pgpid, std::string &cert)
+void p3discovery2::addPGPCertToPublicKeyRing(const RsPgpId &pgpid, const std::string &cert)
 {
     /* should only happen if in FULL Mode */
 
@@ -1272,6 +1375,21 @@ void p3discovery2::statusChange(const std::list<pqiServicePeer> &plist)
 			std::cerr << "p3discovery2::statusChange() Adding Friend: " << pit->id << std::endl;
 #endif
 			addFriend(pit->id);
+
+            std::cerr << "p3discovery2::statusChange() RS_SERVICE_PEER_NEW: " << pit->id << std::endl;
+
+            std::string addFriendOption = rsPeers->getAddFriendOption();
+            std::cerr << "Here we will check which addFriend option was called, addFriendOption: " << addFriendOption << std::endl;
+            // we will broadcast the new node certificate in these cases:
+            if (addFriendOption == ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE ||
+                    addFriendOption == ADDFRIEND_PQISSLLISTENNER ||
+                    addFriendOption == ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT)
+            {
+                //unseenp2p: try to broadcast the cert of this peer to all online friendlist except this one
+                std::cerr << "Begin broadcast the cert, because the addFriendOption =  " << addFriendOption << std::endl;
+                broadcastThisCertToAllFriendList(pit->id);
+            }
+
 		}
 		else if (pit->actions & RS_SERVICE_PEER_REMOVED)
 		{
@@ -1475,7 +1593,7 @@ void p3discovery2::setGPGOperation(AuthGPGOperation *operation)
 
 void p3discovery2::fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,peerState &stateDetail )
 {
-
+    stateDetail.name = peerDetail.name;
     stateDetail.id = peerDetail.id;
     stateDetail.gpg_id = peerDetail.gpg_id;
     stateDetail.location = peerDetail.location;
@@ -1500,7 +1618,7 @@ void p3discovery2::fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,p
 }
 
 // unseenp2p: need to send all my friends info to this peer for share info using populateContactInfo(detail, pkt, !rsPeers->isHiddenNode(sslid));
-// meiyousixin - 11 Sep 2019: update function:   share network contacts instead of friendlist
+// meiyousixin - 11 Sep 2019: update function:   share network contacts + friendlist
 void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
 {
 #ifdef P3DISC_DEBUG
@@ -1520,16 +1638,17 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
         RsPeerDetails peerDetail;
         if (rsPeers->getPeerDetails(*it, peerDetail))
         {
-            peerState stateDetail;
+            //peerState stateDetail;
             //Need to set stateDetail from peerDetail
-            fromPeerDetailToStateDetail(peerDetail, stateDetail);
+            //fromPeerDetailToStateDetail(peerDetail, stateDetail);
             RsDiscContactItem *pkt = new RsDiscContactItem();
-            populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+            //populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+            populateContactInfoFromRsPeerDetails(peerDetail,pkt, !rsPeers->isHiddenNode(*it));
             pkt->version = RS_HUMAN_READABLE_VERSION;
             //add full certificate to share with friend
             pkt->full_cert = rsPeers->GetRetroshareInvite(*it);
-            if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
-            else pkt->requestAboutCert = "NO_REQUEST";
+            if (sendCertBack) pkt->requestAboutCert = ONLINE_SEND_ME_CERT_REQ_SYNC;
+            else pkt->requestAboutCert = ONLINE_NO_REQ_SYNC;
             pkt->PeerId(sslid);
 
 #ifdef P3DISC_DEBUG
@@ -1544,12 +1663,16 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
 
     //then try to share all other network contacts
     std::map<RsPgpId, std::string> certList =  rsPeers->certListOfContact();
-    std::map<RsPgpId, RsPeerId> networkContacts = rsPeers->friendListOfContact();
+    //std::map<RsPgpId, RsPeerId> networkContacts = rsPeers->friendListOfContact();
 
-    for ( std::map<RsPgpId, RsPeerId>::iterator netConIt = networkContacts.begin(); netConIt != networkContacts.end(); netConIt++)
+    std::map<RsPgpId, UnseenNetworkContactsItem> rsDetailsList = rsPeers->networkContacts(); //this is real network contacts, new one
+
+    for ( std::map<RsPgpId, UnseenNetworkContactsItem>::iterator netConIt = rsDetailsList.begin(); netConIt != rsDetailsList.end(); netConIt++)
+    //for ( std::map<RsPgpId, RsPeerId>::iterator netConIt = networkContacts.begin(); netConIt != networkContacts.end(); netConIt++)
     {
 
-        RsPeerId id = netConIt->second;
+        //RsPeerId id = netConIt->second;
+        RsPeerId id = netConIt->second.id;
         std::list<RsPeerId>::iterator lit = std::find( sslIdFriendList.begin(), sslIdFriendList.end(), id);
         //Work only with network contact that not in friendList
         if (lit == sslIdFriendList.end())
@@ -1563,16 +1686,17 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
                 uint32_t cert_error_code;
                 if (rsPeers->loadDetailsFromStringCert(certStr, peerDetails, cert_error_code))
                 {
-                    peerState stateDetail;
+                    //peerState stateDetail;
                     //Need to set stateDetail from peerDetail
-                    fromPeerDetailToStateDetail(peerDetails, stateDetail);
+                    //fromPeerDetailToStateDetail(peerDetails, stateDetail);
                     RsDiscContactItem *pkt = new RsDiscContactItem();
-                    populateContactInfo(stateDetail, pkt, false);
+                    //populateContactInfo(stateDetail, pkt, false);
+                    populateContactInfoFromRsPeerDetails(peerDetails,pkt, false);
                     pkt->version = RS_HUMAN_READABLE_VERSION;
                     //add full certificate to share with friend
                     pkt->full_cert = certStr;
-                    if (sendCertBack) pkt->requestAboutCert = "SEND_ME_CERT";
-                    else pkt->requestAboutCert = "NO_REQUEST";
+                    if (sendCertBack) pkt->requestAboutCert = ONLINE_SEND_ME_CERT_REQ_SYNC;
+                    else pkt->requestAboutCert = ONLINE_NO_REQ_SYNC;
                     pkt->PeerId(sslid);
                     sendItem(pkt);
 
@@ -1584,4 +1708,93 @@ void p3discovery2::sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack )
     }
 
 
+}
+
+//There are two LISTs that we concern: friend list and network contact list
+// if one is in friend list then it can not be in network contact list and vice verse.
+// When we the first time broadcast the cert, that mean we broadcast our friend cert to all other friend.
+// On the receiving side, it can be a friend or a contact of friend, a just a network contact
+
+// This broadcast is also called ONLINE broadcast, it applies only for online nodes.
+// The network contact syncing is related to offline syncing, when the node goes to online, it need to be sync
+// all the network contact from other online nodes, include supernodes.
+
+// The process of broadcast is implemented by the following algorithm:
+// 1. After 2 nodes A and B connected together, they will be friends each other.
+//    The first time of connection will get action "RS_SERVICE_PEER_NEW" (check statusChange in this class)
+// 2. p3LinkMgrIMPL will raise the action RS_PEER_NEW when A and B connected the first time,
+//    A look B as new peer and B look A as new peer too.
+// 3. A will send B's cert to all A's friends and B will send A's cert to all B's friends.
+// 4. When A's friends receive B's cert, they will check if B's cert already exist or not in a) friend list, b) network contact
+// 5. If it exist, then A's friends DO nothing, just ignore.
+// 6. If NO exist, then A's friends will a) add and save B's cert to network contact list (because it can not be friend)
+//                                       b) broadcast B's cert to all friends of A's friends except the sender and continue.
+
+void p3discovery2::broadcastThisCertToAllFriendList( const RsPeerId& exceptThisId)
+{
+      //get the certificate of this peer (exceptThisId)
+      PGPID pgpId = getPGPId(exceptThisId);
+      std::string cert ="";
+      std::map<RsPgpId, std::string> certList = rsPeers->certListOfContact();
+      std::map<RsPgpId, std::string>::iterator itCert = certList.find(pgpId);
+      if (itCert != certList.end() )
+      {
+            cert = (*itCert).second;
+            std::cerr << " Certificate need to be broadcast is " << cert << std::endl;
+      }
+      else
+      {
+            std::cerr << " There is no cert in the certificate list! " << std::endl;
+            //return;
+      }
+
+      //Begin to broadcast this new node cert to all online friends .
+      std::list<RsPeerId> sslIdFriendList;
+      rsPeers->getOnlineList(sslIdFriendList);
+
+      for(std::list<RsPeerId>::iterator it = sslIdFriendList.begin(); it != sslIdFriendList.end(); it++)
+      {
+          //do not send again to sender that send this cert
+          if ((*it) == exceptThisId) continue;
+          RsPeerDetails peerDetail;
+          uint32_t cert_error_code;
+          if (cert != "" && rsPeers->loadDetailsFromStringCert(cert, peerDetail, cert_error_code))
+          {
+              //peerState stateDetail;
+              //Need to set stateDetail from peerDetail
+              //fromPeerDetailToStateDetail(peerDetail, stateDetail);
+              RsDiscContactItem *pkt = new RsDiscContactItem();
+              //populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(*it));
+              populateContactInfoFromRsPeerDetails(peerDetail, pkt, !rsPeers->isHiddenNode(*it));
+              pkt->version = RS_HUMAN_READABLE_VERSION;
+              //add full certificate to share with friend
+              pkt->full_cert = cert;
+
+              pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
+              pkt->PeerId((*it));
+              std::cerr << " Broadcast this cert to friend: " << peerDetail.name << "sslid: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
+              sendItem(pkt);
+
+          }
+          else if (rsPeers->isFriend(exceptThisId))
+          {
+
+              //peerState stateDetail;
+              RsPeerDetails peerDetail;
+              rsPeers->getPeerDetails(exceptThisId, peerDetail);
+              //fromPeerDetailToStateDetail(peerDetail, stateDetail);
+              RsDiscContactItem *pkt = new RsDiscContactItem();
+              //populateContactInfo(stateDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
+              populateContactInfoFromRsPeerDetails(peerDetail, pkt, !rsPeers->isHiddenNode(exceptThisId));
+              pkt->version = RS_HUMAN_READABLE_VERSION;
+              pkt->full_cert = rsPeers->GetRetroshareInvite(exceptThisId);
+
+              pkt->requestAboutCert = ONLINE_BROADCAST_CERT_REQ_SYNC;
+              pkt->PeerId((*it));
+              std::cerr << " This cert is friend cert. Broadcast this cert to online friend: " << peerDetail.name << "sslid: " << (*it).toStdString() << ", with cert : " << pkt->full_cert << std::endl;
+              sendItem(pkt);
+
+          }
+
+      }
 }

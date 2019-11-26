@@ -70,6 +70,14 @@ class MainPage;
 class NewsFeed;
 class UserNotify;
 
+//unseenp2p
+ namespace unseenp2p { namespace api {
+ class ConversationModel;
+
+ namespace conversation {}
+}
+}
+
 #ifdef UNFINISHED
 class ApplicationWindow;
 #endif
@@ -192,6 +200,7 @@ public:
     static bool hiddenmode;
 
     ChatLobbyWidget *getChatLobbyDialog();
+    unseenp2p::api::ConversationModel* getConversationModel();
 public slots:
     void receiveNewArgs(QStringList args);
     void displayErrorMessage(int,int,const QString&) ;
@@ -312,6 +321,7 @@ private:
     bool isIdle;
 
      Ui::MainWindow *ui ;
+
 };
 
 #endif

@@ -260,7 +260,7 @@ ChatLobbyId ChatId::toLobbyId() const
         return lobby_id;
     else
     {
-        std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
+        //std::cerr << "ChatId Warning: conversation to ChatLobbyId requested, but type is different. Current value=\"" << toStdString() << "\"" << std::endl;
         return 0;
     }
 }
@@ -490,10 +490,22 @@ ChatLobbyId p3Msgs::createChatLobby(const std::string& lobby_name,const RsGxsId&
     return mChatSrv->createChatLobby(lobby_name,lobby_identity,lobby_topic,invited_friends,privacy_type) ;
 }
 
+//unseenp2p
 void p3Msgs::getGroupChatInfoList(std::map<ChatLobbyId, ChatLobbyInfo> &_groupchats)
 {
     return mChatSrv->getGroupChatInfoList(_groupchats);
 }
+
+void p3Msgs::saveGroupChatInfo()
+{
+    return mChatSrv->saveGroupChatInfo();
+}
+
+void p3Msgs::locked_printDebugInfo() const
+{
+   return mChatSrv->locked_printDebugInfo();
+}
+//end of unseenp2p
 
 void p3Msgs::setLobbyAutoSubscribe(const ChatLobbyId& lobby_id, const bool autoSubscribe)
 {
@@ -542,3 +554,72 @@ uint32_t p3Msgs::getDistantChatPermissionFlags()
 	return mChatSrv->getDistantChatPermissionFlags() ;
 }
 
+//unseenp2p - for MVC
+void p3Msgs::saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                               unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                               int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId)
+{
+    mChatSrv->saveContactOrGroupChatToModelData(displayName, nickInGroupChat,
+                                                UnreadMessagesCount,lastMsgDatetime, lastMessage, isOtherLastMsg,
+                                                contactType, groupChatType,rsPeerIdStr, chatLobbyId, uId);
+}
+
+void p3Msgs::removeContactOrGroupChatFromModelData(std::string uId)
+{
+    mChatSrv->removeContactOrGroupChatFromModelData(uId);
+}
+
+std::vector<conversationInfo> p3Msgs::getConversationItemList()
+{
+    return mChatSrv->getConversationItemList();
+}
+
+void p3Msgs::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+{
+    mChatSrv->updateRecentTimeOfItemInConversationList(uId, nickInGroupChat, lastMsgDatetime, textmsg, isOtherMsg);
+}
+
+void p3Msgs::sortConversationItemListByRecentTime()
+{
+    mChatSrv->sortConversationItemListByRecentTime();
+}
+
+void p3Msgs::updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset)
+{
+    mChatSrv->updateUnreadNumberOfItemInConversationList(uId,unreadNumber, isReset);
+}
+
+std::string p3Msgs::getSeletedUIdBeforeSorting(int row)
+{
+    return mChatSrv->getSeletedUIdBeforeSorting(row);
+}
+
+int p3Msgs::getIndexFromUId(std::string uId)
+{
+    return mChatSrv->getIndexFromUId(uId);
+}
+
+bool p3Msgs::isChatIdInConversationList(std::string uId)
+{
+    return mChatSrv->isChatIdInConversationList(uId);
+}
+
+void p3Msgs::setConversationListMode(uint32_t mode)
+{
+    mChatSrv->setConversationListMode(mode);
+}
+
+uint32_t p3Msgs::getConversationListMode()
+{
+    return mChatSrv->getConversationListMode();
+}
+
+void p3Msgs::setSearchFilter(std::string text)
+{
+    mChatSrv->setSearchFilter(text);
+}
+
+std::vector<conversationInfo> p3Msgs::getSearchFilteredConversationItemList()
+{
+    return mChatSrv->getSearchFilteredConversationItemList();
+}

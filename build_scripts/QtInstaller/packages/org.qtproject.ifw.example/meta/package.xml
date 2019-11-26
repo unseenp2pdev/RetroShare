@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>Unseen P2P </DisplayName>
-    <Description>A README.txt, accessible through a start menu entry.</Description>
-    <Version>0.6.7</Version>
-    <ReleaseDate>2019-08-01</ReleaseDate>
+    <Description>Install UnseenP2P Communicator.</Description>
+    <Version>0.6.9</Version>
+    <ReleaseDate>2019-11-15</ReleaseDate>
     <Licenses>
         <License name="GPL Public License Agreement" file="LICENSE.txt" />
     </Licenses>
     <Default>true</Default>
+    <Required>false</Required>
     <Script>installscript.qs</Script>
+    <UserInterfaces>
+        <UserInterface>targetwidget.ui</UserInterface>
+    </UserInterfaces>
 </Package>

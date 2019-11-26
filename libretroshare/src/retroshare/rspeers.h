@@ -32,6 +32,9 @@
 #include "util/rsdeprecate.h"
 #include "util/rstime.h"
 
+////unseenp2p
+//#include "services/p3discovery2.h"
+
 class RsPeers;
 
 /**
@@ -197,6 +200,15 @@ static const RsNodeGroupId RS_GROUP_ID_FAVORITES ("00000000000000000000000000000
 
 const uint32_t RS_GROUP_FLAG_STANDARD = 0x0001;
 
+//unseenp2p - add friend options
+static const std::string ADDFRIEND_PQISSLLISTENNER = "ADDFRIEND_PQISSLLISTENNER";
+static const std::string ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT = "ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT";
+static const std::string ADDFRIEND_CONNECT_FRIEND_WIZARD_SIGN_ALL_USERS = "ADDFRIEND_CONNECT_FRIEND_WIZARD_SIGN_ALL_USERS";
+static const std::string ADDFRIEND_LOADFRIENDS_FROM_LOCALFILE = "ADDFRIEND_LOADFRIENDS_FROM_LOCALFILE";
+static const std::string ADDFRIEND_PEERHANDLER_HANDLEWILDCARD = "ADDFRIEND_PEERHANDLER_HANDLEWILDCARD";
+static const std::string ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE = "ADDFRIEND_ACCEPT_INVITE_ON_SUPERNODE";
+static const std::string ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND = "ADDFRIEND_PGPKEY_DIALOG_MAKE_FRIEND";
+
 /* A couple of helper functions for translating the numbers games */
 
 std::string RsPeerTrustString(uint32_t trustLvl);
@@ -328,6 +340,51 @@ struct RsPeerDetails : RsSerializable
 	}
 };
 
+struct UnseenNetworkContactsItem : RsSerializable
+{
+    UnseenNetworkContactsItem();
+    RsPeerId id;
+    RsPgpId gpg_id;
+
+    std::string name;
+    uint32_t trustLvl;
+
+    bool ownsign; /* we have signed the remote peer GPG key */
+    bool hasSignedMe; /* the remote peer has signed my GPG key */
+
+    bool accept_connection;
+
+    // Hidden Node details.
+    bool isHiddenNode;
+    std::string hiddenNodeAddress;
+    uint16_t hiddenNodePort;
+    uint32_t hiddenType;
+
+    /* basic stats */
+    uint32_t lastConnect;           /* how long ago */
+    uint32_t lastUsed;              /* how long ago since last used: signature verif, connect attempt, etc */
+    std::string full_cert;
+    /// @see RsSerializable
+    virtual void serial_process( RsGenericSerializer::SerializeJob j,
+                                 RsGenericSerializer::SerializeContext& ctx )
+    {
+        RS_SERIAL_PROCESS(id);
+        RS_SERIAL_PROCESS(gpg_id);
+        RS_SERIAL_PROCESS(name);
+        RS_SERIAL_PROCESS(trustLvl);
+        RS_SERIAL_PROCESS(ownsign);
+        RS_SERIAL_PROCESS(hasSignedMe);
+        RS_SERIAL_PROCESS(accept_connection);
+        RS_SERIAL_PROCESS(isHiddenNode);
+        RS_SERIAL_PROCESS(hiddenNodeAddress);
+        RS_SERIAL_PROCESS(hiddenNodePort);
+        RS_SERIAL_PROCESS(hiddenType);
+        RS_SERIAL_PROCESS(lastConnect);
+        RS_SERIAL_PROCESS(lastUsed);
+        RS_SERIAL_PROCESS(full_cert);
+    }
+};
+
 // This class is used to get info about crytographic algorithms used with a
 // particular peer.
 struct RsPeerCryptoParams
@@ -335,6 +392,9 @@ struct RsPeerCryptoParams
 	int connexion_state;
 	std::string cipher_name;
 };
+
+
+
 
 struct RsGroupInfo : RsSerializable
 {
@@ -695,10 +755,17 @@ public:
     	virtual bool getPeerMaximumRates(const RsPeerId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate) =0;
     	virtual bool getPeerMaximumRates(const RsPgpId& pid,uint32_t& maxUploadRate,uint32_t& maxDownloadRate) =0;
 
-    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert) =0;
+    //unseenp2p - for both client and supernode
+    virtual void addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem) =0;
     virtual bool isFriendOfContact( const RsPgpId& rsPgpId) = 0;
-    virtual std::map<RsPgpId, RsPeerId> friendListOfContact() =0;
+    virtual std::string getAddFriendOption() =0;
+    virtual void setAddFriendOption(const std::string&  option) = 0;
     virtual std::map<RsPgpId, std::string> certListOfContact() =0;
+    virtual std::map<RsPgpId, UnseenNetworkContactsItem> networkContacts() =0;
+    virtual std::list<RsPgpId> getNetworkContactsPgpIdList() =0;
+    virtual bool getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d) =0;
+
+    //unseenp2p - only for client
     virtual void saveSupernodeCert(const std::string& cert) =0;
     virtual std::list<std::string> getSupernodeCertList() =0;
 

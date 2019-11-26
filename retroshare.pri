@@ -159,7 +159,7 @@ RS_MINOR_VERSION=6
 
 # Specify RetroShare major version appending the following assignation to qmake
 # command line 'RS_MINI_VERSION=4'
-RS_MINI_VERSION=8
+RS_MINI_VERSION=9
 
 # Specify RetroShare major version appending the following assignation to qmake
 # command line 'RS_EXTRA_VERSION=""'
@@ -376,7 +376,7 @@ rs_autologin {
 }
 
 rs_onlyhiddennode {
-    DEFINES *= RS_ONLYHIDDENNODE
+#    DEFINES *= RS_ONLYHIDDENNODE
 #   CONFIG -= bitdht
 #   CONFIG *= no_bitdht
     message("QMAKE: You have enabled only hidden node.")

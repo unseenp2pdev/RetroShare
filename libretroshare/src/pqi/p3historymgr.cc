@@ -121,6 +121,7 @@ void p3HistoryMgr::addMessage(const ChatMessage& cm)
 		item->peerName = peerName;
 		item->sendTime = cm.sendTime;
 		item->recvTime = cm.recvTime;
+        item->nickInGroupChat = cm.peer_alternate_nickname; //unseenp2p - save the nickname to history for show right then
 
 		item->message = cm.msg ;
         if (!item->incoming) item->unread = false;
@@ -452,6 +453,7 @@ static void convertMsg(const RsHistoryMsgItem* item, HistoryMsg &msg)
 	msg.recvTime = item->recvTime;
 	msg.message = item->message;
     msg.unread = item->unread;
+    msg.nickInGroupchat = item->nickInGroupChat;
 }
 
 bool p3HistoryMgr::getMessages(const ChatId &chatId, std::list<HistoryMsg> &msgs, uint32_t loadCount)

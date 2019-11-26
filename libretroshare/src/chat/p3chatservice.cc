@@ -42,12 +42,13 @@
 
 #include "chat/p3chatservice.h"
 #include "rsitems/rsconfigitems.h"
+#include <string>
 
 /****
   #define CHAT_DEBUG 1
 ****/
 
-static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 6000 ; // Max message size to forward other friends
+static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 100000 ; // Max message size to forward other friends
 static const uint32_t MAX_AVATAR_JPEG_SIZE              = 32767; // Maximum size in bytes for an avatar. Too large packets 
                                                                  // don't transfer correctly and can kill the system.
 																					  // Images are 96x96, which makes approx. 27000 bytes uncompressed.
@@ -858,12 +859,14 @@ bool p3ChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
 
 	ci->recvTime = time(NULL);
 
+    //rsIdentity->getIdDetails(ci->id, details)
+
     ChatMessage cm;
     initChatMessage(ci, cm);
     cm.incoming = true;
     cm.online = true;
     cm.unread = true; //need to update this field when user already read the msg
-    std::cerr << "Msg go here first? " << std::endl;
+    //std::cerr << "Msg go here first? " << std::endl;
     RsServer::notify()->notifyChatMessage(cm);
     
     // cyril: history is temporarily diabled for distant chat, since we need to store the full tunnel ID, but then
@@ -935,6 +938,15 @@ void p3ChatService::initChatMessage(RsChatMsgItem *c, ChatMessage &m)
     {
         m.lobby_peer_gxs_id = lobbyItem->signature.keyId ;
         m.chat_id = ChatId(lobbyItem->lobby_id);
+        //unseenp2p - try to save the nickname into peer_alternate_nickname to use then (for ex. in history)
+        RsIdentityDetails details;
+        if (rsIdentity->getIdDetails(m.lobby_peer_gxs_id, details ))
+        {
+#ifdef CHAT_DEBUG
+        std::cerr << " Yes, I can save the nickname of groupchat member: " << details.mNickname << std::endl;
+#endif
+            m.peer_alternate_nickname = details.mNickname;
+        }
         return;
     }
 
@@ -1448,4 +1460,167 @@ void p3ChatService::statusChange(const std::list<pqiServicePeer> &plist)
 			IndicateConfigChanged();
 		}
 	}
+}
+
+
+//unseenp2p - for MVC
+ void p3ChatService::saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                               unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                               int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId)
+{
+     conversationInfo entry(displayName, nickInGroupChat,
+                            UnreadMessagesCount, lastMsgDatetime, lastMessage, isOtherLastMsg,
+                            contactType, groupChatType,rsPeerIdStr, chatLobbyId, uId);
+     conversationItemList.push_back(entry);
+}
+
+ void p3ChatService::removeContactOrGroupChatFromModelData(std::string uId)
+ {
+     std::vector<conversationInfo>::iterator it2;
+
+     for(it2 = conversationItemList.begin(); it2 != conversationItemList.end();)
+     {
+
+        if((*it2).uId == uId)
+        {
+           it2 = conversationItemList.erase(it2);
+           break;
+        }
+        else
+        {
+           ++it2;
+        }
+     }
+
+//     for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+//     {
+//         if (conversationItemList[i].uId == uId)
+//         {
+//            conversationItemList.
+//             break;
+//         }
+//     }
+ }
+
+std::vector<conversationInfo> p3ChatService::getConversationItemList()
+{
+     return conversationItemList;
+}
+
+void p3ChatService::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+{
+    //for (std::vector<conversationInfo>::iterator it = conversationItemList.begin() ; it != conversationItemList.end(); ++it)
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            conversationItemList[i].lastMsgDatetime = lastMsgDatetime;
+            conversationItemList[i].lastMessage = textmsg;
+            conversationItemList[i].isOtherLastMsg = isOtherMsg;
+            conversationItemList[i].nickInGroupChat = nickInGroupChat;
+            break;
+        }
+    }
+}
+
+void p3ChatService::sortConversationItemListByRecentTime()
+{
+    std::sort(conversationItemList.begin(), conversationItemList.end(),
+              [] (conversationInfo const& a, conversationInfo const& b)
+    { return a.lastMsgDatetime > b.lastMsgDatetime; });
+}
+void p3ChatService::updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset)
+{
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            if (isReset) conversationItemList[i].UnreadMessagesCount = 0;
+            else  conversationItemList[i].UnreadMessagesCount += unreadNumber;
+            break;
+        }
+    }
+}
+
+std::string p3ChatService::getSeletedUIdBeforeSorting(int row)
+{
+    return conversationItemList.at(row).uId;
+//    if (conversationListMode == CONVERSATION_MODE_WITHOUT_FILTER)
+//        return conversationItemList.at(row).uId;
+//    else if (conversationListMode == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+//    {
+//        if (row < static_cast<int>(filtererConversationItemList.size()))
+//        return filtererConversationItemList.at(row).uId;
+//    }
+//    return conversationItemList.at(row).uId;;
+}
+
+int p3ChatService::getIndexFromUId(std::string uId)
+{
+    int index = -1;
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            index = static_cast<int>(i);
+            break;
+        }
+    }
+    return index;
+}
+
+bool p3ChatService::isChatIdInConversationList(std::string uId)
+{
+    bool foundUIdInList = false;
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            foundUIdInList = true;
+            break;
+        }
+    }
+    return foundUIdInList;
+}
+
+void p3ChatService::setConversationListMode(uint32_t mode)
+{
+    conversationListMode = mode;
+}
+
+uint32_t p3ChatService::getConversationListMode()
+{
+    return conversationListMode;
+}
+
+void p3ChatService::setSearchFilter(const std::string &filtertext)
+{
+    //When user change the filter (text) need to update the conversation, by using copy from conversationItemList
+    // and filter to the filteredConversationList
+
+    filter_text = filtertext;
+    //filtererConversationItemList = conversationItemList;
+
+    filtererConversationItemList.clear();
+    for (const conversationInfo& item : conversationItemList)
+    {
+        std::string nameforsearch = item.displayName;
+
+        std::transform(nameforsearch.begin(), nameforsearch.end(), nameforsearch.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+        std::string filtertext2 = filtertext;
+        std::transform(filtertext2.begin(), filtertext2.end(), filtertext2.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+
+        if (std::size_t found = nameforsearch.find(filtertext2) !=std::string::npos)
+        {
+            //std::cout << "id: " << item.displayName << " is good" << std::endl;
+            filtererConversationItemList.push_back(item);
+        }
+   }
+}
+
+std::vector<conversationInfo> p3ChatService::getSearchFilteredConversationItemList()
+{
+     return filtererConversationItemList;
 }

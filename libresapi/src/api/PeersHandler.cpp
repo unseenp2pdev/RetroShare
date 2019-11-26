@@ -690,6 +690,9 @@ void PeersHandler::handleWildcard(Request &req, Response &resp)
 					break;
 				}
 
+                //unseenp2p - set addFriend option for checking then the cases of add friend
+                mRsPeers->setAddFriendOption(ADDFRIEND_PEERHANDLER_HANDLEWILDCARD);
+
 				if(!mRsPeers->addFriend( peerDetails.id, peerDetails.gpg_id,
 				                         flags ))
 				{

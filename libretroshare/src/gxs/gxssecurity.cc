@@ -1121,8 +1121,8 @@ bool GxsSecurity::validateNxsGrp(const RsNxsGrp& grp, const RsTlvKeySignature& s
 		signOk = EVP_VerifyFinal(mdctx, sigbuf, siglen, signKey);
 		EVP_MD_CTX_destroy(mdctx);
 
-                if(i>0)
-		std::cerr << "(WW) Checking group signature with old api version " << i+1 << " : tag " << std::hex << api_versions_to_check[i] << std::dec << " result: " << signOk << std::endl;
+        //        if(i>0)
+        //std::cerr << "(WW) Checking group signature with old api version " << i+1 << " : tag " << std::hex << api_versions_to_check[i] << std::dec << " result: " << signOk << std::endl;
 	}
 
 	/* clean up */

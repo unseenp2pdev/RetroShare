@@ -83,7 +83,6 @@ ChatWidget::ChatWidget(QWidget *parent)
   , ui(new Ui::ChatWidget)
 {
 	ui->setupUi(this);
-
 	int iconHeight = QFontMetricsF(font()).height();
 	double fmm = iconHeight > FMM_THRESHOLD ? FMM : FMM_SMALLER;
 	iconHeight *= fmm;
@@ -98,6 +97,7 @@ ChatWidget::ChatWidget(QWidget *parent)
 	ui->emoteiconButton->setIconSize(iconSize);
 	ui->attachPictureButton->setFixedSize(buttonSize);
 	ui->attachPictureButton->setIconSize(iconSize);
+    ui->attachPictureButton->hide();    //hide Search image Button
 	ui->addFileButton->setFixedSize(buttonSize);
 	ui->addFileButton->setIconSize(iconSize);
 	ui->pushtoolsButton->setFixedSize(buttonSize);
@@ -212,6 +212,8 @@ ChatWidget::ChatWidget(QWidget *parent)
 	connect(ui->chatTextEdit, SIGNAL(textChanged()), this, SLOT(updateCMPreview()) );
 #endif
 	ui->cmPreview->setVisible(false);
+    ui->chatTextEditHSplitter->setCollapsible(0, false);
+    ui->chatTextEditHSplitter->setCollapsible(1, false);
 
 	ui->textBrowser->resetImagesStatus(Settings->getChatLoadEmbeddedImages());
 	ui->textBrowser->installEventFilter(this);
@@ -235,6 +237,7 @@ ChatWidget::ChatWidget(QWidget *parent)
     ui->chatTextEdit->setCompleter(completer);
     ui->chatTextEdit->setCompleterKeyModifiers(Qt::ControlModifier);
     ui->chatTextEdit->setCompleterKey(Qt::Key_Space);
+    ui->chatVSplitter->setSizes((QList<int>() << 800 << 40));
 
 //#ifdef ENABLE_DISTANT_CHAT_AND_MSGS
 //	contextMnu->addSeparator();
@@ -397,9 +400,9 @@ void ChatWidget::init(const ChatId &chat_id, const QString &title)
                     if (rsIdentity->getIdDetails(RsGxsId(historyIt->peerName), details))
                         name = QString::fromUtf8(details.mNickname.c_str());
                     else
-                        name = QString::fromUtf8(historyIt->peerName.c_str());
+                        name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
                 } else {
-                    name = QString::fromUtf8(historyIt->peerName.c_str());
+                    name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
                 }
 
                 addChatMsg(historyIt->incoming, name, RsGxsId(historyIt->peerName.c_str()), QDateTime::fromTime_t(historyIt->sendTime), QDateTime::fromTime_t(historyIt->recvTime), QString::fromUtf8(historyIt->message.c_str()), MSGTYPE_HISTORY);
@@ -455,7 +458,8 @@ void ChatWidget::processSettings(bool load)
 		// load settings
 
 		// state of splitter
-		ui->chatVSplitter->restoreState(Settings->value("ChatSplitter").toByteArray());
+        //ui->chatVSplitter->restoreState(Settings->value("ChatSplitter").toByteArray());
+        ;
 	} else {
 		// save settings
 
@@ -1014,7 +1018,7 @@ void ChatWidget::addChatMsg(bool incoming, const QString &name, const RsGxsId gx
 	if (!Settings->valueFromGroup("Chat", "EnableCustomFontSize", true).toBool()) {
 		formatTextFlag |= RSHTML_FORMATTEXT_REMOVE_FONT_SIZE;
 	}
-	int desiredMinimumFontSize = Settings->valueFromGroup("Chat", "MinimumFontSize", 10).toInt();
+    int desiredMinimumFontSize = Settings->valueFromGroup("Chat", "MinimumFontSize", 10).toInt();
 	if (!Settings->valueFromGroup("Chat", "EnableBold", true).toBool()) {
 		formatTextFlag |= RSHTML_FORMATTEXT_REMOVE_FONT_WEIGHT;
 	}
@@ -1093,7 +1097,8 @@ void ChatWidget::addChatMsg(bool incoming, const QString &name, const RsGxsId gx
 		emit infoChanged(this);
 
         /* meiyousixin - need to update the recent time and sort the chat list */
-        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, QDateTime::currentDateTime().toTime_t());
+        long long current_time = QDateTime::currentSecsSinceEpoch();
+        emit NotifyQt::getInstance()->newChatMessageReceive(this->chatId, name.toStdString(), current_time, message.toStdString(), false);
 	}
 }
 
@@ -1269,6 +1274,7 @@ void ChatWidget::sendChat()
 #endif
     rsMsgs->sendChat(chatId, msg);
 
+    std::string textToSignal = chatWidget->toPlainText().toStdString();
 	chatWidget->clear();
 	// workaround for Qt bug - http://bugreports.qt.nokia.com/browse/QTBUG-2533
 	// QTextEdit::clear() does not reset the CharFormat if document contains hyperlinks that have been accessed.
@@ -1277,8 +1283,17 @@ void ChatWidget::sendChat()
     /* meiyousixin - update recent time when user send msg, need to sort the contact list by recent time */
     if (this->chatType() == CHATTYPE_PRIVATE || this->chatType() == CHATTYPE_LOBBY )
     {
-        uint current_time = QDateTime::currentDateTime().toTime_t();
-        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), current_time);
+        //unsigned int current_time = QDateTime::currentDateTime().toTime_t();
+        long long current_time = QDateTime::currentSecsSinceEpoch();
+        std::string nickInGroupChat = "You";
+        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
+
+        //we can check the scroll position here, if it now at the end, so update it to the end
+        QScrollBar *scrollbar = ui->textBrowser->verticalScrollBar();
+        bool is_scrollbar_at_end = scrollbar->value() == scrollbar->maximum();
+        if (!is_scrollbar_at_end ) {
+            scrollbar->setValue(scrollbar->maximum());
+        }
     }
 }
 
@@ -1604,7 +1619,7 @@ void ChatWidget::addExtraPicture()
 	if (misc::getOpenFileName(window(), RshareSettings::LASTDIR_IMAGES, tr("Load Picture File"), "Pictures (*.png *.xpm *.jpg *.jpeg)", file)) {
 		QString encodedImage;
 		uint32_t maxMessageSize = this->maxMessageSize();
-		if (RsHtml::makeEmbeddedImage(file, encodedImage, 640*480, maxMessageSize - 200)) {		//-200 for the html stuff
+        if (RsHtml::makeEmbeddedImage(file, encodedImage, 640*480, maxMessageSize - 200)) {		//-200 for the html stuff
 			QTextDocumentFragment fragment = QTextDocumentFragment::fromHtml(encodedImage);
 			ui->chatTextEdit->textCursor().insertFragment(fragment);
 		}

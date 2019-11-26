@@ -1147,7 +1147,7 @@ int RsServer::StartupRetroShare()
         {
             //vivo010 generate new supernode.txt if it's doesn't exist on the configuration.
             if(RsDirUtil::saveStringToFile(supernodefile,supernode_default)){
-                std::cerr << "Successful generated DHT bootstrap file " << bootstrapfile << std::endl;
+                std::cerr << "Successful generated Supernode bootstrap file " << supernodefile << std::endl;
             }
 	    else 
 		std::cerr << "No Installation supernode file to copy" << std::endl;
@@ -2010,6 +2010,7 @@ int RsServer::StartupRetroShare()
     std::cerr << "========================================================================" << std::endl;
 
 	coreReady = true;
+
 	return 1;
 }
 

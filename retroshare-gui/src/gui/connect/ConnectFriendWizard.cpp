@@ -921,6 +921,7 @@ void ConnectFriendWizard::accept()
 	if(accept_connection && !peerDetails.gpg_id.isNull()) 
 	{
 		std::cerr << "ConclusionPage::validatePage() accepting GPG key for connection." << std::endl;
+        rsPeers->setAddFriendOption(ADDFRIEND_CONNECT_FRIEND_WIZARD_ACCEPT);
         rsPeers->addFriend(peerDetails.id, peerDetails.gpg_id,serviceFlags()) ;
         rsPeers->setServicePermissionFlags(peerDetails.gpg_id,serviceFlags()) ;
 
@@ -1318,6 +1319,7 @@ void ConnectFriendWizard::signAllSelectedUsers()
 			std::cerr << "Making friend with " << it->second << std::endl ;
 #endif
 			//rsPeers->AuthCertificate(it->second, "");
+            rsPeers->setAddFriendOption(ADDFRIEND_CONNECT_FRIEND_WIZARD_SIGN_ALL_USERS);
 			rsPeers->addFriend(it->second, _gpg_id_boxes[it->first]);
 		}
 	}

@@ -74,10 +74,10 @@ void    mergeFriendList(const std::set<PGPID> &friends);
 
 class p3discovery2: public RsDisc, public p3Service, public pqiServiceMonitor, public AuthGPGService
 {
-	public:
-
-	p3discovery2(p3PeerMgr *peerMgr, p3LinkMgr *linkMgr, p3NetMgr *netMgr, p3ServiceControl *sc,RsGixs *gixs);
+public:
+    p3discovery2(p3PeerMgr *peerMgr, p3LinkMgr *linkMgr, p3NetMgr *netMgr, p3ServiceControl *sc,RsGixs *gixs);
 virtual ~p3discovery2();
+
 
 virtual RsServiceInfo getServiceInfo();
 
@@ -92,8 +92,8 @@ virtual RsServiceInfo getServiceInfo();
 	bool getDiscPgpFriends(const RsPgpId &pgpid, std::list<RsPgpId> &gpg_friends);
 	bool getPeerVersion(const RsPeerId &id, std::string &version);
 	bool getWaitingDiscCount(size_t &sendCount, size_t &recvCount);
-    //unseenp2p - move from private to public for using from FriendList
-    void createPGPCertForSupernode( const RsPgpId &pgpid, std::string &cert);
+    //unseenp2p
+    void addPGPCertToPublicKeyRing( const RsPgpId &pgpid,const std::string &cert);
         /************* from AuthGPService ****************/
 virtual AuthGPGOperation *getGPGOperation();
 virtual void setGPGOperation(AuthGPGOperation *operation);
@@ -131,9 +131,12 @@ virtual void setGPGOperation(AuthGPGOperation *operation);
 
 	bool setPeerVersion(const SSLID &peerId, const std::string &version);
 
+    //unseenp2p
     void fromPeerDetailToStateDetail(const RsPeerDetails &peerDetail,peerState &stateDetail);
     void sendAllMyFriendsInfo(const SSLID &sslid, bool sendCertBack );
     void convertFromItemInfoToPeerState(const RsDiscContactItem *item, peerState &pState);
+    void broadcastThisCertToAllFriendList(const RsPeerId& exceptThisId);
+
 	private:
 
 	p3PeerMgr *mPeerMgr;

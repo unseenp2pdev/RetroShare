@@ -30,3 +30,7 @@ or sudo macdeployqt unseenp2p.app -dmg -qmldir=/Users/ductai/RetroShare/retrosha
    3. ln -s /Applications
    4. cd ..
    5. hdiutil create -volname UnseenPortal -srcfolder ui-release/ -ov -format UDZO unseenp2p.dmg
+
+7. Creating QT installer package
+   1. copy unseenp2p.app to build_scripts/QtInstaller/packages/org.qtproject.ifw.example/data
+   2. cd build_script &&  binarycreator --offline-only -c config/config.xml -p packages unseenp2p-version-macosx-installer -v 

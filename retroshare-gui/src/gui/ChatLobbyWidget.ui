@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>803</width>
-    <height>517</height>
+    <width>890</width>
+    <height>580</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>790</width>
+    <height>580</height>
+   </size>
   </property>
   <layout class="QVBoxLayout">
    <property name="leftMargin">
@@ -95,7 +101,7 @@
       <item>
        <widget class="QPushButton" name="addContactButton">
         <property name="text">
-         <string>Add contact</string>
+         <string>Add friends certificate</string>
         </property>
        </widget>
       </item>
@@ -121,13 +127,34 @@
    </item>
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>true</bool>
+     </property>
+     <property name="handleWidth">
+      <number>0</number>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>true</bool>
      </property>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="lobbyTreeVLayout">
        <item>
         <widget class="QFrame" name="toolBarFrame">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>40</height>
+          </size>
+         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
@@ -145,7 +172,7 @@
            <number>1</number>
           </property>
           <property name="rightMargin">
-           <number>2</number>
+           <number>12</number>
           </property>
           <property name="bottomMargin">
            <number>1</number>
@@ -190,21 +217,37 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeWidget" name="lobbyTreeWidget">
+        <widget class="SmartListView" name="lobbyTreeWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <property name="iconSize">
+         <property name="iconSize" stdset="0">
           <size>
            <width>16</width>
            <height>16</height>
           </size>
          </property>
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>
@@ -215,6 +258,12 @@
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>590</width>
+        <height>0</height>
+       </size>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -238,6 +287,12 @@
         </property>
         <item row="0" column="0">
          <widget class="QGroupBox" name="lobbyinfo_groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>390</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true"/>
           </property>
@@ -311,14 +366,19 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>LineEditClear</class>
+   <extends>QLineEdit</extends>
+   <header location="global">gui/common/LineEditClear.h</header>
+  </customwidget>
+  <customwidget>
    <class>StyledLabel</class>
    <extends>QLabel</extends>
    <header>gui/common/StyledLabel.h</header>
   </customwidget>
   <customwidget>
-   <class>LineEditClear</class>
-   <extends>QLineEdit</extends>
-   <header location="global">gui/common/LineEditClear.h</header>
+   <class>SmartListView</class>
+   <extends>QWidget</extends>
+   <header>gui/smartlistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

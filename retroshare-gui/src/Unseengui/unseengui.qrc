@@ -190,5 +190,22 @@
         <file>home/img/file/unlocked-padlock.png</file>
         <file>home/img/face_icon/confbtn.png</file>
         <file>chat/img/groundchat_private_unread.png</file>
+        <file>home/img/Setting/envelope_x.png</file>
+        <file>home/img/Setting/exclamation_x.png</file>
+        <file>home/img/Setting/file_x.png</file>
+        <file>home/img/Setting/group-profile-users_x.png</file>
+        <file>home/img/Setting/information-symbol_x.png</file>
+        <file>home/img/Setting/listing-option_x.png</file>
+        <file>home/img/Setting/puzzle-piece-silhouette_x.png</file>
+        <file>home/img/Setting/reduced-volume_x.png</file>
+        <file>home/img/Setting/settings_x.png</file>
+        <file>home/img/Setting/share_x.png</file>
+        <file>home/img/Setting/shield_x.png</file>
+        <file>home/img/Setting/tint-drop_x.png</file>
+        <file>home/img/Setting/world_x.png</file>
+        <file>home/img/Setting/youtube-play-button_x.png</file>
+        <file>home/img/Setting/bull-horn-announcer_x.png</file>
+        <file>home/img/Setting/comment-black-oval-bubble-shape_x.png</file>
+        <file>home/img/mountain3-1.jpg</file>
     </qresource>
 </RCC>

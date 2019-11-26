@@ -20,6 +20,9 @@
  ****************************************************************/
 
 #include <QPixmap>
+#include <QImage>
+#include <QSize>
+#include <QPainter>
 
 #include <retroshare/rsmsgs.h>
 #include <retroshare/rspeers.h>
@@ -27,6 +30,27 @@
 #include <gui/gxs/GxsIdDetails.h>
 
 #include "AvatarDefs.h"
+
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
+}
 
 void AvatarDefs::getOwnAvatar(QPixmap &avatar, const QString& defaultImage)
 {
@@ -79,7 +103,11 @@ void AvatarDefs::getAvatarFromGxsId(const RsGxsId& gxsId, QPixmap &avatar, const
     /* load image */
 
         if(details.mAvatar.mSize == 0 || !avatar.loadFromData(details.mAvatar.mData, details.mAvatar.mSize, "PNG"))
-            avatar = QPixmap::fromImage(GxsIdDetails::makeDefaultIcon(gxsId));
+        {
+            //unseenp2p - make the circle avatar
+            QImage circleAvatar = GxsIdDetails::makeDefaultIcon(gxsId);
+            avatar = QPixmap::fromImage(getCirclePhoto(circleAvatar, circleAvatar.size().width()));
+        }
 }
 
 void AvatarDefs::getAvatarFromGpgId(const RsPgpId& gpgId, QPixmap &avatar, const QString& defaultImage)

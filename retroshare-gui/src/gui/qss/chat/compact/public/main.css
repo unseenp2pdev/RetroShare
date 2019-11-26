@@ -3,29 +3,82 @@
 }
 
 .incomingTime {
-	color:#808080;
+	color:#C00000;
+}
+
+.incomingName {
+	color:#2D84C9;
 }
 
 .outgoingTime {
-	color:#808080;
+	color:#C00000;
+}
+
+.outgoingName {
+	color:#2D84C9;
 }
 
 .hincomingTime {
-	color:#808080;
+	color:#800000;
+}
+
+.hincomingName {
+	color:#1E5684;
 }
 
 .houtgoingTime {
-	color:#808080;
+	color:#800000;
+}
+
+.houtgoingName {
+	color:#1E5684;
 }
 
 .ooutgoingTime {
-	color:#808080;
+	color:#C00000;
+}
+
+.ooutgoingName {
+	color:#FF0000;
 }
 
 .systemTime {
-	color:#808080;
+}
+
+.systemName {
 }
 
 .meName {
 	font-weight: bold;
+}
+.hincomingMsg, .incomingMsg{
+    display: inline-block;
+    font-size: 1pt;
+}
+.houtgoingMsg, .outgoingMsg, .ooutgoingMsg{
+    padding: 10px 18px;
+    font-size: 1pt;
+}
+.message {
+    color: #000000;
+    font-size: 13pt;
+    font-family: "Segoe UI";
+}
+.name {
+    font-weight: bold;
+    font-size: 13pt;
+    font-family: "Segoe UI Semibold";
+}
+.time {
+    color: #4d4d5e;
+    font-size: 9pt;
+    padding: 0px 0px;
+    font-family: "Segoe UI";
+
+}
+.cin {
+background-color: #ececec;
+}
+.cout {
+background-color: #bbebff;
 }

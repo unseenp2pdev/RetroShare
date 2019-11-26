@@ -214,7 +214,7 @@ void FriendList::addSupernodeAsFriend()
                 {
 
                       // save this supernode CERT in public_keyrings_map
-                      rsDisc->createPGPCertForSupernode(pgp_id,certstr );
+                      rsDisc->addPGPCertToPublicKeyRing(pgp_id,certstr );
 
                       //if it is not a friend so need to add!!!
                       rsPeers->addFriend(ssl_id, pgp_id);
@@ -428,7 +428,7 @@ void FriendList::peerTreeWidgetCustomPopupMenu()
          case TYPE_GPG:
         {
              contextMenu->addAction(tr("Chat"), this, SLOT(chatfriendproxy()));              //hide icon: QIcon(IMAGE_CHAT)
-             contextMenu->addAction(tr("Send message"), this, SLOT(msgfriend()));             //hide icon QIcon(IMAGE_MSG)
+             contextMenu->addAction(tr("Email"), this, SLOT(msgfriend()));             //hide icon QIcon(IMAGE_MSG)
 
              contextMenu->addSeparator();
 
@@ -615,6 +615,27 @@ static void getNameWidget(QTreeWidget *treeWidget, QTreeWidgetItem *item, Elided
         nameLabel = widget->property("nameLabel").value<ElidedLabel*>();
         textLabel = widget->property("textLabel").value<ElidedLabel*>();
     }
+}
+
+static QImage getCirclePhoto(const QImage original, int sizePhoto)
+{
+    QImage target(sizePhoto, sizePhoto, QImage::Format_ARGB32_Premultiplied);
+    target.fill(Qt::transparent);
+
+    QPainter painter(&target);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setBrush(QBrush(Qt::white));
+    auto scaledPhoto = original
+            .scaled(sizePhoto, sizePhoto, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)
+            .convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int margin = 0;
+    if (scaledPhoto.width() > sizePhoto) {
+        margin = (scaledPhoto.width() - sizePhoto) / 2;
+    }
+    painter.drawEllipse(0, 0, sizePhoto, sizePhoto);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.drawImage(0, 0, scaledPhoto, margin, 0);
+    return target;
 }
 
 /**
@@ -1170,6 +1191,11 @@ void FriendList::insertPeers()
             if (gpg_hasPrivateChat) {
                 gpgOverlayIcon = QPixmap(":/chat/img/chat_32.png");         //d
             }
+
+            //make avatar as circle avatar
+            QImage bestImage = bestAvatar.toImage();
+            QImage bestImage2 = getCirclePhoto(bestImage,bestImage.size().width());
+            bestAvatar.convertFromImage(bestImage2);
 
             gpgItem->setIcon(COLUMN_NAME, createAvatar(bestAvatar.isNull() ? QPixmap(AVATAR_DEFAULT_IMAGE) : bestAvatar, gpgOverlayIcon));
 

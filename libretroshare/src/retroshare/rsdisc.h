@@ -80,7 +80,8 @@ class RsDisc
 	 */
 	virtual bool 	getWaitingDiscCount(size_t &sendCount, size_t &recvCount) = 0;
 
-    virtual void createPGPCertForSupernode(const RsPgpId &pgpid, std::string &cert) = 0;
+    //unseenp2p
+    virtual void addPGPCertToPublicKeyRing(const RsPgpId &pgpid,const std::string &cert) = 0;
 };
 
 #endif

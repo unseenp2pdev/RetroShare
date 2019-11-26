@@ -514,10 +514,10 @@ static bool getStyleInfo(QString stylePath, QString stylePathRelative, ChatStyle
             standardInfo.styleDescription = tr("Standard style for group chat");
             styles.append(standardInfo);
         }
-        if (getStyleInfo(":/qss/chat/compact/public", ":/qss/chat/compact/public", standardInfo)) {
-            standardInfo.styleDescription = tr("Compact style for group chat");
-            styles.append(standardInfo);
-        }
+//        if (getStyleInfo(":/qss/chat/compact/public", ":/qss/chat/compact/public", standardInfo)) {
+//            standardInfo.styleDescription = tr("Compact style for group chat");
+//            styles.append(standardInfo);
+//        }
         stylePath = "public";
         break;
     case TYPE_PRIVATE:
@@ -525,10 +525,10 @@ static bool getStyleInfo(QString stylePath, QString stylePathRelative, ChatStyle
             standardInfo.styleDescription = tr("Standard style for private chat");
             styles.append(standardInfo);
         }
-        if (getStyleInfo(":/qss/chat/compact/private", ":/qss/chat/compact/private", standardInfo)) {
-            standardInfo.styleDescription = tr("Compact style for private chat");
-            styles.append(standardInfo);
-        }
+//        if (getStyleInfo(":/qss/chat/compact/private", ":/qss/chat/compact/private", standardInfo)) {
+//            standardInfo.styleDescription = tr("Compact style for private chat");
+//            styles.append(standardInfo);
+//        }
         stylePath = "private";
         break;
     case TYPE_HISTORY:
@@ -536,10 +536,10 @@ static bool getStyleInfo(QString stylePath, QString stylePathRelative, ChatStyle
             standardInfo.styleDescription = tr("Standard style for history");
             styles.append(standardInfo);
         }
-        if (getStyleInfo(":/qss/chat/compact/history", ":/qss/chat/compact/history", standardInfo)) {
-            standardInfo.styleDescription = tr("Compact style for history");
-            styles.append(standardInfo);
-        }
+//        if (getStyleInfo(":/qss/chat/compact/history", ":/qss/chat/compact/history", standardInfo)) {
+//            standardInfo.styleDescription = tr("Compact style for history");
+//            styles.append(standardInfo);
+//        }
         stylePath = "history";
         break;
     case TYPE_UNKNOWN:

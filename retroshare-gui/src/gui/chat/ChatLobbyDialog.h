@@ -54,6 +54,11 @@ public:
 	ChatId	chatId() const {return cId;}
 	void sortParcipants();
 
+    //unseenp2p  - move from private to public
+    void updateParticipantsList();
+    //unseenp2p - move from protected to public
+    void processSettings(bool load);
+
 private slots:
 	void participantsTreeWidgetCustomPopupMenu( QPoint point );
 	void textBrowserAskContextMenu(QMenu* contextMnu, QString anchorForPosition, const QPoint point);
@@ -61,7 +66,6 @@ private slots:
 	void leaveLobby() ;
 	void filterChanged(const QString &text);
     void showInPeopleTab();
-
 signals:
 	void lobbyLeave(ChatLobbyId) ;
 	void typingEventReceived(ChatLobbyId) ;
@@ -76,7 +80,6 @@ protected:
 	/** Default destructor */
 	virtual ~ChatLobbyDialog();
 
-	void processSettings(bool load);
 	virtual void init(const ChatId &id, const QString &title);
 	virtual bool canClose();
     virtual void addChatMsg(const ChatMessage &msg);
@@ -90,7 +93,7 @@ protected slots:
 	void voteParticipant();
 
 private:
-	void updateParticipantsList();
+
 	void initParticipantsContextMenu(QMenu* contextMnu, QList<RsGxsId> idList);
 	
 	void filterIds();
@@ -131,6 +134,7 @@ private:
     GxsIdChooser *ownIdChooser ;
     //icons cache
     QIcon bullet_red_128, bullet_grey_128, bullet_green_128, bullet_yellow_128;
+    QIcon bullet_unknown_128;
 };
 
 #endif

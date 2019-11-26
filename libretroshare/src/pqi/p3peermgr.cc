@@ -49,6 +49,7 @@
 #include "retroshare/rspeers.h" // Needed for Group Parameters.
 #include "retroshare/rsbanlist.h" // Needed for banned IPs
 
+
 /* Network setup States */
 
 //Defined and used in /libretroshare/src/pqi/p3netmgr.cc
@@ -72,6 +73,7 @@ static struct RsLog::logInfo p3peermgrzoneInfo = {RsLog::Default, "p3peermgr"};
  * #define PEER_DEBUG 1
  * #define PEER_DEBUG_LOG 1
  ***/
+//#define PEER_DEBUG 1
 
 #define MAX_AVAIL_PERIOD 230 //times a peer stay in available state when not connected
 #define MIN_RETRY_PERIOD 140
@@ -998,7 +1000,7 @@ bool p3PeerMgrIMPL::addFriend(const RsPeerId& input_id, const RsPgpId& input_gpg
 			pstate.lastcontact = lastContact;
 
 			/* addr & timestamps -> auto cleared */
-            std::cerr << "p3PeerMgrIMPL:addFriend is calling... mFriendList[id] = pstate " << std::endl;
+            std::cerr << "p3PeerMgrIMPL:addFriend is calling... add name: " << pstate.name << std::endl;
 
 			mFriendList[id] = pstate;
 
@@ -3011,9 +3013,10 @@ bool p3PeerMgrIMPL::removeUnusedLocations()
 	return true;
 }
 
-std::map<RsPgpId, RsPeerId> p3PeerMgrIMPL::friendListOfContact()
+
+std::map<RsPgpId, UnseenNetworkContactsItem> p3PeerMgrIMPL::networkContacts()
 {
-    return mFriendOfContactList;
+    return mNetworkContacts;
 }
 
 std::map<RsPgpId, std::string> p3PeerMgrIMPL::certListOfContact()
@@ -3021,54 +3024,93 @@ std::map<RsPgpId, std::string> p3PeerMgrIMPL::certListOfContact()
     return mCertList;
 }
 
-void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert)
+bool p3PeerMgrIMPL::getPeerDetailsFromNetworkContacts(const RsPgpId &pgp_id, UnseenNetworkContactsItem &d)
 {
-    std::map<RsPgpId, RsPeerId>::iterator it;
-    std::map<RsPgpId, std::string>::iterator itCert;
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+    itDetails = mNetworkContacts.find(pgp_id);
+    if (itDetails == mNetworkContacts.end())
+    {
+        return false;
+    }
+    else
+    {
+        d = (*itDetails).second;
+        return true;
+    }
 
-    it =  mFriendOfContactList.find(rsPgpId);
+}
+std::list<RsPgpId> p3PeerMgrIMPL::getNetworkContactsPgpIdList()
+{
+    std::list<RsPgpId> list;
+    list.clear() ;
+
+    for(std::map<RsPgpId,UnseenNetworkContactsItem>::const_iterator it(mNetworkContacts.begin());it!=mNetworkContacts.end();++it)
+            list.push_back(RsPgpId(it->first)) ;
+    return list;
+}
+void p3PeerMgrIMPL::addFriendOfContact( const RsPgpId& rsPgpId, const RsPeerId& sslId, const std::string& cert, const UnseenNetworkContactsItem& dcItem)
+{
+
+    std::map<RsPgpId, std::string>::iterator itCert;
     itCert = mCertList.find(rsPgpId);
-    if (it == mFriendOfContactList.end() && itCert == mCertList.end() )
+    if ( itCert == mCertList.end() )
     {
 #ifdef PEER_DEBUG
             std::cerr << "we will add this Peer into Friend Of Contact PGP id: " << rsPgpId << " with sslId: " << sslId << std::endl;
 #endif
-        mFriendOfContactList[rsPgpId] = sslId;
-        mCertList[rsPgpId] = cert;
-        return;
+        mCertList[rsPgpId] = cert;   
     }
-#ifdef PEER_DEBUG
-            std::cerr << " This Peer already existed in Friend Of Contact PGP id: " << rsPgpId << " with sslId: " << sslId << std::endl;
-#endif
 
+    //Add the peer into network contacts by using RsPeerDetails get from cert string
+    std::map<RsPgpId, UnseenNetworkContactsItem>::iterator itDetails;
+    itDetails = mNetworkContacts.find(rsPgpId);
+    if (itDetails == mNetworkContacts.end())
+    {
+  #ifdef PEER_DEBUG
+            std::cerr << "Add this peer into network contacts: " << rsPgpId << " with name: " << dcItem.name << std::endl;
+#endif
+            mNetworkContacts[rsPgpId] = dcItem;
+    }
     return;
 }
 
 bool p3PeerMgrIMPL::isFriendOfContact( const RsPgpId& rsPgpId)
 {
-    std::map<RsPgpId, RsPeerId>::iterator it;
-    it =     mFriendOfContactList.find(rsPgpId);
-    if ((it != mFriendOfContactList.end())) return true;
+    std::map<RsPgpId, std::string>::iterator it;
+    it =     mCertList.find(rsPgpId);
+    if ((it != mCertList.end())) return true;
     else return false;
 }
 
-void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
-{
-    std::list<std::string>::iterator it;
-    it = std::find(mSupernodeCertList.begin(), mSupernodeCertList.end(), cert);
-    if(it != mSupernodeCertList.end())
-    {
-        //if it already exist so do nothing
-        return;
-    }
-    else
-    {
-        mSupernodeCertList.push_back(cert);
-    }
-    // TODO: Check more about max = 3 supernode certificates ?
-}
-
- std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
+ std::string p3PeerMgrIMPL::getAddFriendOption()
  {
-     return mSupernodeCertList;
+     return mAddFriendOption;
  }
+ void p3PeerMgrIMPL::setAddFriendOption(const std::string&  option)
+ {
+     mAddFriendOption = option;
+ }
+
+ //unseenp2p - only for client
+ void p3PeerMgrIMPL::saveSupernodeCert(const std::string& cert)
+ {
+     std::list<std::string>::iterator it;
+     it = std::find(mSupernodeCertList.begin(), mSupernodeCertList.end(), cert);
+     if(it != mSupernodeCertList.end())
+     {
+         //if it already exist so do nothing
+         return;
+     }
+     else
+     {
+         mSupernodeCertList.push_back(cert);
+     }
+     // TODO: Check more about max = 3 supernode certificates ?
+ }
+
+  std::list<std::string> p3PeerMgrIMPL::getSupernodeCertList()
+  {
+      return mSupernodeCertList;
+  }
+
+

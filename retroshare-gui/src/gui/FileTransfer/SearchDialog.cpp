@@ -198,6 +198,9 @@ SearchDialog::SearchDialog(QWidget *parent)
     sizes << 250 << width(); // Qt calculates the right sizes
     ui.splitter->setSizes(sizes);
 
+    ui.splitter->setCollapsible(0, false);
+    ui.splitter->setCollapsible(1, false);
+
     /* add filter actions */
     ui.filterLineEdit->addFilter(QIcon(), tr("File Name"), SR_NAME_COL);
     //ui.filterLineEdit->addFilter(QIcon(), tr("File Size"), SR_SIZE_COL);

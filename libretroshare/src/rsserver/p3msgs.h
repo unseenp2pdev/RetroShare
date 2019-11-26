@@ -136,6 +136,23 @@ class p3Msgs: public RsMsgs
      */
     virtual void clearChatLobby(const ChatId &id);
 
+          //unseenp2p - for MVC
+          virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                                         unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                                         int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId);
+          virtual void removeContactOrGroupChatFromModelData(std::string uId);
+          virtual std::vector<conversationInfo> getConversationItemList();
+          virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg );
+          virtual void sortConversationItemListByRecentTime();
+          virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset);
+          virtual std::string getSeletedUIdBeforeSorting(int row);
+          virtual int getIndexFromUId(std::string uId);
+          virtual bool isChatIdInConversationList(std::string uId);
+          virtual void setConversationListMode(uint32_t mode);
+          virtual uint32_t getConversationListMode();
+          virtual void setSearchFilter(std::string text);
+          virtual std::vector<conversationInfo> getSearchFilteredConversationItemList();
+
 	  /****************************************/
 
       virtual bool joinVisibleChatLobby(const ChatLobbyId& id, const RsGxsId &own_id) ;
@@ -154,8 +171,11 @@ class p3Msgs: public RsMsgs
     virtual void setLobbyAutoSubscribe(const ChatLobbyId& lobby_id, const bool autoSubscribe);
     virtual bool getLobbyAutoSubscribe(const ChatLobbyId& lobby_id);
       virtual ChatLobbyId createChatLobby(const std::string& lobby_name,const RsGxsId& lobby_identity,const std::string& lobby_topic,const std::set<RsPeerId>& invited_friends,ChatLobbyFlags privacy_type) ;
+          //unseenp2p
       virtual   void getGroupChatInfoList(std::map<ChatLobbyId,ChatLobbyInfo>& _groupchats); //meiyousixin - add for new function
-
+          virtual   void saveGroupChatInfo(); //meiyousixin - add for new function
+       virtual void locked_printDebugInfo() const ;
+          //end of unseenp2p
 	virtual bool initiateDistantChatConnexion(
 		          const RsGxsId& to_gxs_id, const RsGxsId& from_gxs_id,
 		          DistantChatPeerId &pid, uint32_t& error_code,
