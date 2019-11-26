@@ -160,39 +160,3 @@ Component.prototype.componentSelectionPageEntered = function()
 }
 
 
-
-//function Controller()
-//{
-//	 installer.installationFinished.connect(function() {
-//
-//			 var isUpdate = installer.isUpdater();
-//			
-//			 if(isUpdate)
-//			 {
-//				 var targetDir = installer.value("TargetDir");
-//				 console.log("targetDir: " + targetDir);
-//				 installer.executeDetached(targetDir + "/unseenp2p.app");			 
-//				 
-//			 }else{
-//				var result = QMessageBox.question("quit.question", "Start Program", "Do you want to start the installed application?",QMessageBox.Yes | QMessageBox.No);
-//				if( result == QMessageBox.Yes)
-//				 {
-//					var targetDir = installer.value("TargetDir");
-//				  	console.log("targetDir: " + targetDir);
-//					console.log("Is Updater: " + installer.isUpdater());
-//					console.log("Is Uninstaller: " + installer.isUninstaller());
-//					console.log("Is Package Manager: " + installer.isPackageManager());
-//					installer.executeDetached(targetDir+"/unseenp2p.app");			 
-//				}
-//				 
-//			 }
-//			 
-//		
-//    });
-//	installer.updateFinished.connect(function(){
-//		var targetDir = installer.value("TargetDir");
-//		console.log("targetDir: " + targetDir);
-//		installer.executeDetached(targetDir+"/unseenp2p.app");	
-//	});
-//
-//}
