@@ -156,8 +156,10 @@ QVariant SmartListModel::data(const QModelIndex &index, int role) const
             switch (statusContactInfo.status)
             {
                 case RS_STATUS_OFFLINE:
-                case RS_STATUS_INACTIVE:
                     presenceForChat = "offline";
+                    break;
+                case RS_STATUS_INACTIVE:
+                    presenceForChat = "idle";
                     break;
                 case RS_STATUS_ONLINE:
                     presenceForChat = "online";

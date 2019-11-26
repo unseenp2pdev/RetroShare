@@ -144,6 +144,10 @@ ConversationItemDelegate::paint(QPainter* painter
         {
             painter->fillPath(innerCircle, RingTheme::grey_);
         }
+        else if (statusStr == "idle")
+        {
+            painter->fillPath(innerCircle, RingTheme::urgentOrange_);
+        }
         else if (statusStr == "online")
         {
             painter->fillPath(innerCircle, RingTheme::presenceGreen_);
