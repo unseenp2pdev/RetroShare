@@ -666,8 +666,10 @@ void ChatLobbyDialog::updateParticipantsList()
                 switch (statusContactInfo.status)
                 {
                 case RS_STATUS_OFFLINE:
-                case RS_STATUS_INACTIVE:
                     widgetitem->setIcon(COLUMN_ICON, bullet_grey_128 );
+                    break;
+                case RS_STATUS_INACTIVE:
+                    widgetitem->setIcon(COLUMN_ICON, bullet_yellow_128 );
                     break;
                 case RS_STATUS_ONLINE:
                     widgetitem->setIcon(COLUMN_ICON, bullet_green_128);

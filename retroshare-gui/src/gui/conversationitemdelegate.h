@@ -46,7 +46,7 @@ private:
     constexpr static int dx_ = 12;
     constexpr static int fontSize_ = 11;
     constexpr static int infoTextWidth_ = 70; // 176;
-#elif linux
+#elif __linux__
     constexpr static int sizeImage_ = 58;
     constexpr static int cellHeight_ = 68;
     constexpr static int dy_ = 6;
