@@ -38,7 +38,7 @@
 #include "gxstrans/p3gxstrans.h"
 #include "util/rsdeprecate.h"
 
-#include "services/p3gxschats.h"
+//#include "services/p3gxschats.h"
 #include "rsitems/rsgxschatitems.h"
 
 class p3ServiceControl;
@@ -57,7 +57,7 @@ typedef RsPeerId ChatLobbyVirtualPeerId ;
   */
 class p3GxsChatService :
         public p3Service, public DistantChatService, public DistributedChatService,
-        public pqiServiceMonitor, /*GxsTransClient, */ p3GxsChats
+        public pqiServiceMonitor, GxsTransClient
 {
 public:
     p3GxsChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm,

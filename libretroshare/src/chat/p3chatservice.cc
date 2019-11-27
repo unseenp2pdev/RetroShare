@@ -53,19 +53,30 @@ static const uint32_t MAX_AVATAR_JPEG_SIZE              = 32767; // Maximum size
                                                                  // don't transfer correctly and can kill the system.
 																					  // Images are 96x96, which makes approx. 27000 bytes uncompressed.
 
+//p3ChatService::p3ChatService( p3ServiceControl *sc, p3IdService *pids,
+//                              p3LinkMgr *lm, p3HistoryMgr *historyMgr,
+//                              p3GxsTrans& gxsTransService ) :
+//    DistributedChatService(getServiceInfo().mServiceType, sc, historyMgr,pids),
+//    mChatMtx("p3ChatService"), mServiceCtrl(sc), mLinkMgr(lm),
+//    mHistoryMgr(historyMgr), _own_avatar(NULL),
+//    _serializer(new RsChatSerialiser()),
+//    mDGMutex("p3ChatService distant id - gxs id map mutex"),
+//    mGxsTransport(gxsTransService)
+//{
+//	addSerialType(_serializer);
+//    mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,this );
+//}
+
 p3ChatService::p3ChatService( p3ServiceControl *sc, p3IdService *pids,
-                              p3LinkMgr *lm, p3HistoryMgr *historyMgr,
-                              p3GxsTrans& gxsTransService ) :
+                              p3LinkMgr *lm, p3HistoryMgr *historyMgr) :
     DistributedChatService(getServiceInfo().mServiceType, sc, historyMgr,pids),
     mChatMtx("p3ChatService"), mServiceCtrl(sc), mLinkMgr(lm),
     mHistoryMgr(historyMgr), _own_avatar(NULL),
     _serializer(new RsChatSerialiser()),
-    mDGMutex("p3ChatService distant id - gxs id map mutex"),
-    mGxsTransport(gxsTransService)
+    mDGMutex("p3ChatService distant id - gxs id map mutex")
 {
-	addSerialType(_serializer);
-	mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,
-	                                      this );
+    addSerialType(_serializer);
+    //mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,this );
 }
 
 RsServiceInfo p3ChatService::getServiceInfo()
@@ -366,8 +377,7 @@ bool p3ChatService::sendChat(ChatId destination, std::string msg)
 				uint32_t sz = _serializer->size(ci);
 				std::vector<uint8_t> data; data.resize(sz);
 				_serializer->serialise(ci, &data[0], &sz);
-				mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE,
-				                       de.from, de.to, &data[0], sz);
+                //mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE, de.from, de.to, &data[0], sz);
 			}
 			else
 				std::cout << "p3ChatService::sendChat(...) can't find distant"

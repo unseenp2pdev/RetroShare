@@ -65,12 +65,11 @@ RsGxsChats *rsGxsChats = NULL;
 /******************* Startup / Tick    ******************************************/
 /********************************************************************************/
 
-p3GxsChats::p3GxsChats(
-        RsGeneralDataService *gds, RsNetworkExchangeService *nes,
-        RsGixs* gixs ) :
-    RsGenExchange( gds, nes, new RsGxsChatSerialiser(),
-                   RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
-    RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
+p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs,
+        p3ServiceControl *sc, p3IdService *pids, p3LinkMgr *lm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService) :
+        RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
+        p3ChatService(sc, pids,lm,historyMgr),
+        RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
     mSearchCallbacksMapMutex("GXS chats search")
 {
     // For Dummy Msgs.

@@ -1467,7 +1467,8 @@ int RsServer::StartupRetroShare()
     RsGeneralDataService* gxschats_ds = new RsDataService(currGxsDir + "/", "gxschats_db",
                                                         RS_SERVICE_GXS_TYPE_CHATS, NULL, rsInitConfig->gxs_passwd);
 
-    p3GxsChats *mGxsChats = new p3GxsChats(gxschats_ds, NULL, mGxsIdService);
+    p3GxsChats *mGxsChats = new p3GxsChats(gxschats_ds, NULL, mGxsIdService,serviceCtrl,mGxsIdService,mLinkMgr,mHistoryMgr, *mGxsTrans);
+
 
     // create GXS photo service
     RsGxsNetService* gxschats_ns = new RsGxsNetService(
@@ -1548,8 +1549,10 @@ int RsServer::StartupRetroShare()
 	mDisc = new p3discovery2(mPeerMgr, mLinkMgr, mNetMgr, serviceCtrl,mGxsIdService);
 	mHeart = new p3heartbeat(serviceCtrl, pqih);
 	msgSrv = new p3MsgService( serviceCtrl, mGxsIdService, *mGxsTrans );
-	chatSrv = new p3ChatService( serviceCtrl,mGxsIdService, mLinkMgr,
-	                             mHistoryMgr, *mGxsTrans );
+//	chatSrv = new p3ChatService( serviceCtrl,mGxsIdService, mLinkMgr,
+//	                             mHistoryMgr, *mGxsTrans );
+    chatSrv = new p3ChatService( serviceCtrl,mGxsIdService, mLinkMgr,
+                                 mHistoryMgr );
 	mStatusSrv = new p3StatusService(serviceCtrl);
 
 #ifdef ENABLE_GROUTER

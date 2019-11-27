@@ -5,11 +5,26 @@
 #include "services/p3gxscommon.h"
 #include "gxs/rsgenexchange.h"
 #include "gxs/gxstokenqueue.h"
-
 #include "util/rstickevent.h"
 
 #include <map>
 #include <string>
+
+//chatservice
+#include "chat/p3Chatservice.h"
+#include "rsitems/rsmsgitems.h"
+#include "pqi/pqiservicemonitor.h"
+#include "chat/distantchat.h"
+#include "chat/distributedchat.h"
+#include "retroshare/rsmsgs.h"
+#include "gxstrans/p3gxstrans.h"
+#include "util/rsdeprecate.h"
+
+class p3ServiceControl;
+class p3LinkMgr;
+class p3HistoryMgr;
+
+
 
 class SSGxsChatGroup
 {
@@ -23,12 +38,14 @@ class SSGxsChatGroup
 };
 
 class p3GxsChats: public RsGenExchange, public RsGxsChats,
-    public GxsTokenQueue, public p3Config,
+    public GxsTokenQueue, public p3ChatService, virtual public p3Config,
     public RsTickEvent	/* only needed for testing - remove after */
 {
 public:
     p3GxsChats( RsGeneralDataService* gds, RsNetworkExchangeService* nes,
-                   RsGixs* gixs );
+                   RsGixs* gixs, p3ServiceControl *sc, p3IdService *pids,
+                p3LinkMgr *lm, p3HistoryMgr *historyMgr,
+                p3GxsTrans& gxsTransService );
     virtual RsServiceInfo getServiceInfo();
 
     virtual void service_tick();
