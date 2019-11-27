@@ -11,7 +11,7 @@
 #include <string>
 
 //chatservice
-#include "chat/p3Chatservice.h"
+#include "chat/p3chatservice.h"
 #include "rsitems/rsmsgitems.h"
 #include "pqi/pqiservicemonitor.h"
 #include "chat/distantchat.h"
