@@ -618,16 +618,16 @@ macx-* {
 
         CONFIG += c++11
 
-        INCLUDEPATH += "/usr/local/Cellar/openssl/1.0.2s/include/"
-        INCLUDEPATH += "/usr/include"
-        INCLUDEPATH += "/usr/local/include"
-        INCLUDEPATH += "/opt/local/include"
-        INCLUDEPATH += "/usr/local/opt/openssl/include"
-        INCLUDEPATH += "/usr/local/Cellar/miniupnpc/2.1/include"
-        INCLUDEPATH += "/usr/local/Cellar/libmicrohttpd/0.9.59/include"
-        INCLUDEPATH += "/usr/local/Cellar/sqlcipher/3.4.2/include"
+#        INCLUDEPATH += "/usr/local/Cellar/openssl/1.0.2s/include/"
+#        INCLUDEPATH += "/usr/include"
+#        INCLUDEPATH += "/usr/local/include"
+#        INCLUDEPATH += "/opt/local/include"
+#        INCLUDEPATH += "/usr/local/opt/openssl/include"
+#        INCLUDEPATH += "/usr/local/Cellar/miniupnpc/2.1/include"
+#        INCLUDEPATH += "/usr/local/Cellar/libmicrohttpd/0.9.59/include"
+#        INCLUDEPATH += "/usr/local/Cellar/sqlcipher/3.4.2/include"
 
-        LIB_DIR += "/usr/local/Cellar/openssl/1.0.2s/lib/"
+#        LIB_DIR += "/usr/local/Cellar/openssl/1.0.2s/lib/"
 
         RS_UPNP_LIB = miniupnpc
         QT += macextras
