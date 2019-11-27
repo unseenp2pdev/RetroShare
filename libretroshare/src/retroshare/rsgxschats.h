@@ -51,7 +51,7 @@ class RsGxsChatGroup : RsSerializable
         RsGxsImage  mImage; //conversation avatar image
         std::map<RsPeerId,RsGxsId> members;
         /// @see RsSerializable
-        //bool mAutoDownload;
+        bool mAutoDownload;
         virtual void serial_process( RsGenericSerializer::SerializeJob j,
                                  RsGenericSerializer::SerializeContext& ctx )
         {
@@ -59,9 +59,9 @@ class RsGxsChatGroup : RsSerializable
             RS_SERIAL_PROCESS(mImage);
             RS_SERIAL_PROCESS(mDescription);
             RS_SERIAL_PROCESS(members);
-            //RS_SERIAL_PROCESS(mAutoDownload);
+            RS_SERIAL_PROCESS(mAutoDownload);
 
-            //RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
+            RsTypeSerializer::serial_process<RsPeerId,RsGxsId>(j,ctx,members,"members");
         }
 };
 

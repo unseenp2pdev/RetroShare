@@ -96,7 +96,7 @@ rs_autologin:CONFIG -= no_rs_autologin
 
 # To have only hidden node generation append the following assignation
 # to qmake command line "CONFIG+=rs_onlyhiddennode"
-CONFIG *= rs_onlyhiddennode
+CONFIG *= no_rs_onlyhiddennode
 rs_onlyhiddennode:CONFIG -= no_rs_onlyhiddennode
 
 # To disable GXS (General eXchange System) append the following
@@ -376,7 +376,7 @@ rs_autologin {
 }
 
 rs_onlyhiddennode {
-#    DEFINES *= RS_ONLYHIDDENNODE
+    DEFINES *= RS_ONLYHIDDENNODE
 #   CONFIG -= bitdht
 #   CONFIG *= no_bitdht
     message("QMAKE: You have enabled only hidden node.")
