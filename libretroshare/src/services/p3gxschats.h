@@ -11,7 +11,7 @@
 #include <string>
 
 //chatservice
-#include "chat/p3chatservice.h"
+#include "chat/p3gxschatservice.h"
 #include "rsitems/rsmsgitems.h"
 #include "pqi/pqiservicemonitor.h"
 #include "chat/distantchat.h"
@@ -38,7 +38,7 @@ class SSGxsChatGroup
 };
 
 class p3GxsChats: public RsGenExchange, public RsGxsChats,
-    public GxsTokenQueue, public p3ChatService, virtual public p3Config,
+    public GxsTokenQueue, public p3GxsChatService, virtual public p3Config,
     public RsTickEvent	/* only needed for testing - remove after */
 {
 public:

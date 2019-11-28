@@ -23,7 +23,6 @@
 #include <math.h>
 #include <sstream>
 #include <unistd.h>
-#include <list>
 
 #include "util/rsdir.h"
 #include "util/radix64.h"
@@ -43,34 +42,33 @@
 
 #include "chat/p3gxschatservice.h"
 #include "rsitems/rsconfigitems.h"
+#include <string>
 
-/****
-  #define CHAT_DEBUG 1
-****/
 
-static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 6000 ; // Max message size to forward other friends
+#define GXSGXSCHAT_DEBUG 1
+
+
+static const uint32_t MAX_MESSAGE_SECURITY_SIZE         = 100000 ; // Max message size to forward other friends
 static const uint32_t MAX_AVATAR_JPEG_SIZE              = 32767; // Maximum size in bytes for an avatar. Too large packets
                                                                  // don't transfer correctly and can kill the system.
-                                                                                      // Images are 96x96, which makes approx. 27000 bytes uncompressed.
-const uint32_t p3GxsChatService::FRAGMENT_SIZE = 150000;
+                                                                 // Images are 96x96, which makes approx. 27000 bytes uncompressed.
 
-p3GxsChatService::p3GxsChatService(p3ServiceControl *sc, p3IdService *pids,
-                              p3LinkMgr *lm, p3HistoryMgr *historyMgr, RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs ) :
-    p3GxsChats(gds, nes,gixs),
+p3GxsChatService::p3GxsChatService( p3ServiceControl *sc, p3IdService *pids,
+                              p3LinkMgr *lm, p3HistoryMgr *historyMgr) :
     DistributedChatService(getServiceInfo().mServiceType, sc, historyMgr,pids),
-    mChatMtx("p3ChatService"), mServiceCtrl(sc), mLinkMgr(lm),
+    mChatMtx("p3GxsChatService"), mServiceCtrl(sc), mLinkMgr(lm),
     mHistoryMgr(historyMgr), _own_avatar(NULL),
     _serializer(new RsChatSerialiser()),
-    mDGMutex("p3ChatService distant id - gxs id map mutex")
+    mDGMutex("p3GxsChatService distant id - gxs id map mutex")
 {
     addSerialType(_serializer);
-
+    //mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,this );
 }
 
 RsServiceInfo p3GxsChatService::getServiceInfo()
 { return RsServiceInfo(RS_SERVICE_TYPE_CHAT, "chat", 1, 0, 1, 0); }
 
-int	p3ChatService::tick()
+int	p3GxsChatService::tick()
 {
     if(receivedItems()) receiveChatQueue();
 
@@ -93,8 +91,9 @@ void p3GxsChatService::sendPublicChat(const std::string &msg)
     RsPeerId ownId = mServiceCtrl->getOwnId();
     ids.insert(ownId);
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sendPublicChat()<<std::endl";
+#ifdef GXSGXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sendChat()";
+    std::cerr << std::endl;
 #endif
 
     for(it = ids.begin(); it != ids.end(); ++it)
@@ -107,8 +106,8 @@ void p3GxsChatService::sendPublicChat(const std::string &msg)
         ci->recvTime = ci->sendTime;
         ci->message = msg;
 
-#ifdef CHAT_DEBUG
-        std::cerr << "p3ChatService::sendPublicChat() Msg Item:";
+#ifdef GXSGXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService::sendChat() Item:";
         std::cerr << std::endl;
         ci->print(std::cerr);
         std::cerr << std::endl;
@@ -116,6 +115,7 @@ void p3GxsChatService::sendPublicChat(const std::string &msg)
 
         if (*it == ownId)
         {
+            //mHistoryMgr->addMessage(false, RsPeerId(), ownId, ci);
             ChatMessage message;
             initChatMessage(ci, message);
             message.incoming = false;
@@ -188,8 +188,8 @@ void p3GxsChatService::sendGroupChatStatusString(const std::string& status_strin
     std::set<RsPeerId> ids;
     mServiceCtrl->getPeersConnected(getServiceInfo().mServiceType, ids);
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sendChat(): sending group chat status string: " << status_string << std::endl ;
+#ifdef GXSGXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sendChat(): sending group chat status string: " << status_string << std::endl ;
     std::cerr << std::endl;
 #endif
 
@@ -225,7 +225,7 @@ void p3GxsChatService::sendStatusString( const ChatId& id,
             cs->flags = RS_CHAT_FLAG_PRIVATE;
             cs->PeerId(vpid);
 
-#ifdef CHAT_DEBUG
+#ifdef GXSGXSCHAT_DEBUG
             std::cerr  << "sending chat status packet:" << std::endl;
             cs->print(std::cerr);
 #endif
@@ -234,7 +234,7 @@ void p3GxsChatService::sendStatusString( const ChatId& id,
     }
     else
     {
-        std::cerr << "p3ChatService::sendStatusString() Error: chat id of this "
+        std::cerr << "p3GxsChatService::sendStatusString() Error: chat id of this "
                   << "type is not handled, is it empty?" << std::endl;
         return;
     }
@@ -248,8 +248,8 @@ void p3GxsChatService::clearChatLobby(const ChatId& id)
 void p3GxsChatService::sendChatItem(RsChatItem *item)
 {
     if(DistantChatService::handleOutgoingItem(item)) return;
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sendChatItem(): sending to " << item->PeerId()
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sendChatItem(): sending to " << item->PeerId()
               << ": interpreted as friend peer id." << std::endl;
 #endif
     sendItem(item);
@@ -261,7 +261,7 @@ void p3GxsChatService::checkSizeAndSendMessage(RsChatMsgItem *msg)
 
     static const uint32_t MAX_STRING_SIZE = 15000 ;
 
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Sending message: size=" << msg->message.size() << ", sha1sum=" << RsDirUtil::sha1sum((uint8_t*)msg->message.c_str(),msg->message.size()) << std::endl;
 #endif
 
@@ -279,7 +279,7 @@ void p3GxsChatService::checkSizeAndSendMessage(RsChatMsgItem *msg)
         //
         item->chatFlags &= (RS_CHAT_FLAG_PRIVATE | RS_CHAT_FLAG_PUBLIC | RS_CHAT_FLAG_LOBBY) ;
 
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "Creating slice of size " << item->message.size() << std::endl;
 #endif
         // Indicate that the message is to be continued.
@@ -287,7 +287,7 @@ void p3GxsChatService::checkSizeAndSendMessage(RsChatMsgItem *msg)
         item->chatFlags |= RS_CHAT_FLAG_PARTIAL_MESSAGE ;
         sendChatItem(item) ;
     }
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Creating slice of size " << msg->message.size() << std::endl;
 #endif
     sendChatItem(msg) ;
@@ -314,12 +314,12 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
     }
     else if(destination.isPeerId()==false && destination.isDistantChatId()==false)
     {
-        std::cerr << "p3ChatService::sendChat() Error: chat id type not handled. Is it empty?" << std::endl;
+        std::cerr << "p3GxsChatService::sendChat() Error: chat id type not handled. Is it empty?" << std::endl;
         return false;
     }
     // destination is peer or distant
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sendChat()" << std::endl;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sendChat()" << std::endl;
 #endif
 
     RsPeerId vpid;
@@ -363,11 +363,10 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
                 uint32_t sz = _serializer->size(ci);
                 std::vector<uint8_t> data; data.resize(sz);
                 _serializer->serialise(ci, &data[0], &sz);
-//                mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE,
-//                                       de.from, de.to, &data[0], sz);
+                //mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE, de.from, de.to, &data[0], sz);
             }
             else
-                std::cout << "p3ChatService::sendChat(...) can't find distant"
+                std::cout << "p3GxsChatService::sendChat(...) can't find distant"
                           << "chat id in mDistantGxsMap this is unxpected!"
                           << std::endl;
         }
@@ -393,8 +392,8 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
         }
         if(it->second->_own_is_new)
         {
-#ifdef CHAT_DEBUG
-            std::cerr << "p3ChatService::sendChat: new avatar never sent to peer " << vpid << ". Setting <new> flag to packet." << std::endl;
+#ifdef GXSCHAT_DEBUG
+            std::cerr << "p3GxsChatService::sendChat: new avatar never sent to peer " << vpid << ". Setting <new> flag to packet." << std::endl;
 #endif
 
             ci->chatFlags |= RS_CHAT_FLAG_AVATAR_AVAILABLE ;
@@ -402,9 +401,9 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
         }
     }
 
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Sending msg to (maybe virtual) peer " << vpid << ", flags = " << ci->chatFlags << std::endl ;
-    std::cerr << "p3ChatService::sendChat() Item:";
+    std::cerr << "p3GxsChatService::sendChat() Item:";
     std::cerr << std::endl;
     ci->print(std::cerr);
     std::cerr << std::endl;
@@ -442,7 +441,7 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
 
     if(should_send_state_string)
     {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "own status string is new for peer " << vpid << ": sending it." << std::endl ;
 #endif
         RsChatStatusItem *cs = makeOwnCustomStateStringItem() ;
@@ -452,388 +451,6 @@ bool p3GxsChatService::sendChat(ChatId destination, std::string msg)
 
     return true;
 }
-
-bool p3GxsChatService::fragmentMsg(GxsNxsChatMsgItem& msg, MsgFragments& msgFragments) const
-{
-    // first determine how many fragments
-    uint32_t msgSize = msg.msg.TlvSize();
-    uint32_t dataLeft = msgSize;
-    uint8_t nFragments = ceil(float(msgSize)/FRAGMENT_SIZE);
-
-        RsTemporaryMemory buffer(FRAGMENT_SIZE);
-    int currPos = 0;
-
-
-    for(uint8_t i=0; i < nFragments; ++i)
-    {
-        GxsNxsChatMsgItem* msgFrag = new GxsNxsChatMsgItem();
-        msgFrag->grpId = msg.grpId;
-        msgFrag->msgId = msg.msgId;
-        msgFrag->meta = msg.meta;
-        msgFrag->transactionNumber = msg.transactionNumber;
-        msgFrag->pos = i;
-        msgFrag->PeerId(msg.PeerId());
-        msgFrag->count = nFragments;
-        uint32_t fragSize = std::min(dataLeft, FRAGMENT_SIZE);
-
-        memcpy(buffer, ((char*)msg.msg.bin_data) + currPos, fragSize);
-        msgFrag->msg.setBinData(buffer, fragSize);
-
-        currPos += fragSize;
-        dataLeft -= fragSize;
-        msgFragments.push_back(msgFrag);
-    }
-
-    return true;
-}
-
-bool p3GxsChatService::fragmentGrp(GxsNxsChatGroupItem& grp, GrpFragments& grpFragments) const
-{
-    // first determine how many fragments
-    uint32_t grpSize = grp.grp.TlvSize();
-    uint32_t dataLeft = grpSize;
-    uint8_t nFragments = ceil(float(grpSize)/FRAGMENT_SIZE);
-    char buffer[FRAGMENT_SIZE];
-    int currPos = 0;
-
-
-    for(uint8_t i=0; i < nFragments; ++i)
-    {
-        GxsNxsChatGroupItem* grpFrag = new GxsNxsChatGroupItem();
-        grpFrag->grpId = grp.grpId;
-        grpFrag->meta = grp.meta;
-        grpFrag->pos = i;
-        grpFrag->count = nFragments;
-        uint32_t fragSize = std::min(dataLeft, FRAGMENT_SIZE);
-
-        memcpy(buffer, ((char*)grp.grp.bin_data) + currPos, fragSize);
-        grpFrag->grp.setBinData(buffer, fragSize);
-
-        currPos += fragSize;
-        dataLeft -= fragSize;
-        grpFragments.push_back(grpFrag);
-    }
-
-    return true;
-}
-
-GxsNxsChatMsgItem* p3GxsChatService::deFragmentMsg(MsgFragments& msgFragments) const
-{
-    if(msgFragments.empty()) return NULL;
-
-    // if there is only one fragment with a count 1 or less then
-    // the fragment is the msg
-    if(msgFragments.size() == 1)
-    {
-        GxsNxsChatMsgItem *m  = msgFragments.front();
-
-        if(m->count > 1)	// normally mcount should be exactly 1, but if not initialised (old versions) it's going to be 0
-                {
-                    // delete everything
-                    std::cerr << "(WW) Cannot deFragment message set. m->count=" << m->count << ", but msgFragments.size()=" << msgFragments.size() << ". Incomplete? Dropping all." << std::endl;
-
-                    for(uint32_t i=0;i<msgFragments.size();++i)
-                            delete msgFragments[i] ;
-
-                        msgFragments.clear();
-            return NULL;
-                }
-        else
-                {
-                    // single piece. No need to say anything. Just return it.
-
-                        msgFragments.clear();
-            return m;
-                }
-    }
-
-    // first determine total size for binary data
-    MsgFragments::iterator mit = msgFragments.begin();
-    uint32_t datSize = 0;
-
-    for(; mit != msgFragments.end(); ++mit)
-        datSize += (*mit)->msg.bin_len;
-
-        RsTemporaryMemory data(datSize) ;
-
-        if(!data)
-        {
-        for(uint32_t i=0;i<msgFragments.size();++i)
-            delete msgFragments[i] ;
-
-        msgFragments.clear();
-            return NULL ;
-        }
-
-    uint32_t currPos = 0;
-
-        std::cerr << "(II) deFragmenting long message of size " << datSize << ", from " << msgFragments.size() << " pieces." << std::endl;
-
-    for(mit = msgFragments.begin(); mit != msgFragments.end(); ++mit)
-    {
-        GxsNxsChatMsgItem* msg = *mit;
-        memcpy(data + (currPos), msg->msg.bin_data, msg->msg.bin_len);
-        currPos += msg->msg.bin_len;
-    }
-
-    GxsNxsChatMsgItem*msg = new GxsNxsChatMsgItem();
-    const GxsNxsChatMsgItem& m = *(*(msgFragments.begin()));
-    msg->msg.setBinData(data, datSize);
-    msg->msgId = m.msgId;
-    msg->grpId = m.grpId;
-    msg->transactionNumber = m.transactionNumber;
-    msg->meta = m.meta;
-
-        // now clean!
-    for(uint32_t i=0;i<msgFragments.size();++i)
-        delete msgFragments[i] ;
-
-    msgFragments.clear();
-
-    return msg;
-}
-
-// This is unused apparently, since groups are never large. Anyway, we keep it in case we need it.
-
-GxsNxsChatGroupItem* p3GxsChatService::deFragmentGrp(GrpFragments& grpFragments) const
-{
-    if(grpFragments.empty()) return NULL;
-
-    // first determine total size for binary data
-    GrpFragments::iterator mit = grpFragments.begin();
-    uint32_t datSize = 0;
-
-    for(; mit != grpFragments.end(); ++mit)
-        datSize += (*mit)->grp.bin_len;
-
-    char* data = new char[datSize];
-    uint32_t currPos = 0;
-
-    for(mit = grpFragments.begin(); mit != grpFragments.end(); ++mit)
-    {
-        GxsNxsChatGroupItem* grp = *mit;
-        memcpy(data + (currPos), grp->grp.bin_data, grp->grp.bin_len);
-        currPos += grp->grp.bin_len;
-    }
-
-    GxsNxsChatGroupItem* grp = new GxsNxsChatGroupItem();
-    const GxsNxsChatGroupItem& g = *(*(grpFragments.begin()));
-    grp->grp.setBinData(data, datSize);
-    grp->grpId = g.grpId;
-    grp->transactionNumber = g.transactionNumber;
-    grp->meta = g.meta;
-
-    delete[] data;
-
-    return grp;
-}
-
-struct GrpFragCollate
-{
-    RsGxsGroupId mGrpId;
-    GrpFragCollate(const RsGxsGroupId& grpId) : mGrpId(grpId){ }
-    bool operator()(GxsNxsChatGroupItem* grp) { return grp->grpId == mGrpId;}
-};
-
-
-void p3GxsChatService::collateGrpFragments(GrpFragments fragments,
-        std::map<RsGxsGroupId, GrpFragments>& partFragments) const
-{
-    // get all unique grpIds;
-    GrpFragments::iterator vit = fragments.begin();
-    std::set<RsGxsGroupId> grpIds;
-
-    for(; vit != fragments.end(); ++vit)
-        grpIds.insert( (*vit)->grpId );
-
-    std::set<RsGxsGroupId>::iterator sit = grpIds.begin();
-
-    for(; sit != grpIds.end(); ++sit)
-    {
-        const RsGxsGroupId& grpId = *sit;
-        GrpFragments::iterator bound = std::partition(
-                    fragments.begin(), fragments.end(),
-                    GrpFragCollate(grpId));
-
-        // something will always be found for a group id
-        for(vit = fragments.begin(); vit != bound; )
-        {
-            partFragments[grpId].push_back(*vit);
-            vit = fragments.erase(vit);
-        }
-
-        GrpFragments& f = partFragments[grpId];
-        GxsNxsChatGroupItem* grp = *(f.begin());
-
-        // if counts of fragments is incorrect remove
-        // from coalescion
-        if(grp->count != f.size())
-        {
-            GrpFragments::iterator vit2 = f.begin();
-
-            for(; vit2 != f.end(); ++vit2)
-                delete *vit2;
-
-            partFragments.erase(grpId);
-        }
-    }
-
-    fragments.clear();
-}
-
-struct MsgFragCollate
-{
-    RsGxsMessageId mMsgId;
-    MsgFragCollate(const RsGxsMessageId& msgId) : mMsgId(msgId){ }
-    bool operator()(GxsNxsChatMsgItem* msg) { return msg->msgId == mMsgId;}
-};
-
-void p3GxsChatService::collateMsgFragments(MsgFragments& fragments, std::map<RsGxsMessageId, MsgFragments>& partFragments) const
-{
-    // get all unique message Ids;
-    MsgFragments::iterator vit = fragments.begin();
-    std::set<RsGxsMessageId> msgIds;
-
-    for(; vit != fragments.end(); ++vit)
-        msgIds.insert( (*vit)->msgId );
-
-
-    std::set<RsGxsMessageId>::iterator sit = msgIds.begin();
-
-    for(; sit != msgIds.end(); ++sit)
-    {
-        const RsGxsMessageId& msgId = *sit;
-        MsgFragments::iterator bound = std::partition(
-                    fragments.begin(), fragments.end(),
-                    MsgFragCollate(msgId));
-
-        // something will always be found for a group id
-        for(vit = fragments.begin(); vit != bound; ++vit )
-        {
-            partFragments[msgId].push_back(*vit);
-        }
-
-        fragments.erase(fragments.begin(), bound);
-        MsgFragments& f = partFragments[msgId];
-        GxsNxsChatMsgItem* msg = *(f.begin());
-
-        // if counts of fragments is incorrect remove
-        // from coalescion
-        if(msg->count != f.size())
-        {
-            MsgFragments::iterator vit2 = f.begin();
-
-            for(; vit2 != f.end(); ++vit2)
-                delete *vit2;
-
-            partFragments.erase(msgId);
-        }
-    }
-
-    fragments.clear();
-}
-
-
-bool  p3GxsChatService::sendGxsChat(uint32_t &token, RsGxsChatGroup &conversation, RsGxsChatMsg &post){
-    RsGxsChatMsgItem  *msg = new RsGxsChatMsgItem();
-
-    msg->fromChatPost(post,true);  //copying both text and images
-
-    RsPeerId ownId = mServiceCtrl->getOwnId();
-
-
-//    //find all message below which groupId and all the active membership of this groupId
-//     RsGxsGroupId grpId = msgItem->meta.mGroupId;
-//     RsGxsMessageId parentMsgId = msgItem->meta.mParentId;
-//     RsGxsId authorId = msgItem->meta.mAuthorId;
-
-     if (conversation.mMeta.mGroupId !=post.mMeta.mGroupId){
-         //conversationid is not match
-         return false;
-     }
-
-     uint32_t size = _serializer->size(msg);
-     char* mData = new char[size];
-
-     bool serialOk = _serializer->serialise(msg, mData, &size);
-
-
-     if(!serialOk) return false;
-
-     GxsNxsChatMsgItem* msgNxtItem = new GxsNxsChatMsgItem();
-     msgNxtItem->grpId = msg->meta.mGroupId;
-     msgNxtItem->msgId = msg->meta.mMsgId;
-
-     msgNxtItem->msg.setBinData(mData,size);
-     msgNxtItem->metaData = new RsGxsMsgMetaData();
-     *(msgNxtItem->metaData) = msg->meta;
-
-
-     RsGxsMsgMetaData &meta = *(msgNxtItem->metaData);
-
-     uint32_t metaDataLen = meta.serial_size();
-     uint32_t allMsgDataLen = metaDataLen + msgNxtItem->msg.bin_len;
-
-     char* metaData = new char[metaDataLen];
-     //char* allMsgData = new char[allMsgDataLen]; // msgData + metaData
-
-     meta.serialise(metaData, &metaDataLen);
-
-     // copy msg data and meta in allmsgData buffer
-     //memcpy(allMsgData, msgNxtItem->msg.bin_data, msgNxtItem->msg.bin_len);
-     //memcpy(allMsgData+(msgNxtItem->msg.bin_len), metaData, metaDataLen);
-
-
-     RsTlvBinaryData msgData(0);
-     msgData.setBinData(metaData, metaDataLen);
-
-     msgNxtItem->meta = msgData;
-
-
-     std::map<RsPeerId,RsGxsId> members = conversation.members;
-
-     RsGxsId *mymembers = nullptr;
-     for (auto member= members.begin(); member !=members.end(); member++){
-         if (member->first == ownId){
-             mymembers = new RsGxsId(member->second);
-         }
-     }
-
-    if (mymembers == nullptr)
-          return false; //no itself member of the group.
-
-    for (auto member= members.begin(); member !=members.end(); member++){
-         if (member->first == ownId){
-             //send chat notification back to GUI and storage to gxs database if isn't done so.
-         }
-         else{
-             if(!sendGxsChatDirect(member->first,msgNxtItem)){
-                 sendGxsChatDistant(*mymembers,member->second,msgNxtItem);
-             }
-         }
-     }
-
-    return true;
-}
-
-bool  p3GxsChatService::sendGxsChatDirect(const RsPeerId &friendId, GxsNxsChatMsgItem *msgItem ){
-        // send Message to all participants and send one notify message to the owner.
-
-       if(!isOnline(friendId))
-           return false;  //offline friend.
-
-//       GxsNxsChatMsgItem *gxs = new GxsNxsChatMsgItem();
-//       //gxs->meta = msgItem->meta;
-//       gxs->grpId = msgItem->meta.mGroupId;
-//       gxs->msgId = msgItem->meta.mMsgId;
-//       gxs->transactionNumber=0;
-//       gxs->msg = msgItem->mMsg;
-//       gxs->PeerId(friendId);
-//       sendItem(gxs);  //checksizeAndSend function needs to implement.
-
-        return true;
-}
-
 
 // This method might take control over the memory, or modify it, possibly adding missing parts.
 // This function looks weird because it cannot duplicate the message since it does not know
@@ -852,7 +469,7 @@ bool p3GxsChatService::locked_checkAndRebuildPartialMessage(RsChatMsgItem *& ci)
 
     if(it != _pendingPartialMessages.end())
     {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "Pending message found. Appending it." << std::endl;
 #endif
         // Yes, there is. Append the item to ci.
@@ -871,7 +488,7 @@ bool p3GxsChatService::locked_checkAndRebuildPartialMessage(RsChatMsgItem *& ci)
 
     if(ci_is_incomplete)
     {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "Message is partial, storing for later." << std::endl;
 #endif
         // The item is a partial message. Push it, and wait for the rest.
@@ -882,7 +499,7 @@ bool p3GxsChatService::locked_checkAndRebuildPartialMessage(RsChatMsgItem *& ci)
     }
     else
     {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "Message is complete, using it now. Size = " << ci->message.size() << ", hash=" << RsDirUtil::sha1sum((uint8_t*)ci->message.c_str(),ci->message.size()) << std::endl;
 #endif
         return true ;
@@ -913,8 +530,8 @@ class MsgCounter
 
 void p3GxsChatService::handleIncomingItem(RsItem *item)
 {
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::receiveChatQueue() Item:" << (void*)item
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::receiveChatQueue() Item:" << (void*)item
               << std::endl ;
 #endif
 
@@ -952,7 +569,7 @@ void p3GxsChatService::handleIncomingItem(RsItem *item)
         {
             std::cerr << "Unhandled item subtype "
                       << static_cast<int>(item->PacketSubType())
-                      << " in p3ChatService: " << std::endl;
+                      << " in p3GxsChatService: " << std::endl;
             already = true;
         }
     }
@@ -964,7 +581,7 @@ void p3GxsChatService::handleRecvChatAvatarItem(RsChatAvatarItem *ca)
 {
     receiveAvatarJpegData(ca) ;
 
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Received avatar data for peer " << ca->PeerId() << ". Notifying." << std::endl ;
 #endif
     RsServer::notify()->notifyPeerHasNewAvatar(ca->PeerId().toStdString()) ;
@@ -983,7 +600,7 @@ uint32_t p3GxsChatService::getMaxMessageSecuritySize(int type)
         return 0; // unlimited
     }
 
-    std::cerr << "p3ChatService::getMaxMessageSecuritySize: Unknown chat type " << type << std::endl;
+    std::cerr << "p3GxsChatService::getMaxMessageSecuritySize: Unknown chat type " << type << std::endl;
 
     return MAX_MESSAGE_SECURITY_SIZE;
 }
@@ -1063,7 +680,7 @@ bool p3GxsChatService::checkForMessageSecurity(RsChatMsgItem *ci)
 
     uint32_t fl = ci->chatFlags & (RS_CHAT_FLAG_PRIVATE | RS_CHAT_FLAG_PUBLIC | RS_CHAT_FLAG_LOBBY) ;
 
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Checking msg flags: " << std::hex << fl << std::endl;
 #endif
 
@@ -1178,8 +795,8 @@ bool p3GxsChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
      * etc. */
     if(!DistributedChatService::handleRecvChatLobbyMsgItem(ci)) return false;
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::receiveChatQueue() Item:" << std::endl;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::receiveChatQueue() Item:" << std::endl;
     ci->print(std::cerr);
     std::cerr << std::endl << "Got msg. Flags = " << ci->chatFlags << std::endl;
 #endif
@@ -1199,7 +816,7 @@ bool p3GxsChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
 
         if((ci->chatFlags & RS_CHAT_FLAG_AVATAR_AVAILABLE) && !(ci->chatFlags & RS_CHAT_FLAG_LOBBY))
         {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
             std::cerr << "New avatar is available for peer " << ci->PeerId() << ", sending request" << std::endl ;
 #endif
             sendAvatarRequest(ci->PeerId()) ;
@@ -1208,14 +825,14 @@ bool p3GxsChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
 
         std::map<RsPeerId,AvatarInfo *>::const_iterator it = _avatars.find(ci->PeerId()) ;
 
-#ifdef CHAT_DEBUG
-        std::cerr << "p3chatservice:: avatar requested from above. " << std::endl ;
+#ifdef GXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService:: avatar requested from above. " << std::endl ;
 #endif
         // has avatar. Return it strait away.
         //
         if(it!=_avatars.end() && it->second->_peer_is_new)
         {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
             std::cerr << "Avatar is new for peer. ending info above" << std::endl ;
 #endif
             ci->chatFlags |= RS_CHAT_FLAG_AVATAR_AVAILABLE ;
@@ -1238,12 +855,14 @@ bool p3GxsChatService::handleRecvChatMsgItem(RsChatMsgItem *& ci)
 
     ci->recvTime = time(NULL);
 
+    //rsIdentity->getIdDetails(ci->id, details)
+
     ChatMessage cm;
     initChatMessage(ci, cm);
     cm.incoming = true;
     cm.online = true;
     cm.unread = true; //need to update this field when user already read the msg
-    std::cerr << "Msg go here first? " << std::endl;
+    //std::cerr << "Msg go here first? " << std::endl;
     RsServer::notify()->notifyChatMessage(cm);
 
     // cyril: history is temporarily diabled for distant chat, since we need to store the full tunnel ID, but then
@@ -1264,7 +883,7 @@ void p3GxsChatService::locked_storeIncomingMsg(RsChatMsgItem */*item*/)
 
 void p3GxsChatService::handleRecvChatStatusItem(RsChatStatusItem *cs)
 {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
     std::cerr << "Received status string \"" << cs->status_string << "\"" << std::endl ;
 #endif
 
@@ -1279,7 +898,7 @@ void p3GxsChatService::handleRecvChatStatusItem(RsChatStatusItem *cs)
     }
     else if(cs->flags & RS_CHAT_FLAG_CUSTOM_STATE_AVAILABLE)
     {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "New custom state is available for peer " << cs->PeerId() << ", sending request" << std::endl ;
 #endif
         sendCustomStateRequest(cs->PeerId()) ;
@@ -1315,6 +934,15 @@ void p3GxsChatService::initChatMessage(RsChatMsgItem *c, ChatMessage &m)
     {
         m.lobby_peer_gxs_id = lobbyItem->signature.keyId ;
         m.chat_id = ChatId(lobbyItem->lobby_id);
+        //unseenp2p - try to save the nickname into peer_alternate_nickname to use then (for ex. in history)
+        RsIdentityDetails details;
+        if (rsIdentity->getIdDetails(m.lobby_peer_gxs_id, details ))
+        {
+#ifdef GXSCHAT_DEBUG
+        std::cerr << " Yes, I can save the nickname of groupchat member: " << details.mNickname << std::endl;
+#endif
+            m.peer_alternate_nickname = details.mNickname;
+        }
         return;
     }
 
@@ -1338,8 +966,8 @@ void p3GxsChatService::setOwnCustomStateString(const std::string& s)
     {
         RsStackMutex stack(mChatMtx); /********** STACK LOCKED MTX ******/
 
-#ifdef CHAT_DEBUG
-        std::cerr << "p3chatservice: Setting own state string to new value : " << s << std::endl ;
+#ifdef GXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService: Setting own state string to new value : " << s << std::endl ;
 #endif
         _custom_status_string = s ;
 
@@ -1369,8 +997,8 @@ void p3GxsChatService::setOwnAvatarJpegData(const unsigned char *data,int size)
 {
     {
         RsStackMutex stack(mChatMtx); /********** STACK LOCKED MTX ******/
-#ifdef CHAT_DEBUG
-        std::cerr << "p3chatservice: Setting own avatar to new image." << std::endl ;
+#ifdef GXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService: Setting own avatar to new image." << std::endl ;
 #endif
 
         if((uint32_t)size > MAX_AVATAR_JPEG_SIZE)
@@ -1391,8 +1019,8 @@ void p3GxsChatService::setOwnAvatarJpegData(const unsigned char *data,int size)
 
     RsServer::notify()->notifyOwnAvatarChanged() ;
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3chatservice:setOwnAvatarJpegData() done." << std::endl ;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService:setOwnAvatarJpegData() done." << std::endl ;
 #endif
 
 }
@@ -1400,8 +1028,8 @@ void p3GxsChatService::setOwnAvatarJpegData(const unsigned char *data,int size)
 void p3GxsChatService::receiveStateString(const RsPeerId& id,const std::string& s)
 {
     RsStackMutex stack(mChatMtx); /********** STACK LOCKED MTX ******/
-#ifdef CHAT_DEBUG
-   std::cerr << "p3chatservice: received custom state string for peer " << id << ". Storing it." << std::endl ;
+#ifdef GXSCHAT_DEBUG
+   std::cerr << "p3GxsChatService: received custom state string for peer " << id << ". Storing it." << std::endl ;
 #endif
 
    bool new_peer = (_state_strings.find(id) == _state_strings.end()) ;
@@ -1414,8 +1042,8 @@ void p3GxsChatService::receiveStateString(const RsPeerId& id,const std::string& 
 void p3GxsChatService::receiveAvatarJpegData(RsChatAvatarItem *ci)
 {
     RsStackMutex stack(mChatMtx); /********** STACK LOCKED MTX ******/
-#ifdef CHAT_DEBUG
-   std::cerr << "p3chatservice: received avatar jpeg data for peer " << ci->PeerId() << ". Storing it." << std::endl ;
+#ifdef GXSCHAT_DEBUG
+   std::cerr << "p3GxsChatService: received avatar jpeg data for peer " << ci->PeerId() << ". Storing it." << std::endl ;
 #endif
 
     if(ci->image_size > MAX_AVATAR_JPEG_SIZE)
@@ -1444,8 +1072,8 @@ void p3GxsChatService::getOwnAvatarJpegData(unsigned char *& data,int& size)
     RsStackMutex stack(mChatMtx); /********** STACK LOCKED MTX ******/
 
     uint32_t s = 0 ;
-#ifdef CHAT_DEBUG
-    std::cerr << "p3chatservice:: own avatar requested from above. " << std::endl ;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService:: own avatar requested from above. " << std::endl ;
 #endif
     // has avatar. Return it strait away.
     //
@@ -1490,8 +1118,8 @@ void p3GxsChatService::getAvatarJpegData(const RsPeerId& peer_id,unsigned char *
 
         std::map<RsPeerId,AvatarInfo *>::const_iterator it = _avatars.find(peer_id) ;
 
-#ifdef CHAT_DEBUG
-        std::cerr << "p3chatservice:: avatar for peer " << peer_id << " requested from above. " << std::endl ;
+#ifdef GXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService:: avatar for peer " << peer_id << " requested from above. " << std::endl ;
 #endif
         // has avatar. Return it straight away.
         //
@@ -1501,12 +1129,12 @@ void p3GxsChatService::getAvatarJpegData(const RsPeerId& peer_id,unsigned char *
             it->second->toUnsignedChar(data,s) ;
             size = s ;
             it->second->_peer_is_new = false ;
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
             std::cerr << "Already has avatar. Returning it" << std::endl ;
 #endif
             return ;
         } else {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
             std::cerr << "No avatar for this peer. Requesting it by sending request packet." << std::endl ;
 #endif
         }
@@ -1529,8 +1157,8 @@ void p3GxsChatService::sendAvatarRequest(const RsPeerId& peer_id)
     ci->sendTime = time(NULL);
     ci->message.erase();
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sending request for avatar, to peer " << peer_id << std::endl ;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sending request for avatar, to peer " << peer_id << std::endl ;
     std::cerr << std::endl;
 #endif
 
@@ -1548,8 +1176,8 @@ void p3GxsChatService::sendCustomStateRequest(const RsPeerId& peer_id){
     cs->flags = RS_CHAT_FLAG_PRIVATE | RS_CHAT_FLAG_REQUEST_CUSTOM_STATE ;
     cs->status_string.erase();
 
-#ifdef CHAT_DEBUG
-    std::cerr << "p3ChatService::sending request for status, to peer " << peer_id << std::endl ;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::sending request for status, to peer " << peer_id << std::endl ;
     std::cerr << std::endl;
 #endif
 
@@ -1580,8 +1208,8 @@ RsChatAvatarItem *p3GxsChatService::makeOwnAvatarItem()
 
 void p3GxsChatService::sendAvatarJpegData(const RsPeerId& peer_id)
 {
-#ifdef CHAT_DEBUG
-    std::cerr << "p3chatservice: sending requested for peer " << peer_id << ", data=" << (void*)_own_avatar << std::endl ;
+#ifdef GXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService: sending requested for peer " << peer_id << ", data=" << (void*)_own_avatar << std::endl ;
 #endif
 
     if(_own_avatar != NULL)
@@ -1591,15 +1219,15 @@ void p3GxsChatService::sendAvatarJpegData(const RsPeerId& peer_id)
 
         // take avatar, and embed it into a std::string.
         //
-#ifdef CHAT_DEBUG
-        std::cerr << "p3ChatService::sending avatar image to peer" << peer_id << ", image size = " << ci->image_size << std::endl ;
+#ifdef GXSCHAT_DEBUG
+        std::cerr << "p3GxsChatService::sending avatar image to peer" << peer_id << ", image size = " << ci->image_size << std::endl ;
         std::cerr << std::endl;
 #endif
 
         sendChatItem(ci) ;
     }
    else {
-#ifdef CHAT_DEBUG
+#ifdef GXSCHAT_DEBUG
         std::cerr << "We have no avatar yet: Doing nothing" << std::endl ;
 #endif
    }
@@ -1607,8 +1235,8 @@ void p3GxsChatService::sendAvatarJpegData(const RsPeerId& peer_id)
 
 void p3GxsChatService::sendCustomState(const RsPeerId& peer_id){
 
-#ifdef CHAT_DEBUG
-std::cerr << "p3chatservice: sending requested status string for peer " << peer_id << std::endl ;
+#ifdef GXSCHAT_DEBUG
+std::cerr << "p3GxsChatService: sending requested status string for peer " << peer_id << std::endl ;
 #endif
 
     RsChatStatusItem *cs = makeOwnCustomStateStringItem();
@@ -1828,4 +1456,167 @@ void p3GxsChatService::statusChange(const std::list<pqiServicePeer> &plist)
             IndicateConfigChanged();
         }
     }
+}
+
+
+//unseenp2p - for MVC
+ void p3GxsChatService::saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                               unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage, bool isOtherLastMsg,
+                                               int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId)
+{
+     conversationInfo entry(displayName, nickInGroupChat,
+                            UnreadMessagesCount, lastMsgDatetime, lastMessage, isOtherLastMsg,
+                            contactType, groupChatType,rsPeerIdStr, chatLobbyId, uId);
+     conversationItemList.push_back(entry);
+}
+
+ void p3GxsChatService::removeContactOrGroupChatFromModelData(std::string uId)
+ {
+     std::vector<conversationInfo>::iterator it2;
+
+     for(it2 = conversationItemList.begin(); it2 != conversationItemList.end();)
+     {
+
+        if((*it2).uId == uId)
+        {
+           it2 = conversationItemList.erase(it2);
+           break;
+        }
+        else
+        {
+           ++it2;
+        }
+     }
+
+//     for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+//     {
+//         if (conversationItemList[i].uId == uId)
+//         {
+//            conversationItemList.
+//             break;
+//         }
+//     }
+ }
+
+std::vector<conversationInfo> p3GxsChatService::getConversationItemList()
+{
+     return conversationItemList;
+}
+
+void p3GxsChatService::updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg )
+{
+    //for (std::vector<conversationInfo>::iterator it = conversationItemList.begin() ; it != conversationItemList.end(); ++it)
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            conversationItemList[i].lastMsgDatetime = lastMsgDatetime;
+            conversationItemList[i].lastMessage = textmsg;
+            conversationItemList[i].isOtherLastMsg = isOtherMsg;
+            conversationItemList[i].nickInGroupChat = nickInGroupChat;
+            break;
+        }
+    }
+}
+
+void p3GxsChatService::sortConversationItemListByRecentTime()
+{
+    std::sort(conversationItemList.begin(), conversationItemList.end(),
+              [] (conversationInfo const& a, conversationInfo const& b)
+    { return a.lastMsgDatetime > b.lastMsgDatetime; });
+}
+void p3GxsChatService::updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset)
+{
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            if (isReset) conversationItemList[i].UnreadMessagesCount = 0;
+            else  conversationItemList[i].UnreadMessagesCount += unreadNumber;
+            break;
+        }
+    }
+}
+
+std::string p3GxsChatService::getSeletedUIdBeforeSorting(int row)
+{
+    return conversationItemList.at(row).uId;
+//    if (conversationListMode == CONVERSATION_MODE_WITHOUT_FILTER)
+//        return conversationItemList.at(row).uId;
+//    else if (conversationListMode == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+//    {
+//        if (row < static_cast<int>(filtererConversationItemList.size()))
+//        return filtererConversationItemList.at(row).uId;
+//    }
+//    return conversationItemList.at(row).uId;;
+}
+
+int p3GxsChatService::getIndexFromUId(std::string uId)
+{
+    int index = -1;
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            index = static_cast<int>(i);
+            break;
+        }
+    }
+    return index;
+}
+
+bool p3GxsChatService::isChatIdInConversationList(std::string uId)
+{
+    bool foundUIdInList = false;
+    for (unsigned int i = 0; i < conversationItemList.size(); i++ )
+    {
+        if (conversationItemList[i].uId == uId)
+        {
+            foundUIdInList = true;
+            break;
+        }
+    }
+    return foundUIdInList;
+}
+
+void p3GxsChatService::setConversationListMode(uint32_t mode)
+{
+    conversationListMode = mode;
+}
+
+uint32_t p3GxsChatService::getConversationListMode()
+{
+    return conversationListMode;
+}
+
+void p3GxsChatService::setSearchFilter(const std::string &filtertext)
+{
+    //When user change the filter (text) need to update the conversation, by using copy from conversationItemList
+    // and filter to the filteredConversationList
+
+    filter_text = filtertext;
+    //filtererConversationItemList = conversationItemList;
+
+    filtererConversationItemList.clear();
+    for (const conversationInfo& item : conversationItemList)
+    {
+        std::string nameforsearch = item.displayName;
+
+        std::transform(nameforsearch.begin(), nameforsearch.end(), nameforsearch.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+        std::string filtertext2 = filtertext;
+        std::transform(filtertext2.begin(), filtertext2.end(), filtertext2.begin(),
+            [](unsigned char c){ return std::tolower(c); });
+
+        if (std::size_t found = nameforsearch.find(filtertext2) !=std::string::npos)
+        {
+            //std::cout << "id: " << item.displayName << " is good" << std::endl;
+            filtererConversationItemList.push_back(item);
+        }
+   }
+}
+
+std::vector<conversationInfo> p3GxsChatService::getSearchFilteredConversationItemList()
+{
+     return filtererConversationItemList;
 }

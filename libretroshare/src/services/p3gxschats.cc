@@ -68,8 +68,8 @@ RsGxsChats *rsGxsChats = NULL;
 p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs,
         p3ServiceControl *sc, p3IdService *pids, p3LinkMgr *lm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService) :
         RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
-        p3ChatService(sc, pids,lm,historyMgr),
         RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
+        p3GxsChatService(sc, pids,lm,historyMgr),
     mSearchCallbacksMapMutex("GXS chats search")
 {
     // For Dummy Msgs.
@@ -337,6 +337,8 @@ static  rstime_t last_dummy_tick = 0;
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
+    //p3GxsChatService::tick();
+
 
 }
 

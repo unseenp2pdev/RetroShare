@@ -1549,10 +1549,9 @@ int RsServer::StartupRetroShare()
 	mDisc = new p3discovery2(mPeerMgr, mLinkMgr, mNetMgr, serviceCtrl,mGxsIdService);
 	mHeart = new p3heartbeat(serviceCtrl, pqih);
 	msgSrv = new p3MsgService( serviceCtrl, mGxsIdService, *mGxsTrans );
-//	chatSrv = new p3ChatService( serviceCtrl,mGxsIdService, mLinkMgr,
-//	                             mHistoryMgr, *mGxsTrans );
     chatSrv = new p3ChatService( serviceCtrl,mGxsIdService, mLinkMgr,
-                                 mHistoryMgr );
+                                 mHistoryMgr, *mGxsTrans );
+
 	mStatusSrv = new p3StatusService(serviceCtrl);
 
 #ifdef ENABLE_GROUTER

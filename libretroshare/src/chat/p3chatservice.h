@@ -51,12 +51,11 @@ typedef RsPeerId ChatLobbyVirtualPeerId ;
   */
 class   p3ChatService :
         public p3Service, public DistantChatService, public DistributedChatService, virtual public p3Config,
-        public pqiServiceMonitor /* GxsTransClient*/
+        public pqiServiceMonitor, GxsTransClient
 {
 public:
-    //p3ChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService );
+    p3ChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService );
 
-    p3ChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm, p3HistoryMgr *historyMgr );
 	virtual RsServiceInfo getServiceInfo();
 
 	/***** overloaded from p3Service *****/
@@ -286,7 +285,7 @@ private:
 	DIDEMap mDistantGxsMap;
 	RsMutex mDGMutex;
 
-    //p3GxsTrans& mGxsTransport;
+    p3GxsTrans& mGxsTransport;
 
     //unseenp2p - for MVC
     std::vector<conversationInfo> conversationItemList;

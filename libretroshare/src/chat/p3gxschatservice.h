@@ -1,6 +1,3 @@
-#ifndef P3GXSCHATSERVICE_H
-#define P3GXSCHATSERVICE_H
-
 /*******************************************************************************
  * libretroshare/src/chat: chatservice.h                                       *
  *                                                                             *
@@ -23,7 +20,8 @@
  *                                                                             *
  *******************************************************************************/
 
-
+#ifndef SERVICE_GXS_CHAT_HEADER
+#define SERVICE_GXS_CHAT_HEADER
 
 #include <list>
 #include <string>
@@ -38,15 +36,11 @@
 #include "gxstrans/p3gxstrans.h"
 #include "util/rsdeprecate.h"
 
-//#include "services/p3gxschats.h"
-#include "rsitems/rsgxschatitems.h"
-
 class p3ServiceControl;
 class p3LinkMgr;
 class p3HistoryMgr;
 
 typedef RsPeerId ChatLobbyVirtualPeerId ;
-
 
 //!The basic Chat service.
  /**
@@ -55,20 +49,14 @@ typedef RsPeerId ChatLobbyVirtualPeerId ;
   * This service uses rsnotify (callbacks librs clients (e.g. rs-gui))
   * @see NotifyBase
   */
-class p3GxsChatService :
-        public p3Service, public DistantChatService, public DistributedChatService,
-        public pqiServiceMonitor, GxsTransClient
+class   p3GxsChatService :
+        public p3Service, public DistantChatService, public DistributedChatService, virtual public p3Config,
+        public pqiServiceMonitor /* GxsTransClient*/
 {
 public:
-    p3GxsChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm,
-                   p3HistoryMgr *historyMgr, /*p3GxsTrans& gxsTransService,*/ RsGeneralDataService *gds, RsNetworkExchangeService *nes,
-                    RsGixs* gixs );
 
-
-
+    p3GxsChatService(p3ServiceControl *cs, p3IdService *pids, p3LinkMgr *cm, p3HistoryMgr *historyMgr );
     virtual RsServiceInfo getServiceInfo();
-
-    static const uint32_t FRAGMENT_SIZE;
 
     /***** overloaded from p3Service *****/
     /*!
@@ -98,17 +86,6 @@ public:
     bool sendChat(ChatId destination, std::string msg);
 
     /*!
-     * Send a chat gxs message.
-     * @param token use to store sqllite message
-     * @param groupId sending message with this groupid (groupId is conversation ID).
-     * @param post sending gxs message with direct push messages.
-
-     * @see publishMeg
-     */
-    bool sendGxsChat(uint32_t &token, RsGxsChatGroup &conversation, RsGxsChatMsg &post);
-
-
-    /*!
          * chat is sent to specifc peer
          * @param id peer to send chat msg to
          */
@@ -125,6 +102,25 @@ public:
      * @param id: Chat id cleared.
      */
     virtual void clearChatLobby(const ChatId& id);
+
+    //unseenp2p - for MVC
+    virtual void saveContactOrGroupChatToModelData(std::string displayName, std::string nickInGroupChat,
+                                                   unsigned int UnreadMessagesCount, unsigned int lastMsgDatetime, std::string lastMessage,bool isOtherLastMsg,
+                                                   int contactType, int groupChatType, std::string rsPeerIdStr, ChatLobbyId chatLobbyId, std::string uId);
+    virtual void removeContactOrGroupChatFromModelData(std::string uId);
+    virtual std::vector<conversationInfo> getConversationItemList();
+
+    virtual void updateRecentTimeOfItemInConversationList(std::string uId, std::string nickInGroupChat, long long lastMsgDatetime, std::string textmsg, bool isOtherMsg );
+    virtual void sortConversationItemListByRecentTime();
+    virtual void updateUnreadNumberOfItemInConversationList(std::string uId, unsigned int unreadNumber, bool isReset);
+    virtual std::string getSeletedUIdBeforeSorting(int row);
+    virtual int getIndexFromUId(std::string uId);
+    virtual bool isChatIdInConversationList(std::string uId);
+    virtual void setConversationListMode(uint32_t mode);
+    virtual uint32_t getConversationListMode();
+    virtual void setSearchFilter(const std::string &filtertext);
+    virtual std::vector<conversationInfo> getSearchFilteredConversationItemList();
+
 
     /*!
          * send to all peers online
@@ -264,71 +260,6 @@ private:
         /// if so, the chat item will be turned to NULL
     bool locked_checkAndRebuildPartialMessage(RsChatMsgItem *&) ;
 
-    //gxs chat service
-    bool sendGxsChatDirect(const RsPeerId &friendId, GxsNxsChatMsgItem *msgItem );
-    bool sendGxsChatDistant(const RsGxsId & fromGxsid, const RsGxsId toGxsId, GxsNxsChatMsgItem *msgItem ){return true;}
-
-    typedef std::vector<GxsNxsChatGroupItem*> GrpFragments;
-    typedef std::vector<GxsNxsChatMsgItem*> MsgFragments;
-
-    /*!
-     * Loops over pending publish key orders.
-     */
-    void sharePublishKeysPending() ;
-
-    /*!
-     * Fragment a message into individual fragments which are at most 150kb
-     * @param msg message to fragment
-     * @param msgFragments fragmented message
-     * @return false if fragmentation fails true otherwise
-     */
-    bool fragmentMsg(GxsNxsChatMsgItem& msg, MsgFragments& msgFragments) const;
-
-    /*!
-     * Fragment a group into individual fragments which are at most 150kb
-     * @param grp group to fragment
-     * @param grpFragments fragmented group
-     * @return false if fragmentation fails true other wise
-     */
-    bool fragmentGrp(GxsNxsChatGroupItem& grp, GrpFragments& grpFragments) const;
-
-    /*!
-     * Fragment a message into individual fragments which are at most 150kb
-     * @param msg message to fragment
-     * @param msgFragments fragmented message
-     * @return NULL if not possible to reconstruct message from fragment,
-     *              pointer to defragments nxs message is possible
-     */
-    GxsNxsChatMsgItem* deFragmentMsg(MsgFragments& msgFragments) const;
-
-    /*!
-     * Fragment a group into individual fragments which are at most 150kb
-     * @param grp group to fragment
-     * @param grpFragments fragmented group
-     * @return NULL if not possible to reconstruct group from fragment,
-     *              pointer to defragments nxs group is possible
-     */
-    GxsNxsChatGroupItem* deFragmentGrp(GrpFragments& grpFragments) const;
-
-
-    /*!
-     * Note that if all fragments for a message are not found then its fragments are dropped
-     * @param fragments message fragments which are not necessarily from the same message
-     * @param partFragments the partitioned fragments (into message ids)
-     */
-    void collateMsgFragments(MsgFragments &fragments, std::map<RsGxsMessageId, MsgFragments>& partFragments) const;
-
-    /*!
-     * Note that if all fragments for a group are not found then its fragments are dropped
-     * @param fragments group fragments which are not necessarily from the same group
-     * @param partFragments the partitioned fragments (into message ids)
-     */
-    void collateGrpFragments(GrpFragments fragments, std::map<RsGxsGroupId, GrpFragments>& partFragments) const;
-
-    /*!
-    * stamp the group info from that particular peer at the given time.
-    */
-
     RsChatAvatarItem *makeOwnAvatarItem() ;
     RsChatStatusItem *makeOwnCustomStateStringItem() ;
 
@@ -355,6 +286,13 @@ private:
     RsMutex mDGMutex;
 
     //p3GxsTrans& mGxsTransport;
+
+    //unseenp2p - for MVC
+    std::vector<conversationInfo> conversationItemList;
+    std::vector<conversationInfo> filtererConversationItemList;
+    uint32_t conversationListMode ; // CONVERSATION_MODE_WITHOUT_FILTER  or
+                                    // CONVERSATION_MODE_WITH_SEARCH_FILTER
+    std::string filter_text;
 };
 
 class p3GxsChatService::StateStringInfo
@@ -372,6 +310,5 @@ class p3GxsChatService::StateStringInfo
       int _own_is_new ;			// true when I myself a new avatar to send to this peer.
 };
 
+#endif // SERVICE_CHAT_HEADER
 
-
-#endif // P3GXSCHATSERVICE_H
