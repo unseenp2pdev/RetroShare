@@ -503,8 +503,6 @@ void ChatLobbyWidget::addChatPage(ChatLobbyDialog *d)
             QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
             ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
             emit ui->lobbyTreeWidget->model()->layoutChanged();
-            //send this to update member list in the other sides
-            rsMsgs->sendStatusString(ChatId(id), "is typing...");
         }
         else
         {
