@@ -1528,7 +1528,7 @@ void MainWindow::settingsChanged()
      int toolSize = Settings->getToolButtonSize();
 
     ui->toolBarPage->setToolButtonStyle(Settings->getToolButtonStyle());
-    ui->toolBarPage->setIconSize(QSize(128,toolSize));      //ui->toolBarPage->setIconSize(QSize(toolSize,toolSize));
+    ui->toolBarPage->setIconSize(QSize(64,toolSize));      //ui->toolBarPage->setIconSize(QSize(toolSize,toolSize));
 //	ui->toolBarAction->setToolButtonStyle(Settings->getToolButtonStyle());                              //d:hide quit button
 //  ui->toolBarAction->setIconSize(QSize(128,toolSize));        //ui->toolBarAction->setIconSize(QSize(toolSize,toolSize));       //d:hide quit button
 
