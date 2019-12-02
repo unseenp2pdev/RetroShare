@@ -201,12 +201,12 @@ CreateLobbyDialog QLabel#lobbyInfoLabel {
 
 ChatWidget QTextEdit#chatTextEdit {
         border: 1px solid #0099cc;
-	border-radius: 6px;
+        border-radius: 0px;
         background: white;
 }
 ChatWidget QTextBrowser#textBrowser {
         border: 1px solid #0099cc;
-        border-radius: 6px;
+        border-radius: 0px;
         background-size: contain;
         background-attachment: fixed;
         background-image: url(:/home/img/mountain3-1.jpg);
