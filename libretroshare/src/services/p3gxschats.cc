@@ -40,6 +40,8 @@
 #include "util/rsrandom.h"
 #include "util/rsstring.h"
 
+#include "chat/rschatitems.h"
+#include "retroshare/rspeers.h"
 
 #define GXSCHATS_DEBUG 1
 
@@ -65,12 +67,12 @@ RsGxsChats *rsGxsChats = NULL;
 /******************* Startup / Tick    ******************************************/
 /********************************************************************************/
 
-p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs,
-        p3ServiceControl *sc, p3IdService *pids, p3LinkMgr *lm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService) :
-        RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
-        RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
-        p3GxsChatService(sc, pids,lm,historyMgr),
-    mSearchCallbacksMapMutex("GXS chats search")
+p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs):
+    RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
+    RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
+    mSearchCallbacksMapMutex("GXS chats search"),
+    mChatSrv(NULL),
+    mSerialiser(new RsGxsChatSerialiser())
 {
     // For Dummy Msgs.
     mGenActive = false;
@@ -210,6 +212,30 @@ RsSerialiser* p3GxsChats::setupSerialiser()
 RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& /* keySet */)
 {
     updateSubscribedGroup(grpItem->meta);
+
+    bool serialOk = false;
+    RsNxsGrp* grp = new RsNxsGrp(RS_PKT_SUBTYPE_NXS_CHAT_GRP_ITEM);
+
+    uint32_t size = mSerialiser->size(grpItem);
+    char *gData = new char[size];
+    serialOk = mSerialiser->serialise(grpItem, gData, &size);
+    if (serialOk){  //push group to your peers before GxsSync Start!
+        grp->grp.setBinData(gData, size);
+
+        grp->metaData = new RsGxsGrpMetaData();
+        *(grp->metaData) = grpItem->meta;
+
+        // TODO: change when publish key optimisation added (public groups don't have publish key
+        grp->metaData->mSubscribeFlags = GXS_SERV::GROUP_SUBSCRIBE_ADMIN | GXS_SERV::GROUP_SUBSCRIBE_SUBSCRIBED
+                        | GXS_SERV::GROUP_SUBSCRIBE_PUBLISH;
+
+        //send Group to the network
+
+        //mChatSrv->sendGxsItem(grp);  //need to include a list of members or getting circle or private node members.
+        delete grp;
+        delete[] gData;
+
+    } //end pushing group to all add members.
     return SERVICE_CREATE_SUCCESS;
 }
 
@@ -328,17 +354,24 @@ void	p3GxsChats::service_tick()
 {
 
 static  rstime_t last_dummy_tick = 0;
+//static  rstime_t last_chat_tick =0;
 
     if (time(NULL) > last_dummy_tick + 5)
     {
         dummy_tick();
         last_dummy_tick = time(NULL);
+
     }
 
+//    if (time(NULL) > last_chat_tick + 5)
+//    {
+//        p3GxsChatService::tick();
+//        last_chat_tick = time(NULL);
+
+//    }
+//    p3ChatService::tick();
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
-    //p3GxsChatService::tick();
-
 
 }
 
@@ -937,6 +970,75 @@ bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
     msgItem->fromChatPost(msg, true);
 
     //if we want push messages, it should be done before add GxsSync Messages (Poll synchronization).
+    uint32_t size = mSerialiser->size(msgItem);
+    char* mData = new char[size];
+    // for fatal sign creation
+    bool serialOk = mSerialiser->serialise(msgItem, mData, &size);
+
+    if(serialOk)
+    {
+        GxsNxsChatMsgItem* msgNxt = new GxsNxsChatMsgItem(RS_PKT_SUBTYPE_GXSCHAT_MSG);
+        msgNxt->grpId = msgItem->meta.mGroupId;
+
+        msgNxt->msg.setBinData(mData, size);
+
+        // now create meta
+        msgNxt->metaData = new RsGxsMsgMetaData();
+        *(msgNxt->metaData) = msgItem->meta;
+
+        // assign time stamp
+        msgNxt->metaData->mPublishTs = time(NULL);
+
+        //RsGxsGroupId grpId = msgNxt->grpId;
+        //std::map<RsGxsGroupId, RsGrpMetaData> mSubscribedGroups;
+        std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
+
+        it = mSubscribedGroups.find(msgNxt->grpId);
+        if (it != mSubscribedGroups.end()) //found group or conversation
+        {
+            //mSubscribedGroups.erase(it);
+            RsGroupMetaData chatGrpMeta = it->second;
+            switch(chatGrpMeta.mCircleType){
+                case GXS_CIRCLE_TYPE_PUBLIC:
+                {
+                    //get all online friends and send this message to them.
+                    mChatSrv->sendGxsPubChat(msgNxt);
+                    break;
+                }
+                case GXS_CIRCLE_TYPE_EXTERNAL:// restricted to an external circle, made of RsGxsId
+                {
+                    std::cerr << "CircleType: GXS_CIRCLE_TYPE_EXTERNAL"<<std::endl;
+                    break;
+                }
+                case GXS_CIRCLE_TYPE_YOUR_FRIENDS_ONLY:	// restricted to a subset of friend nodes of a given RS node given by a RsPgpId list
+                {
+                    if(!chatGrpMeta.mInternalCircle.isNull())
+                    {
+                        RsGroupInfo ginfo ;
+                        RsNodeGroupId  groupId = RsNodeGroupId(chatGrpMeta.mInternalCircle);
+
+                        if(rsPeers->getGroupInfo(groupId,ginfo))
+                        {
+                            for (auto it = ginfo.peerIds.begin(); it != ginfo.peerIds.end(); it++ ){
+                                std::list<RsPeerId> ids;
+                                if (rsPeers->getAssociatedSSLIds(*it,ids)) {
+                                    mChatSrv->sendGxsChat(msgNxt,ids);
+                                    ids.clear();
+                                }
+                            }//end for loop
+                        }
+                    } //end case
+                    break;
+                }
+              default: {
+                std::cerr << "Error! CircleType:"<<chatGrpMeta.mCircleType<<std::endl;
+                break;
+              }
+           }//end switch
+
+      }//end subscribed group
+    }
+    delete mData;
 
     RsGenExchange::publishMsg(token, msgItem);
     return true;

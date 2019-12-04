@@ -2656,7 +2656,7 @@ void RsGxsNetService::locked_processCompletedIncomingTrans(NxsTransaction* tr)
         else if(flag & RsNxsTransacItem::FLAG_TYPE_MSGS)
         {
 
-            std::vector<RsNxsMsg*> msgs;
+            std::vector<RsNxsMsg*>  msgs;
 #ifdef NXS_NET_DEBUG_0
             GXSNETDEBUG_P_(tr->mTransaction->PeerId()) << "  type = msgs." << std::endl;
 #endif

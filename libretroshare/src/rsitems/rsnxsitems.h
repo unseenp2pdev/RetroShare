@@ -47,6 +47,11 @@ const uint8_t RS_PKT_SUBTYPE_NXS_MSG_ITEM             = 0x20;
 const uint8_t RS_PKT_SUBTYPE_NXS_TRANSAC_ITEM         = 0x40;
 const uint8_t RS_PKT_SUBTYPE_NXS_GRP_PUBLISH_KEY_ITEM = 0x80;
 
+const uint8_t RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM             = 0x90;
+const uint8_t RS_PKT_SUBTYPE_NXS_CHAT_GRP_ITEM             = 0x91;
+const uint8_t RS_PKT_SUBTYPE_NXS_CHAT_GRP_PUBLISH_KEY_ITEM = 0x92;
+
+
 // possibility create second service to deal with this functionality
 
 const uint8_t RS_PKT_SUBTYPE_EXT_SEARCH_GRP   = 0x0001;

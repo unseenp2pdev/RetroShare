@@ -82,8 +82,8 @@ const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_INFO              = 0x1D ; //meiyousixin
 const uint8_t RS_PKT_SUBTYPE_GXSCHAT_ACCEPT                 = 0x30 ; //unseenp2pdev - for lobby Inviation/Accept
 const uint8_t RS_PKT_SUBTYPE_GXSCHAT_INVITE                 = 0x31 ; //unseenp2pdev - for lobby Inviation/Accept
 const uint8_t RS_PKT_SUBTYPE_GXSCHAT_MSG                    = 0x32 ; //unseenp2pdev - gxschat message
-const uint8_t RS_PKT_SUBTYPE_GXSCHAT_LOBBY_PUBLISH_KEY      = 0x33 ; //unseenp2pdev - gxschat shared publish key
-const uint8_t RS_PKT_SUBTYPE_GXSCHAT_GROUP_MSG              = 0x34 ; //unseenp2pdev - gxschat shared publish key
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_PUBLISH_KEY      = 0x33 ; //unseenp2pdev - gxschat shared publish key
+const uint8_t RS_PKT_SUBTYPE_GXSCHAT_GROUP                  = 0x34 ; //unseenp2pdev - gxschat shared publish key
 
 RS_DEPRECATED_FOR(RS_PKT_SUBTYPE_CHAT_LOBBY_INVITE) \
 const uint8_t RS_PKT_SUBTYPE_CHAT_LOBBY_INVITE_DEPRECATED = 0x1A ;	// to be removed (deprecated since May 2017)
@@ -120,7 +120,7 @@ class GxsNxsChatGroupItem : public RsChatItem
 
 public:
 
-    explicit GxsNxsChatGroupItem(uint16_t servtype=RS_PKT_SUBTYPE_GXSCHAT_GROUP_MSG): RsChatItem(servtype),
+    explicit GxsNxsChatGroupItem(uint16_t servtype=RS_PKT_SUBTYPE_GXSCHAT_GROUP): RsChatItem(servtype),
       meta(servtype), metaData(NULL), pos(0), count(0)
     { clear(); }
     virtual ~GxsNxsChatGroupItem() { delete metaData; }
@@ -151,6 +151,25 @@ public:
 
     // Deserialised metaData, this is not serialised by the serialize() method. So it may contain private key parts in some cases.
     RsGxsGrpMetaData* metaData;
+};
+
+/*!
+ * Use to request grp list from peer
+ * Server may advise client peer to use sync file
+ * while serving his request. This results
+ */
+class GxsNxsGroupPublishKeyItem : public RsChatItem
+{
+public:
+    explicit GxsNxsGroupPublishKeyItem(uint16_t servtype = RS_PKT_SUBTYPE_GXSCHAT_PUBLISH_KEY) : RsChatItem(servtype)
+    { clear(); }
+
+    virtual void clear();
+
+    virtual void serial_process(RsGenericSerializer::SerializeJob j,RsGenericSerializer::SerializeContext& ctx);
+
+    RsGxsGroupId grpId ;
+    RsTlvPrivateRSAKey private_key ;
 };
 
 /*!

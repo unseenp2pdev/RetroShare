@@ -41,6 +41,7 @@
 #include "gxstrans/p3gxstrans.h"
 
 #include "chat/p3chatservice.h"
+#include "rsitems/rsnxsitems.h"
 #include "rsitems/rsconfigitems.h"
 #include <string>
 
@@ -54,17 +55,17 @@ static const uint32_t MAX_AVATAR_JPEG_SIZE              = 32767; // Maximum size
 																					  // Images are 96x96, which makes approx. 27000 bytes uncompressed.
 
 p3ChatService::p3ChatService( p3ServiceControl *sc, p3IdService *pids,
-                              p3LinkMgr *lm, p3HistoryMgr *historyMgr,
-                              p3GxsTrans& gxsTransService ) :
+                              p3LinkMgr *lm, p3HistoryMgr *historyMgr,  RsNxsChatObserver *gxsChatObs
+                              /*, p3GxsTrans& gxsTransService */ ) :
     DistributedChatService(getServiceInfo().mServiceType, sc, historyMgr,pids),
     mChatMtx("p3ChatService"), mServiceCtrl(sc), mLinkMgr(lm),
     mHistoryMgr(historyMgr), _own_avatar(NULL),
     _serializer(new RsChatSerialiser()),
     mDGMutex("p3ChatService distant id - gxs id map mutex"),
-    mGxsTransport(gxsTransService)
+    gxsChatSync(gxsChatObs)
 {
     addSerialType(_serializer);
-    mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,this );
+    //mGxsTransport.registerGxsTransClient( GxsTransSubServices::P3_CHAT_SERVICE,this );
 }
 
 
@@ -76,6 +77,7 @@ int	p3ChatService::tick()
 	if(receivedItems()) receiveChatQueue();
 
 	DistributedChatService::flush();
+
 
 	return 0;
 }
@@ -366,7 +368,7 @@ bool p3ChatService::sendChat(ChatId destination, std::string msg)
 				uint32_t sz = _serializer->size(ci);
 				std::vector<uint8_t> data; data.resize(sz);
 				_serializer->serialise(ci, &data[0], &sz);
-                mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE, de.from, de.to, &data[0], sz);
+                //mGxsTransport.sendData(tId, GxsTransSubServices::P3_CHAT_SERVICE, de.from, de.to, &data[0], sz);
 			}
 			else
 				std::cout << "p3ChatService::sendChat(...) can't find distant"
@@ -514,8 +516,25 @@ void p3ChatService::receiveChatQueue()
 {
 	RsItem *item ;
 
-	while(NULL != (item=recvItem()))
-		handleIncomingItem(item) ;
+    while(NULL != (item=recvItem())){
+
+        RsChatItem *ni = dynamic_cast<RsChatItem*>(item) ;
+        if(ni != NULL)  //gxs messages
+        {
+
+            switch(ni->PacketSubType())
+            {
+            case RS_PKT_SUBTYPE_GXSCHAT_MSG:         handleRecvGxsChatMessage(dynamic_cast<GxsNxsChatMsgItem*>(ni)) ; break ;
+            case RS_PKT_SUBTYPE_GXSCHAT_GROUP:       handleRecvGxsChatGroup(dynamic_cast<GxsNxsChatGroupItem*>(ni)) ; break ;
+            case RS_PKT_SUBTYPE_GXSCHAT_PUBLISH_KEY: handleRecvGxsChatPublishKey(dynamic_cast<GxsNxsGroupPublishKeyItem*>(ni)) ; break ;
+
+            default:
+                handleIncomingItem(item) ; break;
+
+            }
+        }
+
+    }//end while loop
 }
 
 class MsgCounter
@@ -1622,4 +1641,287 @@ void p3ChatService::setSearchFilter(const std::string &filtertext)
 std::vector<conversationInfo> p3ChatService::getSearchFilteredConversationItemList()
 {
      return filtererConversationItemList;
+}
+
+
+//gxs chat services and messages
+const uint32_t p3ChatService::FRAGMENT_SIZE = 150000;
+
+bool p3ChatService::fragmentMsg(RsNxsMsg& msg, MsgFragments& msgFragments) const
+{
+    // first determine how many fragments
+    uint32_t msgSize = msg.msg.TlvSize();
+    uint32_t dataLeft = msgSize;
+    uint8_t nFragments = ceil(float(msgSize)/FRAGMENT_SIZE);
+
+        RsTemporaryMemory buffer(FRAGMENT_SIZE);
+    int currPos = 0;
+
+
+    for(uint8_t i=0; i < nFragments; ++i)
+    {
+        RsNxsMsg* msgFrag = new RsNxsMsg(mServType);
+        msgFrag->grpId = msg.grpId;
+        msgFrag->msgId = msg.msgId;
+        msgFrag->meta = msg.meta;
+        msgFrag->transactionNumber = msg.transactionNumber;
+        msgFrag->pos = i;
+        msgFrag->PeerId(msg.PeerId());
+        msgFrag->count = nFragments;
+        uint32_t fragSize = std::min(dataLeft, FRAGMENT_SIZE);
+
+        memcpy(buffer, ((char*)msg.msg.bin_data) + currPos, fragSize);
+        msgFrag->msg.setBinData(buffer, fragSize);
+
+        currPos += fragSize;
+        dataLeft -= fragSize;
+        msgFragments.push_back(msgFrag);
+    }
+
+    return true;
+}
+
+bool p3ChatService::fragmentGrp(RsNxsGrp& grp, GrpFragments& grpFragments) const
+{
+    // first determine how many fragments
+    uint32_t grpSize = grp.grp.TlvSize();
+    uint32_t dataLeft = grpSize;
+    uint8_t nFragments = ceil(float(grpSize)/FRAGMENT_SIZE);
+    char buffer[FRAGMENT_SIZE];
+    int currPos = 0;
+
+
+    for(uint8_t i=0; i < nFragments; ++i)
+    {
+        RsNxsGrp* grpFrag = new RsNxsGrp(mServType);
+        grpFrag->grpId = grp.grpId;
+        grpFrag->meta = grp.meta;
+        grpFrag->pos = i;
+        grpFrag->count = nFragments;
+        uint32_t fragSize = std::min(dataLeft, FRAGMENT_SIZE);
+
+        memcpy(buffer, ((char*)grp.grp.bin_data) + currPos, fragSize);
+        grpFrag->grp.setBinData(buffer, fragSize);
+
+        currPos += fragSize;
+        dataLeft -= fragSize;
+        grpFragments.push_back(grpFrag);
+    }
+
+    return true;
+}
+
+RsNxsMsg* p3ChatService::deFragmentMsg(MsgFragments& msgFragments) const
+{
+    if(msgFragments.empty()) return NULL;
+
+    // if there is only one fragment with a count 1 or less then
+    // the fragment is the msg
+    if(msgFragments.size() == 1)
+    {
+        RsNxsMsg* m  = msgFragments.front();
+
+        if(m->count > 1)	// normally mcount should be exactly 1, but if not initialised (old versions) it's going to be 0
+                {
+                    // delete everything
+                    std::cerr << "(WW) Cannot deFragment message set. m->count=" << m->count << ", but msgFragments.size()=" << msgFragments.size() << ". Incomplete? Dropping all." << std::endl;
+
+                    for(uint32_t i=0;i<msgFragments.size();++i)
+                            delete msgFragments[i] ;
+
+                        msgFragments.clear();
+            return NULL;
+                }
+        else
+                {
+                    // single piece. No need to say anything. Just return it.
+
+                        msgFragments.clear();
+            return m;
+                }
+    }
+
+    // first determine total size for binary data
+    MsgFragments::iterator mit = msgFragments.begin();
+    uint32_t datSize = 0;
+
+    for(; mit != msgFragments.end(); ++mit)
+        datSize += (*mit)->msg.bin_len;
+
+        RsTemporaryMemory data(datSize) ;
+
+        if(!data)
+        {
+        for(uint32_t i=0;i<msgFragments.size();++i)
+            delete msgFragments[i] ;
+
+        msgFragments.clear();
+            return NULL ;
+        }
+
+    uint32_t currPos = 0;
+
+        std::cerr << "(II) deFragmenting long message of size " << datSize << ", from " << msgFragments.size() << " pieces." << std::endl;
+
+    for(mit = msgFragments.begin(); mit != msgFragments.end(); ++mit)
+    {
+        RsNxsMsg* msg = *mit;
+        memcpy(data + (currPos), msg->msg.bin_data, msg->msg.bin_len);
+        currPos += msg->msg.bin_len;
+    }
+
+    RsNxsMsg* msg = new RsNxsMsg(mServType);
+    const RsNxsMsg& m = *(*(msgFragments.begin()));
+    msg->msg.setBinData(data, datSize);
+    msg->msgId = m.msgId;
+    msg->grpId = m.grpId;
+    msg->transactionNumber = m.transactionNumber;
+    msg->meta = m.meta;
+
+        // now clean!
+    for(uint32_t i=0;i<msgFragments.size();++i)
+        delete msgFragments[i] ;
+
+    msgFragments.clear();
+
+    return msg;
+}
+
+// This is unused apparently, since groups are never large. Anyway, we keep it in case we need it.
+
+RsNxsGrp* p3ChatService::deFragmentGrp(GrpFragments& grpFragments) const
+{
+    if(grpFragments.empty()) return NULL;
+
+    // first determine total size for binary data
+    GrpFragments::iterator mit = grpFragments.begin();
+    uint32_t datSize = 0;
+
+    for(; mit != grpFragments.end(); ++mit)
+        datSize += (*mit)->grp.bin_len;
+
+    char* data = new char[datSize];
+    uint32_t currPos = 0;
+
+    for(mit = grpFragments.begin(); mit != grpFragments.end(); ++mit)
+    {
+        RsNxsGrp* grp = *mit;
+        memcpy(data + (currPos), grp->grp.bin_data, grp->grp.bin_len);
+        currPos += grp->grp.bin_len;
+    }
+
+    RsNxsGrp* grp = new RsNxsGrp(mServType);
+    const RsNxsGrp& g = *(*(grpFragments.begin()));
+    grp->grp.setBinData(data, datSize);
+    grp->grpId = g.grpId;
+    grp->transactionNumber = g.transactionNumber;
+    grp->meta = g.meta;
+
+    delete[] data;
+
+    return grp;
+}
+
+struct GrpFragCollate
+{
+    RsGxsGroupId mGrpId;
+    GrpFragCollate(const RsGxsGroupId& grpId) : mGrpId(grpId){ }
+    bool operator()(RsNxsGrp* grp) { return grp->grpId == mGrpId;}
+};
+
+// gxs receiver
+void p3ChatService::handleRecvGxsChatMessage(GxsNxsChatMsgItem *item){
+#ifdef CHAT_DEBUG
+    std::cerr << "p3ChatService::handleRecvGxsChatMessage()";
+    std::cerr << std::endl;
+#endif
+    std::cerr <<"Received Gxs MessageID: "<<item->msgId <<std::endl;
+    std::cerr <<"Message GroupdId: "<<item->grpId<<std::endl;
+    std::cerr <<"Msg Size="<<item->msg.TlvSize() <<std::endl;
+
+}
+void p3ChatService::handleRecvGxsChatGroup(GxsNxsChatGroupItem *item){
+#ifdef CHAT_DEBUG
+    std::cerr << "p3ChatService::handleRecvGxsChatGroup()";
+    std::cerr << std::endl;
+#endif
+    std::cerr << "Received GroupId:"<<item->grpId<<std::endl;
+}
+
+void p3ChatService::handleRecvGxsChatPublishKey(GxsNxsGroupPublishKeyItem *item){
+#ifdef CHAT_DEBUG
+    std::cerr << "p3ChatService::handleRecvGxsChatPublishKey()";
+    std::cerr << std::endl;
+#endif
+    std::cerr << "Received Group Publish Key:"<<item->grpId<<std::endl;
+}
+
+//gxs sending
+
+void p3ChatService::sendGxsChat(RsChatItem *si, std::list<RsPeerId>& ids){
+    //put limit of the package less than FRAME_SIZE
+
+   // RsNxsMsg *msg = dynamic_cast<RsNxsMsg*>(si);
+//    if (msg !=NULL){ //check size only if it's a message or group type
+//        uint32_t msgSize = msg->msg.TlvSize();
+//        if (msgSize < FRAGMENT_SIZE){
+//            sendItem(si) ;
+//            return;
+//         }
+//            std::cerr << "Message is large than limt message per chat " <<std::endl;
+//              return;
+//        }
+
+//    RsNxsGrp *grp = dynamic_cast<RsNxsGrp*>(si);
+//    if(grp != NULL){
+//        uint32_t grpSize = grp->grp.TlvSize();
+//        if (grpSize < FRAGMENT_SIZE ){
+//            sendItem(si) ;
+//            return;
+//        }
+//        std::cerr << "Group Size is larger than limit framesize" <<std::endl;
+//        return ;
+//    }
+#ifdef CHAT_DEBUG
+    std::cerr << "p3ChatService::sendGxsChat()";
+    std::cerr << std::endl;
+#endif
+
+    std::list<RsPeerId>::iterator it;
+    for(it = ids.begin(); it != ids.end(); ++it)
+    {
+        //RsChatMsgItem *ci = new RsChatMsgItem();
+        if(isOnline(*it)){
+            si->PeerId(*it);
+            sendItem(si);  //sharing permission should be that big!
+            std::cerr <<" sent PacketID: "<<si->PacketId()<<" amd PeerId: "<<si->PeerId()<<std::endl;
+         }
+    }
+}
+
+void p3ChatService::sendGxsPubChat(RsChatItem *ci){
+    /* go through all the peers */
+
+    std::set<RsPeerId> ids;
+    std::set<RsPeerId>::iterator it;
+    mServiceCtrl->getPeersConnected(getServiceInfo().mServiceType, ids);
+
+    /* add in own id -> so get reflection
+    RsPeerId ownId = mServiceCtrl->getOwnId();
+    ids.insert(ownId);
+    */
+
+#ifdef CHAT_DEBUG
+    std::cerr << "p3ChatService::sendGxsPubChat()";
+    std::cerr << std::endl;
+#endif
+
+    for(it = ids.begin(); it != ids.end(); ++it)
+    {
+        //RsChatMsgItem *ci = new RsChatMsgItem();
+        ci->PeerId(*it);
+        sendItem(ci);  //sharing permission should be that big!
+        std::cerr <<" sent PacketID: "<<ci->PacketId()<<" amd PeerId: "<<ci->PeerId()<<std::endl;
+    }
+
 }

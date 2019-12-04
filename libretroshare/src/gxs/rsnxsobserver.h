@@ -65,6 +65,32 @@ public:
      * @param grpId group id
      */
     virtual void notifyChangedGroupStats(const RsGxsGroupId &grpId) = 0;
+
+
+
+
+
+};
+
+class RsNxsChatObserver
+{
+    public:
+
+    RsNxsChatObserver() {
+
+    }
+    /* gxschat service callbacks */
+
+    virtual void receiveNewChatMesesage(std::vector<RsNxsMsg*>& messages) = 0;
+
+    virtual void receiveNewChatGroup(std::vector<RsNxsGrp*>& groups) = 0;
+
+    virtual void notifyReceiveChatInvite(const RsGxsGroupId &grpId) = 0;
+
+    virtual void notifyReceiveChatPublishKey(const RsGxsGroupId &grpId) = 0;
+
+    virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) = 0;
+
 };
 
 #endif // RSNXSOBSERVER_H

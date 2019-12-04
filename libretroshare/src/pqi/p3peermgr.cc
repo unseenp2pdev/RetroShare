@@ -2728,6 +2728,8 @@ bool p3PeerMgrIMPL::getGroupInfo(const RsNodeGroupId& groupId, RsGroupInfo &grou
 {
 	RsStackMutex stack(mPeerMtx); /****** STACK LOCK MUTEX *******/
 
+
+
     std::map<RsNodeGroupId,RsGroupInfo>::iterator it = groupList.find(groupId) ;
 
     if(it == groupList.end())
