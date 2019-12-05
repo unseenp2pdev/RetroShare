@@ -24,6 +24,7 @@
 
 #include <set>
 #include "rsitems/rsnxsitems.h"
+#include "chat/rschatitems.h"
 
 typedef uint32_t TurtleRequestId ;
 
@@ -81,9 +82,9 @@ class RsNxsChatObserver
     }
     /* gxschat service callbacks */
 
-    virtual void receiveNewChatMesesage(std::vector<RsNxsMsg*>& messages) = 0;
+    virtual void receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages) = 0;
 
-    virtual void receiveNewChatGroup(std::vector<RsNxsGrp*>& groups) = 0;
+    virtual void receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups) = 0;
 
     virtual void notifyReceiveChatInvite(const RsGxsGroupId &grpId) = 0;
 

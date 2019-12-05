@@ -251,12 +251,14 @@ void PrivateOugoingMapItem::serial_process(
 int GxsNxsChatGroupItem::refcount = 0;
 /** print and clear functions **/
 int GxsNxsChatMsgItem::refcount = 0;
+
 void GxsNxsChatMsgItem::clear()
 {
 
     msg.TlvClear();
     meta.TlvClear();
 }
+
 
 std::ostream&GxsNxsChatMsgItem::print(std::ostream& out, uint16_t /*indent*/)
 { return out; }

@@ -42,6 +42,7 @@
 
 #include "chat/rschatitems.h"
 #include "retroshare/rspeers.h"
+#include "rsitems/rsnxsitems.h"
 
 #define GXSCHATS_DEBUG 1
 
@@ -72,7 +73,8 @@ p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes,
     RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
     mSearchCallbacksMapMutex("GXS chats search"),
     mChatSrv(NULL),
-    mSerialiser(new RsGxsChatSerialiser())
+    mSerialiser(new RsGxsChatSerialiser()),
+    mChatMtx("GxsChat Mutex")
 {
     // For Dummy Msgs.
     mGenActive = false;
@@ -957,14 +959,9 @@ bool p3GxsChats::updateGroup(uint32_t &token, RsGxsChatGroup &group)
     return true;
 }
 
+bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg &msg){
 
-
-bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
-{
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::createChatMsg() GroupId: " << msg.mMeta.mGroupId;
-    std::cerr << std::endl;
-#endif
+    RS_STACK_MUTEX(mChatMtx);
 
     RsGxsChatMsgItem* msgItem = new RsGxsChatMsgItem();
     msgItem->fromChatPost(msg, true);
@@ -974,22 +971,104 @@ bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
     char* mData = new char[size];
     // for fatal sign creation
     bool serialOk = mSerialiser->serialise(msgItem, mData, &size);
-
     if(serialOk)
     {
-        GxsNxsChatMsgItem* msgNxt = new GxsNxsChatMsgItem(RS_PKT_SUBTYPE_GXSCHAT_MSG);
+
+        RsNxsMsg* msgNxt = new RsNxsMsg(RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM);
+
         msgNxt->grpId = msgItem->meta.mGroupId;
+        //msgNxt->msgId = msgItem->meta.mMsgId;
 
         msgNxt->msg.setBinData(mData, size);
 
         // now create meta
         msgNxt->metaData = new RsGxsMsgMetaData();
         *(msgNxt->metaData) = msgItem->meta;
-
         // assign time stamp
         msgNxt->metaData->mPublishTs = time(NULL);
+        uint8_t createReturn = RsGenExchange::createMessage(msgNxt);
 
-        //RsGxsGroupId grpId = msgNxt->grpId;
+        if(createReturn == CREATE_SUCCESS){
+            uint32_t size = mSerialiser->size(msgNxt);
+            char* newData = new char[size];
+            if(mSerialiser->serialise(msgNxt, newData, &size)){
+                mItem = new GxsNxsChatMsgItem(RS_PKT_SUBTYPE_GXSCHAT_MSG);
+                mItem->grpId = msgNxt->grpId;
+                mItem->msg.setBinData(newData,size);
+                mItem->metaData = new RsGxsMsgMetaData();
+                *(mItem->metaData) = *(msgNxt->metaData);
+                mItem->msgId = msgNxt->msgId;  //messageId created after the createMessage function call.
+                delete newData;
+                return true;
+            }
+
+        }
+
+    }
+    delete mData;
+    return false;
+}
+
+void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::receiveNewChatMesesage()" << std::endl;
+#endif
+
+    std::vector<RsNxsMsg *>nxtMsg;
+    uint32_t size =0;
+    std::vector<GxsNxsChatMsgItem*>::iterator it;
+  {
+    RS_STACK_MUTEX(mChatMtx);
+    for (it=messages.begin(); it != messages.end(); it++){
+        GxsNxsChatMsgItem *msg = *it;
+        std::cerr <<"Received Gxs MessageID: "<<msg->msgId <<std::endl;
+        std::cerr <<" GroupdId: "<<msg->grpId<<std::endl;
+        std::cerr <<"Msg Size="<<msg->msg.TlvSize() <<std::endl;
+
+        size = mSerialiser->size(msg);
+        char* mData = new char[size];
+        bool serialOk = mSerialiser->serialise(msg, mData, &size);
+        if (serialOk){ //converting RsChatItem to GxsMessage
+            RsNxsMsg *newMsg = new RsNxsMsg(RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM);
+            newMsg->grpId = msg->grpId;
+            newMsg->msgId = msg->msgId;
+            newMsg->msg.setBinData(mData, size);
+            newMsg->metaData = new RsGxsMsgMetaData();
+            *(newMsg->metaData) = *(msg->metaData);
+            newMsg->meta = msg->meta;
+            newMsg->count = msg->count;
+            newMsg->pos = msg->pos;
+            newMsg->refcount = msg->refcount;
+
+            nxtMsg.push_back(newMsg);
+        }
+        delete []mData;
+    }
+  }//end mutex
+    RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+}
+void p3GxsChats::receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::receiveNewChatGroup()" << std::endl;
+#endif
+}
+
+bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
+{
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::createChatMsg() GroupId: " << msg.mMeta.mGroupId;
+    std::cerr << std::endl;
+#endif
+
+
+    RsGxsChatMsgItem* msgItem = new RsGxsChatMsgItem();
+    msgItem->fromChatPost(msg, true);
+
+//    //if we want push messages, it should be done before add GxsSync Messages (Poll synchronization).
+
+
+    GxsNxsChatMsgItem* msgNxt;
+    if (createGxsChatMessage(msgNxt, msg)){
         //std::map<RsGxsGroupId, RsGrpMetaData> mSubscribedGroups;
         std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
 
@@ -1003,6 +1082,8 @@ bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
                 {
                     //get all online friends and send this message to them.
                     mChatSrv->sendGxsPubChat(msgNxt);
+                    std::cerr <<"Sending Gxs MessageID: "<<msgNxt->msgId <<std::endl;
+                    std::cerr <<"Sending GroupdId: "<<msgNxt->grpId<<std::endl;
                     break;
                 }
                 case GXS_CIRCLE_TYPE_EXTERNAL:// restricted to an external circle, made of RsGxsId
@@ -1024,6 +1105,8 @@ bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
                                 if (rsPeers->getAssociatedSSLIds(*it,ids)) {
                                     mChatSrv->sendGxsChat(msgNxt,ids);
                                     ids.clear();
+                                    std::cerr <<"Sent Gxs MessageID: "<<msgNxt->msgId <<std::endl;
+                                    std::cerr <<"Sent GroupdId: "<<msgNxt->grpId<<std::endl;
                                 }
                             }//end for loop
                         }
@@ -1038,7 +1121,7 @@ bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
 
       }//end subscribed group
     }
-    delete mData;
+    //delete mData;
 
     RsGenExchange::publishMsg(token, msgItem);
     return true;

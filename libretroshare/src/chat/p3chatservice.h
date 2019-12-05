@@ -77,8 +77,8 @@ public:
     void handleRecvGxsChatGroup(GxsNxsChatGroupItem *item);
     void handleRecvGxsChatPublishKey(GxsNxsGroupPublishKeyItem *item);
 
-    void sendGxsChat(RsChatItem *si, std::list<RsPeerId>& ids);
-    void sendGxsPubChat(RsChatItem *ci);
+    void sendGxsChat(GxsNxsChatMsgItem *si, std::list<RsPeerId>& ids);
+    void sendGxsPubChat(GxsNxsChatMsgItem *si);
 
 	/*************** pqiMonitor callback ***********************/
 	virtual void statusChange(const std::list<pqiServicePeer> &plist);

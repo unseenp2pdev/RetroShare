@@ -1835,9 +1835,11 @@ void p3ChatService::handleRecvGxsChatMessage(GxsNxsChatMsgItem *item){
     std::cerr << "p3ChatService::handleRecvGxsChatMessage()";
     std::cerr << std::endl;
 #endif
-    std::cerr <<"Received Gxs MessageID: "<<item->msgId <<std::endl;
-    std::cerr <<"Message GroupdId: "<<item->grpId<<std::endl;
-    std::cerr <<"Msg Size="<<item->msg.TlvSize() <<std::endl;
+    //RS_STACK_MUTEX(mDGMutex);
+
+    std::vector<GxsNxsChatMsgItem *> messages ;
+    messages.push_back(item);
+    gxsChatSync->receiveNewChatMesesage(messages);
 
 }
 void p3ChatService::handleRecvGxsChatGroup(GxsNxsChatGroupItem *item){
@@ -1858,70 +1860,60 @@ void p3ChatService::handleRecvGxsChatPublishKey(GxsNxsGroupPublishKeyItem *item)
 
 //gxs sending
 
-void p3ChatService::sendGxsChat(RsChatItem *si, std::list<RsPeerId>& ids){
+void p3ChatService::sendGxsChat(GxsNxsChatMsgItem *si, std::list<RsPeerId>& ids){
     //put limit of the package less than FRAME_SIZE
-
-   // RsNxsMsg *msg = dynamic_cast<RsNxsMsg*>(si);
-//    if (msg !=NULL){ //check size only if it's a message or group type
-//        uint32_t msgSize = msg->msg.TlvSize();
-//        if (msgSize < FRAGMENT_SIZE){
-//            sendItem(si) ;
-//            return;
-//         }
-//            std::cerr << "Message is large than limt message per chat " <<std::endl;
-//              return;
-//        }
-
-//    RsNxsGrp *grp = dynamic_cast<RsNxsGrp*>(si);
-//    if(grp != NULL){
-//        uint32_t grpSize = grp->grp.TlvSize();
-//        if (grpSize < FRAGMENT_SIZE ){
-//            sendItem(si) ;
-//            return;
-//        }
-//        std::cerr << "Group Size is larger than limit framesize" <<std::endl;
-//        return ;
-//    }
 #ifdef CHAT_DEBUG
     std::cerr << "p3ChatService::sendGxsChat()";
     std::cerr << std::endl;
 #endif
+    /* add in own id -> so get reflection */
+    RsPeerId ownId = mServiceCtrl->getOwnId();
+    ids.push_back(ownId);
 
+    uint32_t size = _serializer->size(si);
+    if (size > FRAGMENT_SIZE){
+           std::cerr << "Message is large than limt message per chat " <<std::endl;
+           return;
+     }
+
+    char* newData = new char[size];
     std::list<RsPeerId>::iterator it;
     for(it = ids.begin(); it != ids.end(); ++it)
     {
-        //RsChatMsgItem *ci = new RsChatMsgItem();
         if(isOnline(*it)){
-            si->PeerId(*it);
-            sendItem(si);  //sharing permission should be that big!
-            std::cerr <<" sent PacketID: "<<si->PacketId()<<" amd PeerId: "<<si->PeerId()<<std::endl;
+            GxsNxsChatMsgItem *ci = new GxsNxsChatMsgItem();
+            ci->grpId = si->grpId;
+            ci->msg.setBinData(newData,size);
+            ci->metaData = new RsGxsMsgMetaData();
+            ci->metaData = si->metaData;
+            ci->msgId = si->msgId;
+            //adding new PeerId to send.
+            ci->PeerId(*it);
+            sendItem(ci);  //sharing permission should be that big!
          }
     }
+    delete newData;
 }
 
-void p3ChatService::sendGxsPubChat(RsChatItem *ci){
+void p3ChatService::sendGxsPubChat(GxsNxsChatMsgItem *si){
     /* go through all the peers */
-
-    std::set<RsPeerId> ids;
-    std::set<RsPeerId>::iterator it;
-    mServiceCtrl->getPeersConnected(getServiceInfo().mServiceType, ids);
-
-    /* add in own id -> so get reflection
-    RsPeerId ownId = mServiceCtrl->getOwnId();
-    ids.insert(ownId);
-    */
-
 #ifdef CHAT_DEBUG
     std::cerr << "p3ChatService::sendGxsPubChat()";
     std::cerr << std::endl;
 #endif
 
-    for(it = ids.begin(); it != ids.end(); ++it)
-    {
-        //RsChatMsgItem *ci = new RsChatMsgItem();
-        ci->PeerId(*it);
-        sendItem(ci);  //sharing permission should be that big!
-        std::cerr <<" sent PacketID: "<<ci->PacketId()<<" amd PeerId: "<<ci->PeerId()<<std::endl;
+    std::set<RsPeerId> ids;
+    std::set<RsPeerId>::iterator it;
+    mServiceCtrl->getPeersConnected(getServiceInfo().mServiceType, ids);
+
+    /* add in own id -> so get reflection */
+    RsPeerId ownId = mServiceCtrl->getOwnId();
+    ids.insert(ownId);
+
+    std::list<RsPeerId> peers;
+    for (it = ids.begin(); it != ids.end(); it++){
+        peers.push_back(*it);
     }
+    sendGxsChat(si, peers);
 
 }

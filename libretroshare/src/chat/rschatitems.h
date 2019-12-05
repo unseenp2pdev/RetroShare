@@ -190,6 +190,7 @@ public:
                                  RsGenericSerializer::SerializeContext& ctx );
 
     virtual void clear();
+
     virtual std::ostream &print(std::ostream& out, uint16_t indent);
 
     uint8_t pos; /// used for splitting up msg

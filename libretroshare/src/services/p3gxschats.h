@@ -79,12 +79,13 @@ protected:
 
     //p3chatservice callback to process gxs messages/groups
 
-    virtual void receiveNewChatMesesage(std::vector<RsNxsMsg*>& messages) {}
-    virtual void receiveNewChatGroup(std::vector<RsNxsGrp*>& groups) {}
+    virtual void receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages);
+    virtual void receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups);
     virtual void notifyReceiveChatInvite(const RsGxsGroupId &grpId) {}
     virtual void notifyReceiveChatPublishKey(const RsGxsGroupId &grpId) {}
     virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) {}
 
+    bool createGxsChatMessage(GxsNxsChatMsgItem* &mItem,  RsGxsChatMsg &msg);
 
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
 
@@ -264,6 +265,8 @@ bool generateGroup(uint32_t &token, std::string groupName);
     void cleanTimedOutSearches();
     p3ChatService *mChatSrv;
     RsSerialType *mSerialiser;
+    RsMutex mChatMtx;
+
 
 
 };
