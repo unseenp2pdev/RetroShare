@@ -1836,7 +1836,7 @@ void p3ChatService::handleRecvGxsChatMessage(GxsNxsChatMsgItem *item){
     std::cerr << std::endl;
 #endif
     //RS_STACK_MUTEX(mDGMutex);
-
+    std::cerr <<"p3ChatService-GxsMessage Meta Size ="<< item->meta.bin_len<<std::endl;
     std::vector<GxsNxsChatMsgItem *> messages ;
     messages.push_back(item);
     gxsChatSync->receiveNewChatMesesage(messages);
@@ -1887,6 +1887,8 @@ void p3ChatService::sendGxsChat(GxsNxsChatMsgItem *si, std::list<RsPeerId>& ids)
             ci->metaData = new RsGxsMsgMetaData();
             ci->metaData = si->metaData;
             ci->msgId = si->msgId;
+            //ci->meta.setBinData(si->meta.bin_data, si->meta.bin_len);
+            ci->meta = si->meta;
             //adding new PeerId to send.
             ci->PeerId(*it);
             sendItem(ci);  //sharing permission should be that big!

@@ -59,7 +59,7 @@ static const uint32_t INDEX_AUTHEN_ADMIN        = 0x00000040; // admin key
 
 #define GXS_MASK "GXS_MASK_HACK"
 
-//#define GEN_EXCH_DEBUG	1
+#define GEN_EXCH_DEBUG	1
 
 static const uint32_t MSG_CLEANUP_PERIOD     = 60*59; // 59 minutes
 static const uint32_t INTEGRITY_CHECK_PERIOD = 60*31; // 31 minutes
@@ -755,7 +755,7 @@ int RsGenExchange::createMessage(RsNxsMsg* msg)
 		msg->msgId = hashId;
 
 		// assign msg id to msg meta
-		msg->metaData->mMsgId = msg->msgId;
+        msg->metaData->mMsgId = msg->msgId;
 
 		delete[] metaData;
 		delete[] allMsgData;
@@ -2279,7 +2279,9 @@ void RsGenExchange::publishMsgs()
                 
 				computeHash(msg->msg, msg->metaData->mHash);
 				mDataAccess->addMsgData(msg);
-				delete msg ;
+
+                ServiceCreate_Return ret = service_CreateMessage(msg); //callback to drived class for push messages.
+                //delete msg ;
 
 				msgChangeMap[grpId].insert(msgId);
 
@@ -2291,6 +2293,8 @@ void RsGenExchange::publishMsgs()
 				// add to published to allow acknowledgement
 				mMsgNotify.insert(std::make_pair(mit->first, std::make_pair(grpId, msgId)));
 				mDataAccess->updatePublicRequestStatus(mit->first, RsTokenService::COMPLETE);
+
+
 
 			}
 			else
@@ -2327,6 +2331,14 @@ void RsGenExchange::publishMsgs()
 		mNotifications.push_back(ch);
 	}
 
+}
+
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateMessage(RsNxsMsg *msg){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_CreateMessage(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
 }
 
 RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateGroup(RsGxsGrpItem* /* grpItem */,

@@ -88,6 +88,7 @@ protected:
     bool createGxsChatMessage(GxsNxsChatMsgItem* &mItem,  RsGxsChatMsg &msg);
 
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);
 
