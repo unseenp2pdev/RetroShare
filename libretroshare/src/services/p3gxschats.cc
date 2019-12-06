@@ -980,11 +980,26 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
         //msgNxt->msgId = msgItem->meta.mMsgId;
 
         msgNxt->msg.setBinData(mData, size);
-
         // now create meta
         msgNxt->metaData = new RsGxsMsgMetaData();
         *(msgNxt->metaData) = msgItem->meta;
         // assign time stamp
+        if (msgNxt->metaData){
+            std::cerr <<"******Print all MetaData***************" <<std::endl;
+            std::cerr<<"mAuthorId:" << msgNxt->metaData->mAuthorId <<std::endl;
+            std::cerr<<"mChildTs:" << msgNxt->metaData->mChildTs <<std::endl;
+            std::cerr<<"mGroupId:" << msgNxt->metaData->mGroupId <<std::endl;
+            std::cerr<<"mHash:" << msgNxt->metaData->mHash <<std::endl;
+            std::cerr<<"mMsgFlags:" << msgNxt->metaData->mMsgFlags <<std::endl;
+            std::cerr<<"mMsgId:" << msgNxt->metaData->mMsgId <<std::endl;
+            std::cerr<<"mMsgName:" << msgNxt->metaData->mMsgName <<std::endl;
+            std::cerr<<"mMsgSize:" << msgNxt->metaData->mMsgSize <<std::endl;
+            std::cerr<<"mMsgStatus:" << msgNxt->metaData->mMsgStatus <<std::endl;
+            std::cerr<<"mServiceString:" << msgNxt->metaData->mServiceString <<std::endl;
+            std::cerr<<"mParentId:" << msgNxt->metaData->mParentId <<std::endl;
+            std::cerr<<"mPublishTs:" << msgNxt->metaData->mPublishTs <<std::endl;
+        }
+
         msgNxt->metaData->mPublishTs = time(NULL);
         uint8_t createReturn = RsGenExchange::createMessage(msgNxt);
 
@@ -997,7 +1012,26 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
                 mItem->msg.setBinData(newData,size);
                 mItem->metaData = new RsGxsMsgMetaData();
                 *(mItem->metaData) = *(msgNxt->metaData);
-                mItem->msgId = msgNxt->msgId;  //messageId created after the createMessage function call.
+                mItem->msgId = msgNxt->msgId;
+                //messageId created after the createMessage function call.
+
+
+                if(mItem->metaData->mOrigMsgId.isNull())
+                {
+                    mItem->metaData->mOrigMsgId = mItem->metaData->mMsgId;
+                }
+
+                // now serialise meta data
+                size = mItem->metaData->serial_size();
+
+                char* metaDataBuff = new char[size];
+                bool s = mItem->metaData->serialise(metaDataBuff, &size);
+                s &= mItem->meta.setBinData(metaDataBuff, size);
+                if (!s)
+                    std::cerr << "(WW) Can't serialise or set bin data" << std::endl;
+
+                //mItem->metaData->mMsgStatus = GXS_SERV::GXS_MSG_STATUS_UNPROCESSED;
+                delete metaDataBuff;
                 delete newData;
                 return true;
             }
@@ -1021,31 +1055,63 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
     RS_STACK_MUTEX(mChatMtx);
     for (it=messages.begin(); it != messages.end(); it++){
         GxsNxsChatMsgItem *msg = *it;
-        std::cerr <<"Received Gxs MessageID: "<<msg->msgId <<std::endl;
-        std::cerr <<" GroupdId: "<<msg->grpId<<std::endl;
-        std::cerr <<"Msg Size="<<msg->msg.TlvSize() <<std::endl;
 
         size = mSerialiser->size(msg);
         char* mData = new char[size];
         bool serialOk = mSerialiser->serialise(msg, mData, &size);
-        if (serialOk){ //converting RsChatItem to GxsMessage
+
+
+        if (serialOk && msg->metaData == NULL){ //converting RsChatItem to GxsMessage
             RsNxsMsg *newMsg = new RsNxsMsg(RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM);
             newMsg->grpId = msg->grpId;
             newMsg->msgId = msg->msgId;
             newMsg->msg.setBinData(mData, size);
-            newMsg->metaData = new RsGxsMsgMetaData();
-            *(newMsg->metaData) = *(msg->metaData);
+
+            RsGxsMsgMetaData* meta = new RsGxsMsgMetaData();
+            if(msg->meta.bin_len != 0 ){
+                if( meta->deserialise(msg->meta.bin_data, &(msg->meta.bin_len))){
+                    newMsg->metaData = meta;
+                    std::cerr <<"******Print all MetaData***************" <<std::endl;
+                    std::cerr<<"mAuthorId:" << newMsg->metaData->mAuthorId <<std::endl;
+                    std::cerr<<"mChildTs:" << newMsg->metaData->mChildTs <<std::endl;
+                    std::cerr<<"mGroupId:" << newMsg->metaData->mGroupId <<std::endl;
+                    std::cerr<<"mHash:" << newMsg->metaData->mHash <<std::endl;
+                    std::cerr<<"mMsgFlags:" << newMsg->metaData->mMsgFlags <<std::endl;
+                    std::cerr<<"mMsgId:" << newMsg->metaData->mMsgId <<std::endl;
+                    std::cerr<<"mMsgName:" << newMsg->metaData->mMsgName <<std::endl;
+                    std::cerr<<"mMsgSize:" << newMsg->metaData->mMsgSize <<std::endl;
+                    std::cerr<<"mMsgStatus:" << newMsg->metaData->mMsgStatus <<std::endl;
+                    std::cerr<<"mServiceString:" << newMsg->metaData->mServiceString <<std::endl;
+                    std::cerr<<"mParentId:" << newMsg->metaData->mParentId <<std::endl;
+                    std::cerr<<"mPublishTs:" << newMsg->metaData->mPublishTs <<std::endl;
+                }
+                else{
+                    std::cerr << "Mesage Meta Size:" << msg->meta.TlvSize() <<std::endl;
+                    std::cerr << "Failed Deserialized Meta" <<std::endl;
+                }
+            }
+            else{
+
+                  newMsg->metaData =meta;
+                  std::cerr <<"Empty metaData* Object:"<<std::endl;
+            }
+            std::cerr <<"Received Gxs MessageID: "<<msg->msgId <<std::endl;
+            std::cerr <<" GroupdId: "<<msg->grpId<<std::endl;
+            std::cerr <<"Msg Size="<<msg->msg.TlvSize() <<std::endl;
             newMsg->meta = msg->meta;
             newMsg->count = msg->count;
             newMsg->pos = msg->pos;
             newMsg->refcount = msg->refcount;
 
             nxtMsg.push_back(newMsg);
+
         }
-        delete []mData;
+        //delete mData;
     }
   }//end mutex
-    RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+    //RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+    std::cerr <<"Crash happened before this!"<<std::endl;
+
 }
 void p3GxsChats::receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups){
 #ifdef GXSCHATS_DEBUG
