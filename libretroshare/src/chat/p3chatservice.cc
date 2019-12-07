@@ -1883,7 +1883,7 @@ void p3ChatService::sendGxsChat(GxsNxsChatMsgItem *si, std::list<RsPeerId>& ids)
         if(isOnline(*it)){
             GxsNxsChatMsgItem *ci = new GxsNxsChatMsgItem();
             ci->grpId = si->grpId;
-            ci->msg.setBinData(newData,size);
+            ci->msg.setBinData(si->msg.bin_data,si->msg.bin_len);
             ci->metaData = new RsGxsMsgMetaData();
             ci->metaData = si->metaData;
             ci->msgId = si->msgId;

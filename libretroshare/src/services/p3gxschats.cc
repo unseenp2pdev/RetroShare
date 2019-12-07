@@ -248,12 +248,9 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
 
         GxsNxsChatMsgItem *mItem = new GxsNxsChatMsgItem(RS_PKT_SUBTYPE_GXSCHAT_MSG);
 
-        uint32_t size = mSerialiser->size(msg);
-        char* mData = new char[size];
-
-        if (mSerialiser->serialise(mItem, mData, &size)){
+        if (mSerialiser->size(msg)){
             mItem->grpId     = msg->grpId;
-            mItem->msg.setBinData(mData,size);
+            mItem->msg.setBinData(msg->msg.bin_data,msg->msg.bin_len);
             mItem->meta.setBinData(msg->meta.bin_data,msg->meta.bin_len);
 
             mItem->metaData  = msg->metaData;
@@ -286,7 +283,6 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
             //messageId created after the createMessage function call.
             sendChatMessage(mItem);
          }
-        delete mData;
 
 
     return SERVICE_CREATE_SUCCESS;
@@ -1064,6 +1060,8 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
     RsGxsChatMsgItem* msgItem = new RsGxsChatMsgItem();
     msgItem->fromChatPost(msg, true);
 
+    RsServiceInfo  gxsChatInfo = this->getServiceInfo();
+
     //if we want push messages, it should be done before add GxsSync Messages (Poll synchronization).
     uint32_t size = mSerialiser->size(msgItem);
     char* mData = new char[size];
@@ -1072,7 +1070,7 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
     if(serialOk)
     {
 
-        RsNxsMsg* msgNxt = new RsNxsMsg(RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM);
+        RsNxsMsg* msgNxt = new RsNxsMsg(gxsChatInfo.mServiceType);
 
         msgNxt->grpId = msgItem->meta.mGroupId;
         //msgNxt->msgId = msgItem->meta.mMsgId;
@@ -1095,7 +1093,7 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
             if(mSerialiser->serialise(msgNxt, newData, &size)){
                 mItem = new GxsNxsChatMsgItem(RS_PKT_SUBTYPE_GXSCHAT_MSG);
                 mItem->grpId = msgNxt->grpId;
-                mItem->msg.setBinData(newData,size);
+                mItem->msg.setBinData(msgNxt->msg.bin_data,msgNxt->msg.bin_len);
 
                 mItem->metaData = new RsGxsMsgMetaData();
                 *(mItem->metaData) = *(msgNxt->metaData);
@@ -1147,7 +1145,7 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
         }
 
     }
-    delete mData;
+    delete []mData;
     return false;
 }
 
@@ -1158,6 +1156,8 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
 
     std::vector<RsNxsMsg *>nxtMsg;
     uint32_t size =0;
+    RsServiceInfo  gxsChatInfo = this->getServiceInfo();
+
     std::vector<GxsNxsChatMsgItem*>::iterator it;
   {
     RS_STACK_MUTEX(mChatMtx);
@@ -1168,46 +1168,18 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
         char* mData = new char[size];
         bool serialOk = mSerialiser->serialise(msg, mData, &size);
 
+        if (serialOk){ //converting RsChatItem to GxsMessage
+            RsNxsMsg *newMsg = new RsNxsMsg(gxsChatInfo.mServiceType);
 
-        if (serialOk && msg->metaData == NULL){ //converting RsChatItem to GxsMessage
-            RsNxsMsg *newMsg = new RsNxsMsg(RS_PKT_SUBTYPE_NXS_CHAT_MSG_ITEM);
             newMsg->grpId = msg->grpId;
             newMsg->msgId = msg->msgId;
-            newMsg->msg.setBinData(mData, size);
+            newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+            newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
 
-            RsGxsMsgMetaData* meta = new RsGxsMsgMetaData();
-            if(msg->meta.bin_len != 0 && meta->deserialise(msg->meta.bin_data, &(msg->meta.bin_len))){
-                    newMsg->metaData = meta;
-            }
-
-            //newMsg->metaData->mMsgStatus = GXS_SERV::GXS_MSG_STATUS_UNPROCESSED;
-            newMsg->meta = msg->meta;
-            newMsg->count = msg->count;
-            newMsg->pos = msg->pos;
-            newMsg->refcount = msg->refcount;
-
-             std::cerr << "***********receiveNewChatMesesage() Info*************************"<<std::endl;
-             std::cerr << "MessageId:"<<newMsg->msgId << " and groupId: "<<newMsg->grpId << " and Message Size: "<<newMsg->msg.TlvSize()<<std::endl;
-             std::cerr << "Mesage= "; newMsg->msg.print(std::cerr, 15); std::cerr<<std::endl;
-             std::cerr <<" Meta Size:"<<newMsg->meta.TlvSize()<<std::endl;
-             std::cerr <<" mAuthorId:" <<newMsg->metaData->mAuthorId << std::endl;
-             std::cerr <<" mChildTs:" <<newMsg->metaData->mChildTs << std::endl;
-             std::cerr <<" mGroupId:" <<newMsg->metaData->mGroupId << std::endl;
-             std::cerr <<" mHash:" <<newMsg->metaData->mHash << std::endl;
-             std::cerr <<" mMsgFlags:" <<newMsg->metaData->mMsgFlags << std::endl;
-             std::cerr <<" mMsgId:" <<newMsg->metaData->mMsgId << std::endl;
-             std::cerr <<" mMsgName:" <<newMsg->metaData->mMsgName << std::endl;
-             std::cerr <<" mMsgSize:" <<newMsg->metaData->mMsgSize << std::endl;
-             std::cerr <<" mMsgStatus:" <<newMsg->metaData->mMsgStatus << std::endl;
-             std::cerr <<" mOrigMsgId:" <<newMsg->metaData->mOrigMsgId << std::endl;
-             std::cerr <<" mParentId:" <<newMsg->metaData->mParentId << std::endl;
-             std::cerr <<" mPublishTs:" <<newMsg->metaData->mPublishTs << std::endl;
-             std::cerr <<" mServiceString:" <<newMsg->metaData->mServiceString << std::endl;
-             std::cerr <<" mThreadId:" <<newMsg->metaData->mThreadId << std::endl;
-             std::cerr <<" recvTS:" <<newMsg->metaData->recvTS << std::endl;
-             std::cerr <<" refcount:" <<newMsg->metaData->refcount << std::endl;
-             std::cerr <<" signSet Size:" <<newMsg->metaData->signSet.TlvSize() << std::endl;
-             newMsg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
+            std::cerr << "***********receiveNewChatMesesage() Info*************************"<<std::endl;
+            std::cerr << "MessageId:"<<newMsg->msgId << " and groupId: "<<newMsg->grpId << " and Message Size: "<<newMsg->msg.TlvSize()<<std::endl;
+            std::cerr << "Mesage= "; newMsg->msg.print(std::cerr, 15); std::cerr<<std::endl;
+            std::cerr <<" Meta Size:"<<newMsg->meta.TlvSize()<<std::endl;
 
             nxtMsg.push_back(newMsg);
             //testing publish the new message anyway.
@@ -1215,7 +1187,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
         //delete mData;
     }
   }//end mutex
-    //RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+    RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
 
 
 }

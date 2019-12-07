@@ -1616,7 +1616,7 @@ void RsGenExchange::receiveNewMessages(std::vector<RsNxsMsg *>& messages)
 		if(it == mMsgPendingValidate.end())
 		{
 #ifdef GEN_EXCH_DEBUG
-			std::cerr << "RsGenExchange::notifyNewMessages() Received Msg: ";
+            std::cerr << "RsGenExchange::receiveNewMessages: ";
 			std::cerr << " GrpId: " << msg->grpId;
 			std::cerr << " MsgId: " << msg->msgId;
 			std::cerr << std::endl;
@@ -3070,7 +3070,9 @@ void RsGenExchange::processRecvdMessages()
 #ifdef GEN_EXCH_DEBUG
 		    std::cerr << "  storing remaining messages" << std::endl;
 #endif
-		    mDataStore->storeMessage(msgs_to_store);
+            if(! mDataStore->storeMessage(msgs_to_store)){
+                std::cerr <<"Failed to store the message" <<std::endl;
+            };
 
 		    RsGxsMsgChange* c = new RsGxsMsgChange(RsGxsNotify::TYPE_RECEIVED_NEW, false);
 		    c->msgChangeMap = msgIds;
