@@ -2985,6 +2985,29 @@ void RsGenExchange::processRecvdMessages()
 			int validateReturn = validateMsg(msg, grpMeta->mGroupFlags, grpMeta->mSignFlags, keys);
 
 #ifdef GEN_EXCH_DEBUG
+            std::cerr << "***********RsGenExchange::processRecvdMessages(): Info*************************"<<std::endl;
+            std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<msg->msg.TlvSize()<<std::endl;
+            std::cerr << "Mesage= "; msg->msg.print(std::cerr, 15); std::cerr<<std::endl;
+            std::cerr <<"   Meta Size:"<<msg->meta.TlvSize()<<std::endl;
+            std::cerr <<"   mAuthorId:" <<msg->metaData->mAuthorId << std::endl;
+            std::cerr <<"   mChildTs:"  <<msg->metaData->mChildTs << std::endl;
+            std::cerr <<"   mGroupId:" <<msg->metaData->mGroupId << std::endl;
+            std::cerr <<"   mHash:" <<msg->metaData->mHash << std::endl;
+            std::cerr <<"   mMsgFlags:" <<msg->metaData->mMsgFlags << std::endl;
+            std::cerr <<"   mMsgId:" <<msg->metaData->mMsgId << std::endl;
+            std::cerr <<"   mMsgName:" <<msg->metaData->mMsgName << std::endl;
+            std::cerr <<"   mMsgSize:" <<msg->metaData->mMsgSize << std::endl;
+            std::cerr <<"   mMsgStatus:" <<msg->metaData->mMsgStatus << std::endl;
+            std::cerr <<"   mOrigMsgId:" <<msg->metaData->mOrigMsgId << std::endl;
+            std::cerr <<"   mParentId:" <<msg->metaData->mParentId << std::endl;
+            std::cerr <<"   mPublishTs:" <<msg->metaData->mPublishTs << std::endl;
+            std::cerr <<"   mServiceString:" <<msg->metaData->mServiceString << std::endl;
+            std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
+            std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
+            std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
+            std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
+            msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
+
 			std::cerr << "    grpMeta.mSignFlags: " << std::hex << grpMeta->mSignFlags << std::dec << std::endl;
 			std::cerr << "    grpMeta.mAuthFlags: " << std::hex << grpMeta->mAuthenFlags << std::dec << std::endl;
 			std::cerr << "    message validation result: " << (int)validateReturn << std::endl;
