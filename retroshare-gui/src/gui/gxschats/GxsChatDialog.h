@@ -24,10 +24,10 @@
 
 
 #include "gui/gxs/GxsGroupFrameDialog.h"
-
+#include "gui/gxs/UnseenGxsGroupFrameDialog.h"
 #define IMAGE_GXSCHANNELS       ":/home/img/face_icon/youtube-play-button_128.png"      //d
 
-class GxsChatDialog : public GxsGroupFrameDialog
+class GxsChatDialog : public UnseenGxsGroupFrameDialog
 {
     Q_OBJECT
 
@@ -44,7 +44,6 @@ public:
     virtual UserNotify *getUserNotify(QObject *parent);
 
     void shareOnChannel(const RsGxsGroupId& channel_id, const QList<RetroShareLink>& file_link) ;
-
 protected:
     /* GxsGroupFrameDialog */
     virtual RetroShareLink::enumType getLinkType() { return RetroShareLink::TYPE_CHATS; }
@@ -55,6 +54,7 @@ protected:
 
     virtual TurtleRequestId distantSearch(const QString& search_string) ;
     virtual void checkRequestGroup(const RsGxsGroupId& grpId) ;
+
 
 private slots:
     void toggleAutoDownload();

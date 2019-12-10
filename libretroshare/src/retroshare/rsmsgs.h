@@ -362,6 +362,31 @@ public:
 	}
 };
 
+
+class gxsChatId : RsSerializable
+{
+public:
+    gxsChatId();
+    explicit gxsChatId(RsGxsGroupId  groupId);
+
+    std::string toStdString() const;
+
+    RsGxsGroupId    toGxsChatId()  const;
+    bool operator<(const gxsChatId& other) const;
+    bool isSameEndpoint(const gxsChatId& other) const;
+
+    bool operator==(const gxsChatId& other) const { return isSameEndpoint(other) ; }
+private:
+
+    RsGxsGroupId  groupId;
+
+    // RsSerializable interface
+public:
+    void serial_process(RsGenericSerializer::SerializeJob j, RsGenericSerializer::SerializeContext &ctx) {
+        RS_SERIAL_PROCESS(groupId);
+    }
+};
+
 class ChatMessage
 {
 public:
@@ -378,6 +403,8 @@ public:
     bool online; // for outgoing messages: was this message send?
     bool unread;
     //bool system_message;
+    //unseenp2p - for gxs chat
+    gxsChatId groupId;
 };
 
 class ChatLobbyInvite : RsSerializable

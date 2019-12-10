@@ -47,7 +47,7 @@ public:
 
 /** Constructor */
 GxsChatDialog::GxsChatDialog(QWidget *parent)
-    : GxsGroupFrameDialog(rsGxsChats, parent,true)
+    : UnseenGxsGroupFrameDialog(rsGxsChats, parent,true)
 {
 }
 
@@ -318,7 +318,7 @@ void GxsChatDialog::loadGroupSummaryToken(const uint32_t &token, std::list<RsGro
 
 void GxsChatDialog::groupInfoToGroupItemInfo(const RsGroupMetaData &groupInfo, GroupItemInfo &groupItemInfo, const RsUserdata *userdata)
 {
-    GxsGroupFrameDialog::groupInfoToGroupItemInfo(groupInfo, groupItemInfo, userdata);
+    UnseenGxsGroupFrameDialog::groupInfoToGroupItemInfo(groupInfo, groupItemInfo, userdata);
 
     const GxsChatGroupInfoData *gxschatData = dynamic_cast<const GxsChatGroupInfoData*>(userdata);
     if (!gxschatData) {

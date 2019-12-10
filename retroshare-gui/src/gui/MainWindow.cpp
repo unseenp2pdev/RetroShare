@@ -1026,7 +1026,7 @@ void SetForegroundWindowInternal(HWND hWnd)
 		 case Channels:
                          _instance->ui->stackPages->setCurrentPage( _instance->gxschannelDialog );
 			 return true ;
-         case Chats:
+         case GxsChats:
                      _instance->ui->stackPages->setCurrentPage( _instance->gxschatDialog );
          return true ;
 		 case Forums:
@@ -1113,7 +1113,7 @@ void SetForegroundWindowInternal(HWND hWnd)
 			return _instance->messagesDialog;
 		case Channels:
 			return _instance->gxschannelDialog;
-        case Chats:
+        case GxsChats:
             return _instance->gxschatDialog;
 		case Forums:
 			return _instance->gxsforumDialog;

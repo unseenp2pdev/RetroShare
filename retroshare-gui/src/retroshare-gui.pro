@@ -19,9 +19,21 @@ libresapihttpserver {
 
 !include("../../libretroshare/src/use_libretroshare.pri"):error("Including")
 
-FORMS   += TorControl/TorControlWindow.ui
-SOURCES += TorControl/TorControlWindow.cpp
-HEADERS += TorControl/TorControlWindow.h
+FORMS   += TorControl/TorControlWindow.ui \
+    gui/gxs/UnseenGxsGroupFrameDialog.ui \
+    gui/gxschats/UnseenGxsChatLobbyDialog.ui
+SOURCES += TorControl/TorControlWindow.cpp \
+    gui/gxs/UnseenGxsGroupFrameDialog.cpp \
+    gui/gxschats/UnseenGxsSmartlistmodel.cpp \
+    gui/gxschats/UnseenGxsSmartlistview.cpp \
+    gui/UnseenGxsConversationitemdelegate.cpp \
+    gui/gxschats/UnseenGxsChatLobbyDialog.cpp
+HEADERS += TorControl/TorControlWindow.h \
+    gui/gxs/UnseenGxsGroupFrameDialog.h \
+    gui/gxschats/UnseenGxsSmartlistmodel.h \
+    gui/gxschats/UnseenGxsSmartlistview.h \
+    gui/UnseenGxsConversationitemdelegate.h \
+    gui/gxschats/UnseenGxsChatLobbyDialog.h
 
 
 #QMAKE_CFLAGS += -fmudflap 

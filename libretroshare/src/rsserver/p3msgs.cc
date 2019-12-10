@@ -265,6 +265,32 @@ ChatLobbyId ChatId::toLobbyId() const
     }
 }
 
+//unseenp2p - for gxsGroupId - for chatDialog of UnseenGxsChatLobbyDialog
+gxsChatId::gxsChatId()
+{
+}
+
+gxsChatId::gxsChatId(RsGxsGroupId groupid)
+{
+    groupId = groupid;
+}
+
+RsGxsGroupId gxsChatId::toGxsChatId() const
+{
+    return groupId;
+}
+
+bool gxsChatId::operator <(const gxsChatId& other) const
+{
+    return groupId < other.groupId;
+}
+
+bool gxsChatId::isSameEndpoint(const gxsChatId &other) const
+{
+    return groupId == other.groupId;
+}
+
+
 bool p3Msgs::getMessageSummaries(std::list<MsgInfoSummary> &msgList)
 {
 	return mMsgSrv->getMessageSummaries(msgList);

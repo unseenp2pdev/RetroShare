@@ -47,5 +47,5 @@ QIcon GxsChatUserNotify::getMainIcon(bool hasNew)
 
 void GxsChatUserNotify::iconClicked()
 {
-    MainWindow::showWindow(MainWindow::Chats);
+    MainWindow::showWindow(MainWindow::GxsChats);
 }

@@ -1513,8 +1513,8 @@ static void processList(const QStringList &list, const QString &textSingular, co
             std::cerr << " RetroShareLink::process ChatsRequest : name : " << link.name().toStdString() << ". id : " << link.hash().toStdString() << ". msgId : " << link.msgId().toStdString() << std::endl;
 #endif
 
-            MainWindow::showWindow(MainWindow::Chats);
-            GxsChatDialog *chatDialog = dynamic_cast<GxsChatDialog*>(MainWindow::getPage(MainWindow::Chats));
+            MainWindow::showWindow(MainWindow::GxsChats);
+            GxsChatDialog *chatDialog = dynamic_cast<GxsChatDialog*>(MainWindow::getPage(MainWindow::GxsChats));
             if (!chatDialog) {
                 return false;
             }

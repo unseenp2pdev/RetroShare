@@ -26,6 +26,9 @@
 #include <QWidget>
 #include <retroshare/rsmsgs.h>
 
+Q_DECLARE_METATYPE(RsGxsId)
+Q_DECLARE_METATYPE(QList<RsGxsId>)
+
 class ChatWidget;
 class RSStyle;
 
@@ -42,6 +45,12 @@ public:
         static void chatFriend(const RsPgpId &gpgId, bool forceFocus = true);
         static void closeChat(const ChatId &chat_id);
         static void chatMessageReceived(ChatMessage msg);
+
+        //unseenp2p - for gxs groupchat
+        static ChatDialog *getExistingChat(gxsChatId id);
+        static ChatDialog *getChat(gxsChatId id, uint chatflags = 0);
+        static void chatFriend(const gxsChatId &id, bool forceFocus = true);
+        static void closeChat(const gxsChatId &chat_id);
 
 	virtual void showDialog(uint /*chatflags*/) {}
 
@@ -66,6 +75,8 @@ public:
 
 	ChatId getChatId(){ return mChatId; }
 
+    gxsChatId getGxsChatId() {return mGxsChatId;}
+
 signals:
 	void infoChanged(ChatDialog *dialog);
 	void newMessage(ChatDialog *dialog);
@@ -86,9 +97,14 @@ protected:
         virtual QString getOwnName() const;
 
         virtual void init(const ChatId &id, const QString &title);
+
+        virtual void init(const gxsChatId &id, const QString &title);
+
         virtual void addChatMsg(const ChatMessage& msg) = 0;
 
         ChatId mChatId;
+
+        gxsChatId  mGxsChatId;
 
 };
 

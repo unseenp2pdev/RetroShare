@@ -38,7 +38,12 @@
 #include <retroshare/rsnotify.h>
 #include <retroshare/rspeers.h>
 
+#include "gui/gxschats/UnseenGxsChatLobbyDialog.h"
+
 static std::map<ChatId, ChatDialog*> chatDialogsList;
+
+//unseenp2p
+static std::map<gxsChatId, ChatDialog*> gxsChatDialogsList;
 
 ChatDialog::ChatDialog(QWidget *parent, Qt::WindowFlags flags) :
 	QWidget(parent, flags)
@@ -52,6 +57,12 @@ ChatDialog::~ChatDialog()
     if (chatDialogsList.end() != (it = chatDialogsList.find(mChatId))) {
         chatDialogsList.erase(it);
 	}
+
+    std::map<gxsChatId, ChatDialog *>::iterator it2;
+    if (gxsChatDialogsList.end() != (it2 = gxsChatDialogsList.find(mGxsChatId))) {
+        gxsChatDialogsList.erase(it2);
+    }
+
 }
 
 void ChatDialog::closeEvent(QCloseEvent *event)
@@ -75,6 +86,18 @@ void ChatDialog::init(const ChatId &id, const QString &title)
 	}
 }
 
+void ChatDialog::init(const gxsChatId &id, const QString &title)
+{
+    mGxsChatId = id;
+    ChatWidget *cw = getChatWidget();
+    if (cw) {
+        cw->init(id, title);
+
+        connect(cw, SIGNAL(infoChanged(ChatWidget*)), this, SLOT(chatInfoChanged(ChatWidget*)));
+        connect(cw, SIGNAL(newMessage(ChatWidget*)), this, SLOT(chatNewMessage(ChatWidget*)));
+    }
+}
+
 /*static*/ ChatDialog* ChatDialog::getExistingChat(ChatId id)
 {
     std::map<ChatId, ChatDialog*>::iterator it;
@@ -86,6 +109,16 @@ void ChatDialog::init(const ChatId &id, const QString &title)
     return NULL;
 }
 
+ChatDialog* ChatDialog::getExistingChat(gxsChatId id)
+{
+    std::map<gxsChatId, ChatDialog*>::iterator it;
+    if (gxsChatDialogsList.end() != (it = gxsChatDialogsList.find(id))) {
+        /* exists already */
+        return it->second;
+    }
+
+    return NULL;
+}
 /*static*/ ChatDialog* ChatDialog::getChat(ChatId id, uint chatflags)
 {
     if(id.isBroadcast() || id.isNotSet())
@@ -135,6 +168,39 @@ void ChatDialog::init(const ChatId &id, const QString &title)
     return cd;
 }
 
+/*static*/ ChatDialog* ChatDialog::getChat(gxsChatId id, uint chatflags)
+{
+
+
+    /* see if it already exists */
+    ChatDialog *cd = getExistingChat(id);
+
+    if (cd == NULL) {
+
+
+        chatflags = RS_CHAT_OPEN | RS_CHAT_FOCUS; // force open for distant chat
+
+        if (chatflags & RS_CHAT_OPEN) {
+
+                UnseenGxsChatLobbyDialog* cld = new UnseenGxsChatLobbyDialog(id.toGxsChatId());
+                cld->init(gxsChatId(), "");
+                cd = cld;
+            }
+    }  else if(cd)
+    {
+                gxsChatDialogsList[id] = cd;
+
+    }
+
+    if (cd == NULL) {
+        return NULL;
+    }
+
+    cd->showDialog(chatflags);
+
+    return cd;
+}
+
 /*static*/ void ChatDialog::cleanupChat()
 {
 	PopupChatWindow::cleanup();
@@ -150,6 +216,15 @@ void ChatDialog::init(const ChatId &id, const QString &title)
 	}
 
 	chatDialogsList.clear();
+
+    std::map<gxsChatId, ChatDialog*>::iterator it2;
+    for (it2 = gxsChatDialogsList.begin(); it2 != gxsChatDialogsList.end(); ++it2) {
+        if (it2->second) {
+            list.push_back(it2->second);
+        }
+    }
+
+    gxsChatDialogsList.clear();
 
 	std::list<ChatDialog*>::iterator it1;
 	for (it1 = list.begin(); it1 != list.end(); ++it1) {
@@ -275,6 +350,11 @@ void ChatDialog::init(const ChatId &id, const QString &title)
         menu.addAction(QString::fromUtf8(detail.location.c_str()), new ChatFriendMethod(&cleanupchildren, *it), SLOT(chatFriend()));
     }
     menu.exec(QCursor::pos());
+}
+
+void ChatDialog::chatFriend(const gxsChatId &id, bool forceFocus)
+{
+    getChat(id,forceFocus ? RS_CHAT_OPEN | RS_CHAT_FOCUS : RS_CHAT_OPEN);
 }
 
 void ChatDialog::addToParent(QWidget *newParent)

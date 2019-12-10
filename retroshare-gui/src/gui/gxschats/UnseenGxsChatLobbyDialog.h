@@ -20,20 +20,25 @@
  ****************************************************************/
 
 
-#ifndef _CHATLOBBYDIALOG_H
-#define _CHATLOBBYDIALOG_H
+#ifndef _UNSEENGXSCHATLOBBYDIALOG_H
+#define _UNSEENGXSCHATLOBBYDIALOG_H
 
 #include "ui_ChatLobbyDialog.h"
 #include "gui/common/RSTreeWidgetItem.h"
-#include "ChatDialog.h"
+#include "gui/chat/ChatDialog.h"
 
+Q_DECLARE_METATYPE(gxsChatId)
+//Q_DECLARE_METATYPE(RsGxsId)
+//Q_DECLARE_METATYPE(QList<RsGxsId>)
+//Q_DECLARE_METATYPE(QList<RsGxsId>)
 
 class GxsIdChooser ;
 class QToolButton;
 class QWidgetAction;
 class ChatId;
+class gxsChatId;
 
-class ChatLobbyDialog: public ChatDialog
+class UnseenGxsChatLobbyDialog: public ChatDialog
 {
 	Q_OBJECT 
 
@@ -56,6 +61,8 @@ public:
     void updateParticipantsList();
     //unseenp2p - move from protected to public
     void processSettings(bool load);
+    //unseenp2p - add for gxs groupchat
+    RsGxsGroupId groupId() const {return mGXSGroupId; }
 
 private slots:
 	void participantsTreeWidgetCustomPopupMenu( QPoint point );
@@ -68,17 +75,26 @@ signals:
 	void lobbyLeave(ChatLobbyId) ;
 	void typingEventReceived(ChatLobbyId) ;
 	void messageReceived(bool incoming, ChatLobbyId lobby_id, QDateTime time, QString senderName, QString msg) ;
+    //unseenp2p: for gxs groupchat
+    void messageReceived(bool incoming, RsGxsGroupId groupId, QDateTime time, QString senderName, QString msg) ;
+
 	void peerJoined(ChatLobbyId) ;
 	void peerLeft(ChatLobbyId) ;
 
 protected:
 	/** Default constructor */
-	ChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    UnseenGxsChatLobbyDialog(const ChatLobbyId& lid, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+
+    //unseenp2p - for gxs groupchat
+     UnseenGxsChatLobbyDialog(const RsGxsGroupId& groupId, QWidget *parent = 0, Qt::WindowFlags flags = 0);
 
 	/** Default destructor */
-	virtual ~ChatLobbyDialog();
+    virtual ~UnseenGxsChatLobbyDialog();
 
-	virtual void init(const ChatId &id, const QString &title);
+    //virtual void init(const ChatId &id, const QString &title);
+     //unseenp2p
+     virtual void init(const gxsChatId &id, const QString &title);
+
 	virtual bool canClose();
     virtual void addChatMsg(const ChatMessage &msg);
 
@@ -133,6 +149,9 @@ private:
     //icons cache
     QIcon bullet_red_128, bullet_grey_128, bullet_green_128, bullet_yellow_128;
     QIcon bullet_unknown_128;
+
+    //unseenp2p - add for gxs groupchat
+    RsGxsGroupId  mGXSGroupId;
 };
 
 #endif

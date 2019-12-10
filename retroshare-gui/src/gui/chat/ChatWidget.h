@@ -72,14 +72,20 @@ class ChatWidget : public QWidget
 
 public:
 	enum MsgType { MSGTYPE_NORMAL, MSGTYPE_HISTORY, MSGTYPE_OFFLINE, MSGTYPE_SYSTEM };
-	enum ChatType { CHATTYPE_UNKNOWN, CHATTYPE_PRIVATE, CHATTYPE_LOBBY, CHATTYPE_DISTANT };
+    enum ChatType { CHATTYPE_UNKNOWN, CHATTYPE_PRIVATE, CHATTYPE_LOBBY, CHATTYPE_DISTANT, GXSGROUPCHAT };
 
 	explicit ChatWidget(QWidget *parent = 0);
 	~ChatWidget();
 
         void init(const ChatId &chat_id, const QString &title);
+        //unseenp2p
+        void init(const gxsChatId &chat_id, const QString &title);
+
         ChatId getChatId();
         ChatType chatType();
+
+        //unseenp2p
+        gxsChatId getGxsChatId();
 
         // allow/disallow sendng of messages
         void blockSending(QString msg);
@@ -211,6 +217,10 @@ private:
     QAbstractItemModel *modelFromPeers();
 
     ChatId chatId;
+
+    //unseenp2p
+    gxsChatId mGxsChatId;
+
 	QString title;
 	QString name;
 	QString completionWord;

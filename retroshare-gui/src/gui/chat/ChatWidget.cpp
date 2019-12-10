@@ -431,9 +431,94 @@ void ChatWidget::init(const ChatId &chat_id, const QString &title)
 	processSettings(true);
 }
 
+
+void ChatWidget::init(const gxsChatId &chat_id, const QString &title)
+{
+    this->mGxsChatId = chat_id;
+    this->title = title;
+
+    ui->titleLabel->setText(RsHtml::plainText(title));
+    ui->chatTextEdit->setMaxBytes(this->maxMessageSize() - 200);
+
+    RsPeerId ownId = rsPeers->getOwnId();
+    setName(QString::fromUtf8(rsPeers->getPeerName(ownId).c_str()));
+
+//    currentColor.setNamedColor(PeerSettings->getPrivateChatColor(chatId));
+//    currentFont.fromString(PeerSettings->getPrivateChatFont(chatId));
+
+    colorChanged();
+    setColorAndFont(true);
+
+    // load style
+//    PeerSettings->getStyle(chatId, "ChatWidget", style);
+
+    /* Add plugin functions */
+    int pluginCount = rsPlugins->nbPlugins();
+    for (int i = 0; i < pluginCount; ++i) {
+        RsPlugin *plugin = rsPlugins->plugin(i);
+        if (plugin) {
+            ChatWidgetHolder *chatWidgetHolder = plugin->qt_get_chat_widget_holder(this);
+            if (chatWidgetHolder) {
+                mChatWidgetHolder.push_back(chatWidgetHolder);
+            }
+        }
+    }
+
+    uint32_t hist_chat_type = RS_HISTORY_TYPE_GXSGROUPCHAT; // a value larger than the biggest RS_HISTORY_TYPE_* value
+    int messageCount=0;
+
+    if (chatType() == GXSGROUPCHAT)
+    {
+        messageCount=100;   //just for testing gxs groupchat
+    }
+
+    if (rsHistory->getEnable(hist_chat_type))
+    {
+        // get chat messages from history
+        std::list<HistoryMsg> historyMsgs;
+
+        if (messageCount > 0)
+        {
+            //TODO: need to replace this one by gxs groupchat function
+//            rsHistory->getMessages(chatId, historyMsgs, messageCount);
+
+//            std::list<HistoryMsg>::iterator historyIt;
+//            for (historyIt = historyMsgs.begin(); historyIt != historyMsgs.end(); ++historyIt)
+//            {
+//                // it can happen that a message is first added to the message history
+//                // and later the gui receives the message through notify
+//                // avoid this by not adding history entries if their age is < 2secs
+//                if ((time(NULL)-2) <= historyIt->recvTime)
+//                    continue;
+
+//                QString name;
+//                if (chatId.isLobbyId() || chatId.isDistantChatId())
+//                {
+//                    RsIdentityDetails details;
+//                    if (rsIdentity->getIdDetails(RsGxsId(historyIt->peerName), details))
+//                        name = QString::fromUtf8(details.mNickname.c_str());
+//                    else
+//                        name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
+//                } else {
+//                    name = QString::fromUtf8(historyIt->nickInGroupchat.c_str());
+//                }
+
+//                addChatMsg(historyIt->incoming, name, RsGxsId(historyIt->peerName.c_str()), QDateTime::fromTime_t(historyIt->sendTime), QDateTime::fromTime_t(historyIt->recvTime), QString::fromUtf8(historyIt->message.c_str()), MSGTYPE_HISTORY);
+//            }
+        }
+    }
+
+    processSettings(true);
+}
+
 ChatId ChatWidget::getChatId()
 {
     return chatId;
+}
+//unseenp2p - for gxs groupchat
+gxsChatId ChatWidget::getGxsChatId()
+{
+    return mGxsChatId;
 }
 
 ChatWidget::ChatType ChatWidget::chatType()
@@ -449,6 +534,8 @@ ChatWidget::ChatType ChatWidget::chatType()
         return CHATTYPE_DISTANT;
     if(chatId.isLobbyId())
         return CHATTYPE_LOBBY;
+
+    if (chatId.isNotSet()) return GXSGROUPCHAT;
 
     return CHATTYPE_UNKNOWN;
 }
@@ -1290,6 +1377,7 @@ void ChatWidget::sendChat()
 #ifdef CHAT_DEBUG
 	std::cout << "ChatWidget:sendChat " << std::endl;
 #endif
+    //TODO: use gxsChatId to send msg?
     rsMsgs->sendChat(chatId, msg);
 
     std::string textToSignal = chatWidget->toPlainText().toStdString();
