@@ -160,6 +160,7 @@ public:
      */
     virtual int requestMsg(const RsGxsGrpMsgIdPair& /* msgId */){ return 0;}
 
+    virtual void handleRecvChatMessage(RsNxsMsg *msg);
     /*!
      * Request for this group is sent through to peers on your network
      * and how many hops from them you've indicated

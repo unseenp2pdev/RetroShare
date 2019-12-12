@@ -1778,10 +1778,15 @@ void RsGxsNetService::recvNxsItemQueue()
             case RS_PKT_SUBTYPE_NXS_GRP_PUBLISH_KEY_ITEM:handleRecvPublishKeys         (dynamic_cast<RsNxsGroupPublishKeyItem*>(ni)) ; break ;
 
             default:
-                if(ni->PacketSubType() != RS_PKT_SUBTYPE_NXS_ENCRYPTED_DATA_ITEM)
+                //assuming a chat message
+                if(ni->PacketSubType() != RS_PKT_SUBTYPE_GXSCHAT_MSG){
+                    handleRecvChatMessage(dynamic_cast<RsNxsMsg*>(ni));
+                }
+                else if(ni->PacketSubType() != RS_PKT_SUBTYPE_NXS_ENCRYPTED_DATA_ITEM)
                 {
                     std::cerr << "Unhandled item subtype " << (uint32_t) ni->PacketSubType() << " in RsGxsNetService: " << std::endl ; break ;
                 }
+
             }
             delete item ;
         }
@@ -4289,6 +4294,24 @@ bool RsGxsNetService::locked_CanReceiveUpdate(RsNxsSyncMsgReqItem *item,bool& gr
     return false;
 }
 
+void RsGxsNetService::handleRecvChatMessage(RsNxsMsg *msg)
+{
+    if (!msg)
+        return;
+
+    RS_STACK_MUTEX(mNxsMutex) ;
+
+    // notify listener of msgs
+    mNewMessagesToNotify.push_back(msg) ;
+
+    // now note that this is the latest you've received from this peer
+    // for the grp id
+    //locked_doMsgUpdateWork(tr->mTransaction, grpId);
+
+    // also update server sync TS, since we need to send the new message list to friends for comparison
+    //locked_stampMsgServerUpdateTS(msg->grpId);
+
+}
 void RsGxsNetService::handleRecvSyncMessage(RsNxsSyncMsgReqItem *item,bool item_was_encrypted)
 {
     if (!item)
