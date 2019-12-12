@@ -281,9 +281,23 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
             msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
 
             //messageId created after the createMessage function call.
-            sendChatMessage(mItem);
+            //sendChatMessage(mItem);
          }
 
+        std::list<RsPeerId> ids;
+        rsPeers->getOnlineList(ids);
+
+        RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+
+        for (auto it = ids.begin(); it != ids.end(); it++){
+            RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
+            newMsg->PeerId(*it);
+            newMsg->grpId = msg->grpId;
+            newMsg->msgId = msg->msgId;
+            newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+            newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
+            netService->PublishChat(newMsg);
+        }
 
     return SERVICE_CREATE_SUCCESS;
 }
@@ -1170,6 +1184,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
 
         if (serialOk){ //converting RsChatItem to GxsMessage
             RsNxsMsg *newMsg = new RsNxsMsg(gxsChatInfo.mServiceType);
+            newMsg->PeerId(msg->PeerId());
 
             newMsg->grpId = msg->grpId;
             newMsg->msgId = msg->msgId;
@@ -1180,6 +1195,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
             std::cerr << "MessageId:"<<newMsg->msgId << " and groupId: "<<newMsg->grpId << " and Message Size: "<<newMsg->msg.TlvSize()<<std::endl;
             std::cerr << "Mesage= "; newMsg->msg.print(std::cerr, 15); std::cerr<<std::endl;
             std::cerr <<" Meta Size:"<<newMsg->meta.TlvSize()<<std::endl;
+            std::cerr <<"Message Meta:"; newMsg->meta.print(std::cerr, 20); std::cerr<<std::endl;
 
             nxtMsg.push_back(newMsg);
             //testing publish the new message anyway.
@@ -1187,7 +1203,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
         //delete mData;
     }
   }//end mutex
-    RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+  //RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
 
 
 }

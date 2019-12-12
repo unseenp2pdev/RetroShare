@@ -123,6 +123,8 @@ public:
 
     void setNetworkExchangeService(RsNetworkExchangeService *ns) ;
 
+    RsNetworkExchangeService * getNetworkExchangeService();
+
     /** S: Observer implementation **/
 
     /*!

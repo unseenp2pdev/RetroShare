@@ -59,7 +59,7 @@ static const uint32_t INDEX_AUTHEN_ADMIN        = 0x00000040; // admin key
 
 #define GXS_MASK "GXS_MASK_HACK"
 
-#define GEN_EXCH_DEBUG	1
+//#define GEN_EXCH_DEBUG	1
 
 static const uint32_t MSG_CLEANUP_PERIOD     = 60*59; // 59 minutes
 static const uint32_t INTEGRITY_CHECK_PERIOD = 60*31; // 31 minutes
@@ -101,6 +101,10 @@ void RsGenExchange::setNetworkExchangeService(RsNetworkExchangeService *ns)
 	{
         mNetService = ns ;
 	}
+}
+
+RsNetworkExchangeService * RsGenExchange::getNetworkExchangeService(){
+        return mNetService;
 }
 
 RsGenExchange::~RsGenExchange()
@@ -1435,7 +1439,6 @@ bool RsGenExchange::getMsgData(uint32_t token, GxsMsgDataMap &msgItems)
 	RS_STACK_MUTEX(mGenMtx) ;
 	NxsMsgDataResult msgResult;
 	bool ok = mDataAccess->getMsgData(token, msgResult);
-
 	if(ok)
 	{
 		NxsMsgDataResult::iterator mit = msgResult.begin();
@@ -1447,7 +1450,7 @@ bool RsGenExchange::getMsgData(uint32_t token, GxsMsgDataMap &msgItems)
 			std::vector<RsNxsMsg*>::iterator vit = nxsMsgsV.begin();
 			for(; vit != nxsMsgsV.end(); ++vit)
 			{
-				RsNxsMsg*& msg = *vit;
+                RsNxsMsg*& msg = *vit;
 				RsItem* item = NULL;
 
 				if(msg->msg.bin_len != 0)
@@ -3005,9 +3008,10 @@ void RsGenExchange::processRecvdMessages()
             std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
             std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
             std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
+            std::cerr <<"   validated:" <<msg->metaData->validated << std::endl;
             std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
             msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
-
+            std::cerr <<"Message Meta:"; msg->meta.print(std::cerr, 20); std::cerr<<std::endl;
 			std::cerr << "    grpMeta.mSignFlags: " << std::hex << grpMeta->mSignFlags << std::dec << std::endl;
 			std::cerr << "    grpMeta.mAuthFlags: " << std::hex << grpMeta->mAuthenFlags << std::dec << std::endl;
 			std::cerr << "    message validation result: " << (int)validateReturn << std::endl;
@@ -3030,6 +3034,7 @@ void RsGenExchange::processRecvdMessages()
 				std::cerr << "    new status flags: " << msg->metaData->mMsgStatus << std::endl;
 				std::cerr << "    computed hash: " << msg->metaData->mHash << std::endl;
 				std::cerr << "Message received. Identity=" << msg->metaData->mAuthorId << ", from peer " << msg->PeerId() << std::endl;
+
 #endif
 
 				if(!msg->metaData->mAuthorId.isNull())
@@ -3074,9 +3079,10 @@ void RsGenExchange::processRecvdMessages()
                 std::cerr <<"Failed to store the message" <<std::endl;
             };
 
-		    RsGxsMsgChange* c = new RsGxsMsgChange(RsGxsNotify::TYPE_RECEIVED_NEW, false);
+            RsGxsMsgChange* c = new RsGxsMsgChange(RsGxsNotify::TYPE_RECEIVED_NEW, false);  //set meta change = reload all
 		    c->msgChangeMap = msgIds;
 		    mNotifications.push_back(c);
+
 	    }
     }
 

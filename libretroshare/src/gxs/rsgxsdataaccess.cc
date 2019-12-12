@@ -26,9 +26,9 @@
 #include "rsgxsdataaccess.h"
 #include "retroshare/rsgxsflags.h"
 
-/***********
- * #define DATA_DEBUG	1
- **********/
+
+ //#define DATA_DEBUG	1
+
 
 RsGxsDataAccess::RsGxsDataAccess(RsGeneralDataService* ds) :
     mDataStore(ds), mDataMutex("RsGxsDataAccess"), mNextToken(0) {}

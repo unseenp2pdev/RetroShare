@@ -172,6 +172,7 @@ public:
      */
     virtual void pauseSynchronisation(bool enabled) = 0;
 
+    virtual void PublishChat(RsNxsItem* msg)=0;
 
     /*!
      * Request for this message is sent through to peers on your network

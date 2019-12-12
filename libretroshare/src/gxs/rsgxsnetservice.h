@@ -445,6 +445,9 @@ private:
     static RsGxsGroupId hashGrpId(const RsGxsGroupId& gid,const RsPeerId& pid) ;
     
 	RsGxsGrpConfig& locked_getGrpConfig(const RsGxsGroupId& grp_id);
+
+    virtual void  PublishChat(RsNxsItem* msg);
+
 private:
 
     typedef std::vector<RsNxsGrp*> GrpFragments;
