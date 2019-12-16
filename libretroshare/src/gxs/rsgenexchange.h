@@ -598,6 +598,8 @@ protected:
      */
     virtual ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
 
+    virtual ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp); //group with complete keypairs
+
     virtual ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
 public:

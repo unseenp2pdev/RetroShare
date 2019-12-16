@@ -173,6 +173,8 @@ public:
     virtual void pauseSynchronisation(bool enabled) = 0;
 
     virtual void PublishChat(RsNxsMsg* msg, std::list<RsPeerId> &ids)=0;
+    virtual void PublishChatGroup(RsNxsGrp *grp, std::list<RsPeerId> &ids)=0;
+
 
     /*!
      * Request for this message is sent through to peers on your network

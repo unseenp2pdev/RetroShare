@@ -2350,6 +2350,13 @@ RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateGroup(RsGxsGrpI
 	return SERVICE_CREATE_SUCCESS;
 }
 
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_PublishGroup(RsNxsGrp *grp){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_PublishGroup(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
+}
 
 #define PENDING_SIGN_TIMEOUT 10 //  5 seconds
 
@@ -2695,7 +2702,11 @@ void RsGenExchange::publishGrps()
 						    else
 							    mDataAccess->addGroupData(grp);
 
-							delete grp ;
+                            grp->metaData->keys.private_keys.clear() ;
+                            ServiceCreate_Return grpRet = service_PublishGroup(grp);
+                            if (grpRet)
+                                delete grp ;
+
 							groups_to_subscribe.push_back(grpId) ;
 					    }
 					    else

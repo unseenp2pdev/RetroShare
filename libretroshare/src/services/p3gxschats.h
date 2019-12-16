@@ -87,6 +87,9 @@ protected:
 
 
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+
+virtual RsGenExchange::ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp);
+
 virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);

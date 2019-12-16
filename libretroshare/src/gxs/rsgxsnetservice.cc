@@ -1825,14 +1825,11 @@ void RsGxsNetService::recvNxsItemQueue()
             case RS_PKT_SUBTYPE_NXS_SYNC_GRP_REQ_ITEM:   handleRecvSyncGroup           (dynamic_cast<RsNxsSyncGrpReqItem*>(ni)) ; break ;
             case RS_PKT_SUBTYPE_NXS_SYNC_MSG_REQ_ITEM:   handleRecvSyncMessage         (dynamic_cast<RsNxsSyncMsgReqItem*>(ni),item_was_encrypted) ; break ;
             case RS_PKT_SUBTYPE_NXS_GRP_PUBLISH_KEY_ITEM:handleRecvPublishKeys         (dynamic_cast<RsNxsGroupPublishKeyItem*>(ni)) ; break ;
+            case RS_PKT_SUBTYPE_NXS_MSG_ITEM:            handleRecvChatMessage         (dynamic_cast<RsNxsMsg*>(ni)); break;
+            case RS_PKT_SUBTYPE_NXS_GRP_ITEM:            handleRecvChatGroup           (dynamic_cast<RsNxsGrp*>(ni)); break;
 
             default:
-                //assuming a chat message
-                if(ni->PacketSubType() != RS_PKT_SUBTYPE_GXSCHAT_MSG){
-                    RsNxsMsg *item = dynamic_cast<RsNxsMsg*>(ni);
-                    handleRecvChatMessage(dynamic_cast<RsNxsMsg*>(ni));
-                }
-                else if(ni->PacketSubType() != RS_PKT_SUBTYPE_NXS_ENCRYPTED_DATA_ITEM)
+                    if(ni->PacketSubType() != RS_PKT_SUBTYPE_NXS_ENCRYPTED_DATA_ITEM)
                 {
                     std::cerr << "Unhandled item subtype " << (uint32_t) ni->PacketSubType() << " in RsGxsNetService: " << std::endl ; break ;
                 }
@@ -4365,7 +4362,8 @@ void RsGxsNetService::handleRecvChatMessage(RsNxsMsg* msg)
     {
         RS_STACK_MUTEX(mNxsMutex) ;
         // notify listener of msgs
-        RsNxsMsg *item = new RsNxsMsg(msg->PacketService());
+        //RsNxsMsg *item = new RsNxsMsg(msg->PacketService());
+        RsNxsMsg *item = new RsNxsMsg(RS_SERVICE_GXS_TYPE_CHATS);
         item->PeerId(msg->PeerId());
         item->msgId = msg->msgId;
         item->grpId = msg->grpId;
@@ -4373,6 +4371,30 @@ void RsGxsNetService::handleRecvChatMessage(RsNxsMsg* msg)
         item->meta.setBinData(msg->meta.bin_data,msg->meta.bin_len);
 
         mNewMessagesToNotify.push_back(item) ;
+    }//end lock
+
+
+}
+
+void RsGxsNetService::handleRecvChatGroup(RsNxsGrp* grp)
+{
+#ifdef NXS_NET_DEBUG_0
+    GXSNETDEBUG___<< "RsGxsNetService::handleRecvChatMessage() " << std::endl;
+#endif
+
+    if (!grp)
+        return;
+
+    {
+        RS_STACK_MUTEX(mNxsMutex) ;
+        // notify listener of msgs
+        RsNxsGrp *item = new RsNxsGrp(grp->PacketService());
+        item->PeerId(grp->PeerId());
+        item->grpId = grp->grpId;
+        item->grp.setBinData(grp->grp.bin_data, grp->grp.bin_len);
+        item->meta.setBinData(grp->meta.bin_data,grp->meta.bin_len);
+        mNewGroupsToNotify.push_back(item) ;
+
     }//end lock
 
 
@@ -5554,4 +5576,16 @@ void RsGxsNetService::PublishChat(RsNxsMsg* msg, std::list<RsPeerId> &ids){
         generic_sendItem(newMsg);
     }
 
+}
+
+void RsGxsNetService::PublishChatGroup(RsNxsGrp *grp, std::list<RsPeerId> &ids){
+
+    for (auto it = ids.begin(); it != ids.end(); it++){
+        RsNxsGrp *newGrp = new RsNxsGrp(grp->PacketService());
+        newGrp->PeerId(*it);
+        newGrp->grpId = grp->grpId;
+        newGrp->grp.setBinData(grp->grp.bin_data, grp->grp.bin_len);
+        newGrp->meta.setBinData(grp->meta.bin_data, grp->grp.bin_len);
+        generic_sendItem(newGrp);
+    }
 }

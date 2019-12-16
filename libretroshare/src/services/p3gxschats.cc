@@ -212,7 +212,7 @@ RsSerialiser* p3GxsChats::setupSerialiser()
 }
 
 /** Overloaded to cache new groups **/
-RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& /* keySet */)
+RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet)
 {
     updateSubscribedGroup(grpItem->meta);
 
@@ -242,6 +242,15 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem
     return SERVICE_CREATE_SUCCESS;
 }
 
+RsGenExchange::ServiceCreate_Return p3GxsChats::service_PublishGroup(RsNxsGrp *grp){
+
+    std::list<RsPeerId> ids;
+    RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+
+    rsPeers->getOnlineList(ids);
+    netService->PublishChatGroup(grp,ids);
+}
+
 RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* msg){
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::service_CreateMessage()  MsgId: " << msg->msgId << " and GroupId: " << msg->grpId<< std::endl;
@@ -252,7 +261,6 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
 
     if (it == mSubscribedGroups.end() )
         return SERVICE_CREATE_FAIL;  //message doesn't belong to any group.
-
 
     RsGroupMetaData chatGrpMeta =it->second;
     RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
