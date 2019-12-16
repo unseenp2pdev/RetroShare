@@ -85,8 +85,6 @@ protected:
     virtual void notifyReceiveChatPublishKey(const RsGxsGroupId &grpId) {}
     virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) {}
 
-    virtual bool createGxsChatMessage(GxsNxsChatMsgItem* &mItem,  RsGxsChatMsg &msg);
-    virtual void sendChatMessage(GxsNxsChatMsgItem *&msg );
 
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
 virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);

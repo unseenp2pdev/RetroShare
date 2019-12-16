@@ -5541,7 +5541,17 @@ bool RsGxsNetService::search(const Sha1CheckSum& hashed_group_id,unsigned char *
     return librs::crypto::encryptAuthenticateData(mem,size,encryption_master_key,encrypted_group_data,encrypted_group_data_len);
 }
 
-void RsGxsNetService::PublishChat(RsNxsItem* msg){
-    generic_sendItem(msg);
+void RsGxsNetService::PublishChat(RsNxsMsg* msg, std::list<RsPeerId> &ids){
+
+    for (auto it = ids.begin(); it != ids.end(); it++){
+        RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
+        newMsg->PeerId(*it);
+        newMsg->grpId = msg->grpId;
+        newMsg->msgId = msg->msgId;
+        newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+        newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
+        //netService->PublishChat(newMsg);
+        generic_sendItem(newMsg);
+    }
 
 }

@@ -446,7 +446,7 @@ private:
     
 	RsGxsGrpConfig& locked_getGrpConfig(const RsGxsGroupId& grp_id);
 
-    virtual void  PublishChat(RsNxsItem* msg);
+    virtual void PublishChat(RsNxsMsg* msg, std::list<RsPeerId> &ids);
 
 private:
 
