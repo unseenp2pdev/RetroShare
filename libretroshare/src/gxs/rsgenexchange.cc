@@ -1361,10 +1361,6 @@ bool RsGenExchange::getGroupData(const uint32_t &token, std::vector<RsGxsGrpItem
 	bool ok = mDataAccess->getGroupData(token, nxsGrps);
 
 	std::list<RsNxsGrp*>::iterator lit = nxsGrps.begin();
-#ifdef GEN_EXCH_DEBUG
-	std::cerr << "RsGenExchange::getGroupData() RsNxsGrp::len: " << nxsGrps.size();
-    std::cerr << std::endl;
-#endif
 
 	if(ok)
 	{
@@ -1620,9 +1616,9 @@ void RsGenExchange::receiveNewMessages(std::vector<RsNxsMsg *>& messages)
 		{
 #ifdef GEN_EXCH_DEBUG
             std::cerr << "RsGenExchange::receiveNewMessages: ";
-			std::cerr << " GrpId: " << msg->grpId;
-			std::cerr << " MsgId: " << msg->msgId;
-			std::cerr << std::endl;
+            std::cerr << " GrpId: " << msg->grpId;
+            std::cerr << " MsgId: " << msg->msgId;
+            std::cerr << std::endl;
 #endif
 			RsGxsGrpMsgIdPair id;
 			id.first = msg->grpId;
@@ -2916,6 +2912,7 @@ void RsGenExchange::processRecvdMessages()
 			if(!accept_new_msg)
 				messages_to_reject.push_back(msg->metaData->mMsgId); // This prevents reloading the message again at next sync.
 
+
 		    if(!accept_new_msg || gpsi.mFirstTryTS + VALIDATE_MAX_WAITING_TIME < now)
 		    {
 #ifdef GEN_EXCH_DEBUG
@@ -2941,10 +2938,6 @@ void RsGenExchange::processRecvdMessages()
 	    GxsMsgReq msgIds;
 	    RsNxsMsgDataTemporaryList msgs_to_store;
 
-#ifdef GEN_EXCH_DEBUG
-	    std::cerr << "  updating received messages:" << std::endl;
-#endif
-
 		// 3 - Validate each message
 
 	    for(NxsMsgPendingVect::iterator pend_it = mMsgPendingValidate.begin();pend_it != mMsgPendingValidate.end();)
@@ -2968,9 +2961,33 @@ void RsGenExchange::processRecvdMessages()
 #endif
 			std::map<RsGxsGroupId, RsGxsGrpMetaData*>::iterator mit = grpMetas.find(msg->grpId);
 
-#ifdef GEN_EXCH_DEBUG
-			    std::cerr << "    msg info         : grp id=" << msg->grpId << ", msg id=" << msg->msgId << std::endl;
-#endif
+//#ifdef GEN_EXCH_DEBUG
+//			    std::cerr << "    msg info         : grp id=" << msg->grpId << ", msg id=" << msg->msgId << std::endl;
+//                std::cerr << "***********RsGenExchange::processRecvdMessages(): Info*************************"<<std::endl;
+//                std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<msg->msg.TlvSize()<<std::endl;
+//                std::cerr << "Mesage= "; msg->msg.print(std::cerr, 15); std::cerr<<std::endl;
+//                std::cerr <<"   Meta Size:"<<msg->meta.TlvSize()<<std::endl;
+//                std::cerr <<"   mAuthorId:" <<msg->metaData->mAuthorId << std::endl;
+//                std::cerr <<"   mChildTs:"  <<msg->metaData->mChildTs << std::endl;
+//                std::cerr <<"   mGroupId:" <<msg->metaData->mGroupId << std::endl;
+//                std::cerr <<"   mHash:" <<msg->metaData->mHash << std::endl;
+//                std::cerr <<"   mMsgFlags:" <<msg->metaData->mMsgFlags << std::endl;
+//                std::cerr <<"   mMsgId:" <<msg->metaData->mMsgId << std::endl;
+//                std::cerr <<"   mMsgName:" <<msg->metaData->mMsgName << std::endl;
+//                std::cerr <<"   mMsgSize:" <<msg->metaData->mMsgSize << std::endl;
+//                std::cerr <<"   mMsgStatus:" <<msg->metaData->mMsgStatus << std::endl;
+//                std::cerr <<"   mOrigMsgId:" <<msg->metaData->mOrigMsgId << std::endl;
+//                std::cerr <<"   mParentId:" <<msg->metaData->mParentId << std::endl;
+//                std::cerr <<"   mPublishTs:" <<msg->metaData->mPublishTs << std::endl;
+//                std::cerr <<"   mServiceString:" <<msg->metaData->mServiceString << std::endl;
+//                std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
+//                std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
+//                std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
+//                std::cerr <<"   validated:" <<msg->metaData->validated << std::endl;
+//                std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
+//                msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
+//                std::cerr <<"Message Meta:"; msg->meta.print(std::cerr, 20); std::cerr<<std::endl;
+//#endif
 			// validate msg
 
 			if(mit == grpMetas.end())
@@ -2988,30 +3005,6 @@ void RsGenExchange::processRecvdMessages()
 			int validateReturn = validateMsg(msg, grpMeta->mGroupFlags, grpMeta->mSignFlags, keys);
 
 #ifdef GEN_EXCH_DEBUG
-            std::cerr << "***********RsGenExchange::processRecvdMessages(): Info*************************"<<std::endl;
-            std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<msg->msg.TlvSize()<<std::endl;
-            std::cerr << "Mesage= "; msg->msg.print(std::cerr, 15); std::cerr<<std::endl;
-            std::cerr <<"   Meta Size:"<<msg->meta.TlvSize()<<std::endl;
-            std::cerr <<"   mAuthorId:" <<msg->metaData->mAuthorId << std::endl;
-            std::cerr <<"   mChildTs:"  <<msg->metaData->mChildTs << std::endl;
-            std::cerr <<"   mGroupId:" <<msg->metaData->mGroupId << std::endl;
-            std::cerr <<"   mHash:" <<msg->metaData->mHash << std::endl;
-            std::cerr <<"   mMsgFlags:" <<msg->metaData->mMsgFlags << std::endl;
-            std::cerr <<"   mMsgId:" <<msg->metaData->mMsgId << std::endl;
-            std::cerr <<"   mMsgName:" <<msg->metaData->mMsgName << std::endl;
-            std::cerr <<"   mMsgSize:" <<msg->metaData->mMsgSize << std::endl;
-            std::cerr <<"   mMsgStatus:" <<msg->metaData->mMsgStatus << std::endl;
-            std::cerr <<"   mOrigMsgId:" <<msg->metaData->mOrigMsgId << std::endl;
-            std::cerr <<"   mParentId:" <<msg->metaData->mParentId << std::endl;
-            std::cerr <<"   mPublishTs:" <<msg->metaData->mPublishTs << std::endl;
-            std::cerr <<"   mServiceString:" <<msg->metaData->mServiceString << std::endl;
-            std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
-            std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
-            std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
-            std::cerr <<"   validated:" <<msg->metaData->validated << std::endl;
-            std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
-            msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
-            std::cerr <<"Message Meta:"; msg->meta.print(std::cerr, 20); std::cerr<<std::endl;
 			std::cerr << "    grpMeta.mSignFlags: " << std::hex << grpMeta->mSignFlags << std::dec << std::endl;
 			std::cerr << "    grpMeta.mAuthFlags: " << std::hex << grpMeta->mAuthenFlags << std::dec << std::endl;
 			std::cerr << "    message validation result: " << (int)validateReturn << std::endl;

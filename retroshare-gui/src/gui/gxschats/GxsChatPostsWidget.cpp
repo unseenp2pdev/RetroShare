@@ -40,7 +40,7 @@
 #define ROLE_PUBLISH FEED_TREEWIDGET_SORTROLE
 
 
-#define DEBUG_CHAT
+//#define DEBUG_CHAT
 
 
 /* View mode */

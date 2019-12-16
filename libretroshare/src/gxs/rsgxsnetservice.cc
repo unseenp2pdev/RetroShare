@@ -274,13 +274,13 @@
  	NXS_NET_DEBUG_8		gxs distant sync
 
  ***/
-#define NXS_NET_DEBUG_0 	1
+//#define NXS_NET_DEBUG_0 	1
 //#define NXS_NET_DEBUG_1 	1
 //#define NXS_NET_DEBUG_2 	1
 //#define NXS_NET_DEBUG_3 	1
-#define NXS_NET_DEBUG_4 	1
-#define NXS_NET_DEBUG_5 	1
-#define NXS_NET_DEBUG_6 	1
+//#define NXS_NET_DEBUG_4 	1
+//#define NXS_NET_DEBUG_5 	1
+//#define NXS_NET_DEBUG_6 	1
 //#define NXS_NET_DEBUG_7 	1
 //#define NXS_NET_DEBUG_8 	1
 
@@ -1829,6 +1829,7 @@ void RsGxsNetService::recvNxsItemQueue()
             default:
                 //assuming a chat message
                 if(ni->PacketSubType() != RS_PKT_SUBTYPE_GXSCHAT_MSG){
+                    RsNxsMsg *item = dynamic_cast<RsNxsMsg*>(ni);
                     handleRecvChatMessage(dynamic_cast<RsNxsMsg*>(ni));
                 }
                 else if(ni->PacketSubType() != RS_PKT_SUBTYPE_NXS_ENCRYPTED_DATA_ITEM)
@@ -1850,10 +1851,6 @@ void RsGxsNetService::recvNxsItemQueue()
 
 bool RsGxsNetService::handleTransaction(RsNxsItem* item)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::handleTransaction()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG_P_(item->PeerId()) << "handleTransaction(RsNxsItem) number=" << item->transactionNumber << std::endl;
 #endif
@@ -1912,9 +1909,6 @@ bool RsGxsNetService::handleTransaction(RsNxsItem* item)
 
 bool RsGxsNetService::locked_processTransac(RsNxsTransacItem *item)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_processTransac()" << std::endl;
-#endif
 	/*!
 	 * To process the transaction item
 	 * It can either be initiating a transaction
@@ -2569,11 +2563,6 @@ void RsGxsNetService::processTransactions()
 
 bool RsGxsNetService::getGroupNetworkStats(const RsGxsGroupId& gid,RsGroupNetworkStats& stats)
 {
-
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::getGroupNetworkStats()" << std::endl;
-#endif
-
     RS_STACK_MUTEX(mNxsMutex) ;
 
     GrpConfigMap::const_iterator it ( mServerGrpConfigMap.find(gid) );
@@ -2618,10 +2607,6 @@ void RsGxsNetService::processCompletedTransactions()
 
 void RsGxsNetService::locked_processCompletedIncomingTrans(NxsTransaction* tr)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_processCompletedIncomingTrans" << std::endl;
-#endif
-
 	uint16_t flag = tr->mTransaction->transactFlag;
 
 #ifdef NXS_NET_DEBUG_0
@@ -2899,9 +2884,6 @@ void RsGxsNetService::locked_processCompletedOutgoingTrans(NxsTransaction* tr)
 
 void RsGxsNetService::locked_pushMsgTransactionFromList(std::list<RsNxsItem*>& reqList, const RsPeerId& peerId, const uint32_t& transN)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_pushMsgTransactionFromList()" << std::endl;
-#endif
 
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG_P_(peerId) << "locked_pushMsgTransactionFromList()" << std::endl;
@@ -2944,11 +2926,6 @@ void RsGxsNetService::locked_pushMsgTransactionFromList(std::list<RsNxsItem*>& r
 
 void RsGxsNetService::locked_genReqMsgTransaction(NxsTransaction* tr)
 {
-
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_pushMsgTransactionFromList()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG___ << "RsGxsNetService::genReqMsgTransaction()" << std::endl;
 #endif
@@ -3205,10 +3182,6 @@ void RsGxsNetService::locked_stampPeerGroupUpdateTime(const RsPeerId& pid,const 
 
 void RsGxsNetService::locked_pushGrpTransactionFromList( std::list<RsNxsItem*>& reqList, const RsPeerId& peerId, const uint32_t& transN)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_pushGrpTransactionFromList()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG_P_(peerId) << "locked_pushGrpTransactionFromList()" << std::endl;
     GXSNETDEBUG_P_(peerId) << "   nelems = " << reqList.size() << std::endl;
@@ -3243,10 +3216,6 @@ void RsGxsNetService::locked_pushGrpTransactionFromList( std::list<RsNxsItem*>& 
 }
 void RsGxsNetService::addGroupItemToList(NxsTransaction*& tr, const RsGxsGroupId& grpId, uint32_t& transN, std::list<RsNxsItem*>& reqList)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::addGroupItemToList()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
 	GXSNETDEBUG_PG(tr->mTransaction->PeerId(),grpId) << "RsGxsNetService::addGroupItemToList() Added GroupID: << grpId" << std::endl;
 #endif
@@ -3370,10 +3339,6 @@ void RsGxsNetService::locked_genReqGrpTransaction(NxsTransaction* tr)
 
 void RsGxsNetService::locked_genSendGrpsTransaction(NxsTransaction* tr)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_genSendGrpsTransaction()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
 	GXSNETDEBUG_P_(tr->mTransaction->PeerId()) << "locked_genSendGrpsTransaction() Generating Grp data send from TransN: " << tr->mTransaction->transactionNumber << std::endl;
 #endif
@@ -3767,10 +3732,6 @@ uint32_t RsGxsNetService::locked_getTransactionId()
 }
 bool RsGxsNetService::locked_addTransaction(NxsTransaction* tr)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_addTransaction" << std::endl;
-#endif
-
     const RsPeerId& peer = tr->mTransaction->PeerId();
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG_P_(peer) << "locked_addTransaction() " << std::endl;
@@ -3901,10 +3862,6 @@ bool RsGxsNetService::encryptSingleNxsItem(RsNxsItem *item, const RsGxsCircleId&
 
 bool RsGxsNetService::processTransactionForDecryption(NxsTransaction *tr)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::processTransactionForDecryption()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_7
     RsPeerId peerId = tr->mTransaction->PeerId() ;
     GXSNETDEBUG_P_(peerId) << "RsGxsNetService::decryptTransaction()" << std::endl;
@@ -4225,10 +4182,6 @@ void RsGxsNetService::handleRecvSyncGroup(RsNxsSyncGrpReqItem *item)
 
 bool RsGxsNetService::canSendGrpId(const RsPeerId& sslId, const RsGxsGrpMetaData& grpMeta, std::vector<GrpIdCircleVet>& /* toVet */, bool& should_encrypt)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::canSendGrpId()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_4
 	GXSNETDEBUG_PG(sslId,grpMeta.mGroupId) << "RsGxsNetService::canSendGrpId()"<< std::endl;
 #endif
@@ -4400,32 +4353,32 @@ bool RsGxsNetService::locked_CanReceiveUpdate(RsNxsSyncMsgReqItem *item,bool& gr
     return false;
 }
 
-void RsGxsNetService::handleRecvChatMessage(RsNxsMsg *msg)
+void RsGxsNetService::handleRecvChatMessage(RsNxsMsg* msg)
 {
+#ifdef NXS_NET_DEBUG_0
+    GXSNETDEBUG___<< "RsGxsNetService::handleRecvChatMessage() " << std::endl;
+#endif
+
     if (!msg)
         return;
 
-    RS_STACK_MUTEX(mNxsMutex) ;
+    {
+        RS_STACK_MUTEX(mNxsMutex) ;
+        // notify listener of msgs
+        RsNxsMsg *item = new RsNxsMsg(msg->PacketService());
+        item->PeerId(msg->PeerId());
+        item->msgId = msg->msgId;
+        item->grpId = msg->grpId;
+        item->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+        item->meta.setBinData(msg->meta.bin_data,msg->meta.bin_len);
 
-    // notify listener of msgs
-    mNewMessagesToNotify.push_back(msg) ;
+        mNewMessagesToNotify.push_back(item) ;
+    }//end lock
 
-    std::cerr << "***********RsGxsNetService::handleRecvChatMessage() Info*************************"<<std::endl;
-    std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<std::endl;
-
-    // now note that this is the latest you've received from this peer
-    // for the grp id
-    //locked_doMsgUpdateWork(tr->mTransaction, grpId);
-
-    // also update server sync TS, since we need to send the new message list to friends for comparison
-    //locked_stampMsgServerUpdateTS(msg->grpId);
 
 }
 void RsGxsNetService::handleRecvSyncMessage(RsNxsSyncMsgReqItem *item,bool item_was_encrypted)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::handleRecvSyncMessage()" << std::endl;
-#endif
     if (!item)
 	    return;
 
@@ -4634,10 +4587,6 @@ void RsGxsNetService::handleRecvSyncMessage(RsNxsSyncMsgReqItem *item,bool item_
 
 void RsGxsNetService::locked_pushMsgRespFromList(std::list<RsNxsItem*>& itemL, const RsPeerId& sslId, const RsGxsGroupId& grp_id,const uint32_t& transN)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_pushMsgRespFromList()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_1
     GXSNETDEBUG_PG(sslId,grp_id) << "locked_pushMsgResponseFromList()" << std::endl;
     GXSNETDEBUG_PG(sslId,grp_id) << "   nelems = " << itemL.size() << std::endl;
@@ -4779,10 +4728,6 @@ bool RsGxsNetService::canSendMsgIds(std::vector<RsGxsMsgMetaData*>& msgMetas, co
 
 bool RsGxsNetService::checkPermissionsForFriendGroup(const RsPeerId& sslId,const RsGxsGrpMetaData& grpMeta)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::checkPermissionsForFriendGroup()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_4
         GXSNETDEBUG_PG(sslId,grpMeta.mGroupId) << "   Circle type: YOUR EYES ONLY - ID = " <<  grpMeta.mInternalCircle << std::endl;
 #endif
@@ -4837,9 +4782,6 @@ void RsGxsNetService::pauseSynchronisation(bool /* enabled */)
 
 void RsGxsNetService::setSyncAge(const RsGxsGroupId &grpId, uint32_t age_in_secs)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::setSyncAge()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
 
     locked_checkDelay(age_in_secs) ;
@@ -4858,9 +4800,6 @@ void RsGxsNetService::setSyncAge(const RsGxsGroupId &grpId, uint32_t age_in_secs
 }
 void RsGxsNetService::setKeepAge(const RsGxsGroupId &grpId, uint32_t age_in_secs)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::setKeepAge()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
 
     locked_checkDelay(age_in_secs) ;
@@ -4876,9 +4815,6 @@ void RsGxsNetService::setKeepAge(const RsGxsGroupId &grpId, uint32_t age_in_secs
 
 RsGxsGrpConfig& RsGxsNetService::locked_getGrpConfig(const RsGxsGroupId& grp_id)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_getGrpConfig()" << std::endl;
-#endif
 	GrpConfigMap::iterator it = mServerGrpConfigMap.find(grp_id);
 
 	if(it == mServerGrpConfigMap.end())
@@ -4901,18 +4837,12 @@ RsGxsGrpConfig& RsGxsNetService::locked_getGrpConfig(const RsGxsGroupId& grp_id)
 
 uint32_t RsGxsNetService::getSyncAge(const RsGxsGroupId& grpId)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::getSyncAge()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
 
 	return locked_getGrpConfig(grpId).msg_req_delay ;
 }
 uint32_t RsGxsNetService::getKeepAge(const RsGxsGroupId& grpId)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::getKeepAge()" << std::endl;
-#endif
     RS_STACK_MUTEX(mNxsMutex) ;
 
 	return locked_getGrpConfig(grpId).msg_keep_delay ;
@@ -4970,9 +4900,6 @@ void RsGxsNetService::processExplicitGroupRequests()
 
 int RsGxsNetService::sharePublishKey(const RsGxsGroupId& grpId,const std::set<RsPeerId>& peers)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::sharePublishKey()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
 
 	mPendingPublishKeyRecipients[grpId] = peers ;
@@ -4985,9 +4912,6 @@ int RsGxsNetService::sharePublishKey(const RsGxsGroupId& grpId,const std::set<Rs
 
 void RsGxsNetService::sharePublishKeysPending()
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::sharePublishKeysPending()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
 
     if(mPendingPublishKeyRecipients.empty())
@@ -5111,10 +5035,6 @@ void RsGxsNetService::sharePublishKeysPending()
 
 void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::handleRecvPublishKeys())" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_3
 	GXSNETDEBUG_PG(item->PeerId(),item->grpId) << "RsGxsNetService::sharePublishKeys() " << std::endl;
 #endif
@@ -5202,9 +5122,6 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 
 bool RsGxsNetService::getGroupServerUpdateTS(const RsGxsGroupId& gid,rstime_t& group_server_update_TS, rstime_t& msg_server_update_TS)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::getGroupServerUpdateTS())" << std::endl;
-#endif
     RS_STACK_MUTEX(mNxsMutex) ;
 
     group_server_update_TS = mGrpServerUpdate.grpUpdateTS ;
@@ -5221,9 +5138,6 @@ bool RsGxsNetService::getGroupServerUpdateTS(const RsGxsGroupId& gid,rstime_t& g
 
 bool RsGxsNetService::removeGroups(const std::list<RsGxsGroupId>& groups)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::removeGroups()" << std::endl;
-#endif
     RS_STACK_MUTEX(mNxsMutex) ;
 
 #ifdef NXS_NET_DEBUG_0
@@ -5264,9 +5178,6 @@ bool RsGxsNetService::removeGroups(const std::list<RsGxsGroupId>& groups)
 
 bool RsGxsNetService::isDistantPeer(const RsPeerId& pid)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::isDistantPeer()" << std::endl;
-#endif
     RS_STACK_MUTEX(mNxsMutex) ;
 
 	if(!mAllowDistSync || mGxsNetTunnel == NULL)
@@ -5279,10 +5190,6 @@ bool RsGxsNetService::isDistantPeer(const RsPeerId& pid)
 
 bool RsGxsNetService::stampMsgServerUpdateTS(const RsGxsGroupId& gid)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::stampMsgServerUpdateTS()" << std::endl;
-#endif
-
     RS_STACK_MUTEX(mNxsMutex) ;
 
     return locked_stampMsgServerUpdateTS(gid) ;
@@ -5290,9 +5197,6 @@ bool RsGxsNetService::stampMsgServerUpdateTS(const RsGxsGroupId& gid)
 
 bool RsGxsNetService::locked_stampMsgServerUpdateTS(const RsGxsGroupId& gid)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::locked_stampMsgServerUpdateTS()" << std::endl;
-#endif
 
     RsGxsServerMsgUpdate& m(mServerMsgUpdateMap[gid]);
 
@@ -5345,10 +5249,6 @@ static bool termSearch(const std::string& src, const std::string& substring)
 
 bool RsGxsNetService::retrieveDistantSearchResults(TurtleRequestId req,std::map<RsGxsGroupId,RsGxsGroupSummary>& group_infos)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::retrieveDistantSearchResults()" << std::endl;
-#endif
-
     RS_STACK_MUTEX(mNxsMutex) ;
 
     auto it = mDistantSearchResults.find(req) ;
@@ -5361,9 +5261,6 @@ bool RsGxsNetService::retrieveDistantSearchResults(TurtleRequestId req,std::map<
 }
 bool RsGxsNetService::retrieveDistantGroupSummary(const RsGxsGroupId& group_id,RsGxsGroupSummary& gs)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::retrieveDistantGroupSummary()" << std::endl;
-#endif
 	RS_STACK_MUTEX(mNxsMutex) ;
     for(auto it(mDistantSearchResults.begin());it!=mDistantSearchResults.end();++it)
     {
@@ -5379,18 +5276,13 @@ bool RsGxsNetService::retrieveDistantGroupSummary(const RsGxsGroupId& group_id,R
 }
 bool RsGxsNetService::clearDistantSearchResults(const TurtleRequestId& id)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::clearDistantSearchResults()" << std::endl;
-#endif
     RS_STACK_MUTEX(mNxsMutex) ;
     mDistantSearchResults.erase(id);
     return true ;
 }
 void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req, const std::list<RsGxsGroupSummary>& group_infos)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::receiveTurtleSearchResults()" << std::endl;
-#endif
+
 	std::set<RsGxsGroupId> groupsToNotifyResults;
 
 	{
@@ -5440,10 +5332,6 @@ void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req, const std:
 
 void RsGxsNetService::receiveTurtleSearchResults(TurtleRequestId req,const unsigned char *encrypted_group_data,uint32_t encrypted_group_data_len)
 {
-#ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::receiveTurtleSearchResults()" << std::endl;
-#endif
-
 #ifdef NXS_NET_DEBUG_8
 	GXSNETDEBUG___ << " received encrypted group data for turtle search request " << std::hex << req << std::dec << ": " << RsUtil::BinToHex(encrypted_group_data,encrypted_group_data_len,50) << std::endl;
 #endif

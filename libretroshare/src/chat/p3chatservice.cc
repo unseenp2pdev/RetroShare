@@ -1839,6 +1839,7 @@ void p3ChatService::handleRecvGxsChatMessage(GxsNxsChatMsgItem *item){
     std::cerr <<"p3ChatService-GxsMessage Meta Size ="<< item->meta.bin_len<<std::endl;
     std::vector<GxsNxsChatMsgItem *> messages ;
     messages.push_back(item);
+
     gxsChatSync->receiveNewChatMesesage(messages);
 
 }

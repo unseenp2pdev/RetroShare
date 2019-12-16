@@ -44,7 +44,7 @@
 #include "retroshare/rspeers.h"
 #include "rsitems/rsnxsitems.h"
 
-#define GXSCHATS_DEBUG 1
+//#define GXSCHATS_DEBUG 1
 
 
 
@@ -257,47 +257,77 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
             mItem->msgId     = msg->msgId;
 
 
-            std::cerr << "***********p3GxsChats::service_CreateMessage: Info*************************"<<std::endl;
-            std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<msg->msg.TlvSize()<<std::endl;
-            std::cerr << "Mesage= "; msg->msg.print(std::cerr, 15); std::cerr<<std::endl;
-            std::cerr <<"   Meta Size:"<<msg->meta.TlvSize()<<std::endl;
-            std::cerr <<"   mAuthorId:" <<msg->metaData->mAuthorId << std::endl;
-            std::cerr <<"   mChildTs:"  <<msg->metaData->mChildTs << std::endl;
-            std::cerr <<"   mGroupId:" <<msg->metaData->mGroupId << std::endl;
-            std::cerr <<"   mHash:" <<msg->metaData->mHash << std::endl;
-            std::cerr <<"   mMsgFlags:" <<msg->metaData->mMsgFlags << std::endl;
-            std::cerr <<"   mMsgId:" <<msg->metaData->mMsgId << std::endl;
-            std::cerr <<"   mMsgName:" <<msg->metaData->mMsgName << std::endl;
-            std::cerr <<"   mMsgSize:" <<msg->metaData->mMsgSize << std::endl;
-            std::cerr <<"   mMsgStatus:" <<msg->metaData->mMsgStatus << std::endl;
-            std::cerr <<"   mOrigMsgId:" <<msg->metaData->mOrigMsgId << std::endl;
-            std::cerr <<"   mParentId:" <<msg->metaData->mParentId << std::endl;
-            std::cerr <<"   mPublishTs:" <<msg->metaData->mPublishTs << std::endl;
-            std::cerr <<"   mServiceString:" <<msg->metaData->mServiceString << std::endl;
-            std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
-            std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
-            std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
-            std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
-            msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
 
-            //messageId created after the createMessage function call.
-            //sendChatMessage(mItem);
+            std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
+            it = mSubscribedGroups.find(msg->grpId);
+
+            if (it == mSubscribedGroups.end() )
+                return SERVICE_CREATE_FAIL;  //message doesn't belong to any group.
+
+
+            RsGroupMetaData chatGrpMeta =it->second;
+            RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+
+            switch(chatGrpMeta.mCircleType){
+                case GXS_CIRCLE_TYPE_PUBLIC:
+                {
+                    //get all online friends and send this message to them.
+                std::list<RsPeerId> ids;
+                rsPeers->getOnlineList(ids);
+
+                for (auto it = ids.begin(); it != ids.end(); it++){
+                    RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
+                    newMsg->PeerId(*it);
+                    newMsg->grpId = msg->grpId;
+                    newMsg->msgId = msg->msgId;
+                    newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+                    newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
+                    netService->PublishChat(newMsg);
+
+                }
+                    break;
+                }
+                case GXS_CIRCLE_TYPE_EXTERNAL:// restricted to an external circle, made of RsGxsId
+                {
+                    std::cerr << "CircleType: GXS_CIRCLE_TYPE_EXTERNAL"<<std::endl;
+                    break;
+                }
+                case GXS_CIRCLE_TYPE_YOUR_FRIENDS_ONLY:	// restricted to a subset of friend nodes of a given RS node given by a RsPgpId list
+                {
+                    if(!chatGrpMeta.mInternalCircle.isNull())
+                    {
+                        RsGroupInfo ginfo ;
+                        RsNodeGroupId  groupId = RsNodeGroupId(chatGrpMeta.mInternalCircle);
+
+                        if(rsPeers->getGroupInfo(groupId,ginfo))
+                        {
+                            for (auto it = ginfo.peerIds.begin(); it != ginfo.peerIds.end(); it++ ){
+                                std::list<RsPeerId> ids;
+                                if (rsPeers->getAssociatedSSLIds(*it,ids)) {
+
+                                    for (auto it = ids.begin(); it != ids.end(); it++){
+                                        RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
+                                        newMsg->PeerId(*it);
+                                        newMsg->grpId = msg->grpId;
+                                        newMsg->msgId = msg->msgId;
+                                        newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+                                        newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
+                                        netService->PublishChat(newMsg);
+
+                                    }
+                                }
+                            }//end for loop
+                        }
+                    } //end case
+                    break;
+                }
+
+            }//end switch
+
+
          }
 
-        std::list<RsPeerId> ids;
-        rsPeers->getOnlineList(ids);
 
-        RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
-
-        for (auto it = ids.begin(); it != ids.end(); it++){
-            RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
-            newMsg->PeerId(*it);
-            newMsg->grpId = msg->grpId;
-            newMsg->msgId = msg->msgId;
-            newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
-            newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
-            netService->PublishChat(newMsg);
-        }
 
     return SERVICE_CREATE_SUCCESS;
 }
@@ -464,7 +494,6 @@ void	p3GxsChats::service_tick()
 {
 
 static  rstime_t last_dummy_tick = 0;
-//static  rstime_t last_chat_tick =0;
 
     if (time(NULL) > last_dummy_tick + 5)
     {
@@ -473,13 +502,6 @@ static  rstime_t last_dummy_tick = 0;
 
     }
 
-//    if (time(NULL) > last_chat_tick + 5)
-//    {
-//        p3GxsChatService::tick();
-//        last_chat_tick = time(NULL);
-
-//    }
-//    p3ChatService::tick();
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
 
@@ -487,10 +509,6 @@ static  rstime_t last_dummy_tick = 0;
 
 bool p3GxsChats::getGroupData(const uint32_t &token, std::vector<RsGxsChatGroup> &groups)
 {
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::getGroupData()";
-    std::cerr << std::endl;
-#endif
 
     std::vector<RsGxsGrpItem*> grpData;
     bool ok = RsGenExchange::getGroupData(token, grpData);
@@ -535,10 +553,6 @@ bool p3GxsChats::groupShareKeys(
 
 bool p3GxsChats::getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &msgs, std::vector<RsGxsComment> &cmts)
 {
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::getPostData()";
-    std::cerr << std::endl;
-#endif
 
     GxsMsgDataMap msgData;
     bool ok = RsGenExchange::getMsgData(token, msgData);
@@ -1084,7 +1098,7 @@ bool p3GxsChats::createGxsChatMessage(GxsNxsChatMsgItem *& mItem,  RsGxsChatMsg 
     if(serialOk)
     {
 
-        RsNxsMsg* msgNxt = new RsNxsMsg(gxsChatInfo.mServiceType);
+        RsNxsMsg* msgNxt = new RsNxsMsg(RS_PKT_SUBTYPE_GXSCHAT_MSG);
 
         msgNxt->grpId = msgItem->meta.mGroupId;
         //msgNxt->msgId = msgItem->meta.mMsgId;
@@ -1168,7 +1182,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
     std::cerr << "p3GxsChats::receiveNewChatMesesage()" << std::endl;
 #endif
 
-    std::vector<RsNxsMsg *>nxtMsg;
+    std::vector<RsNxsMsg *> nxtMsg;
     uint32_t size =0;
     RsServiceInfo  gxsChatInfo = this->getServiceInfo();
 
@@ -1183,7 +1197,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
         bool serialOk = mSerialiser->serialise(msg, mData, &size);
 
         if (serialOk){ //converting RsChatItem to GxsMessage
-            RsNxsMsg *newMsg = new RsNxsMsg(gxsChatInfo.mServiceType);
+            RsNxsMsg *newMsg = new RsNxsMsg(RS_PKT_SUBTYPE_GXSCHAT_MSG);
             newMsg->PeerId(msg->PeerId());
 
             newMsg->grpId = msg->grpId;
@@ -1203,7 +1217,7 @@ void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& message
         //delete mData;
     }
   }//end mutex
-  //RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+  RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
 
 
 }
