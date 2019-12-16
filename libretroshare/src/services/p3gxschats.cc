@@ -249,6 +249,14 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_PublishGroup(RsNxsGrp *g
 
     rsPeers->getOnlineList(ids);
     netService->PublishChatGroup(grp,ids);
+
+    //sharing publish key to all invite members.
+    std::set<RsPeerId> peers;
+    for (auto it=ids.begin(); it !=ids.end(); it++)
+            peers.insert(*it);
+
+    groupShareKeys(grp->grpId,peers);
+
 }
 
 RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* msg){
@@ -381,6 +389,10 @@ void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
                                 {
                                     notify->AddFeedItem(RS_FEED_ITEM_CHATS_NEW, git->toStdString());
                                     mKnownChats.insert(std::make_pair(*git,time(NULL))) ;
+                                    //auto subscribe chat conversation when it's first received.
+                                    uint32_t token;
+                                    bool subscribe=true;
+                                    RsGenExchange::subscribeToGroup(token, *git, subscribe);
                                 }
                                 else
                                     std::cerr << "(II) Not notifying already known chat " << *git << std::endl;

@@ -2703,6 +2703,10 @@ void RsGenExchange::publishGrps()
 							    mDataAccess->addGroupData(grp);
 
                             grp->metaData->keys.private_keys.clear() ;
+                            std::cerr << "******publishGrps****************"<<std::endl;
+                            std::cerr <<"Sendin Group to peers"<<grp->grpId <<std::endl;
+                            std::cerr <<"groupSize():" << grp->grp.TlvSize() <<std::endl;
+                            std::cerr << "GroupMeta Size(): "<< grp->meta.TlvSize() <<std::endl;
                             ServiceCreate_Return grpRet = service_PublishGroup(grp);
                             if (grpRet)
                                 delete grp ;

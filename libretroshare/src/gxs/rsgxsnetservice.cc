@@ -4379,7 +4379,7 @@ void RsGxsNetService::handleRecvChatMessage(RsNxsMsg* msg)
 void RsGxsNetService::handleRecvChatGroup(RsNxsGrp* grp)
 {
 #ifdef NXS_NET_DEBUG_0
-    GXSNETDEBUG___<< "RsGxsNetService::handleRecvChatMessage() " << std::endl;
+    GXSNETDEBUG___<< "RsGxsNetService::handleRecvChatGroup() " << std::endl;
 #endif
 
     if (!grp)
@@ -4393,6 +4393,7 @@ void RsGxsNetService::handleRecvChatGroup(RsNxsGrp* grp)
         item->grpId = grp->grpId;
         item->grp.setBinData(grp->grp.bin_data, grp->grp.bin_len);
         item->meta.setBinData(grp->meta.bin_data,grp->meta.bin_len);
+
         mNewGroupsToNotify.push_back(item) ;
 
     }//end lock
@@ -5585,7 +5586,9 @@ void RsGxsNetService::PublishChatGroup(RsNxsGrp *grp, std::list<RsPeerId> &ids){
         newGrp->PeerId(*it);
         newGrp->grpId = grp->grpId;
         newGrp->grp.setBinData(grp->grp.bin_data, grp->grp.bin_len);
-        newGrp->meta.setBinData(grp->meta.bin_data, grp->grp.bin_len);
+        newGrp->meta.setBinData(grp->meta.bin_data, grp->meta.bin_len);
+
         generic_sendItem(newGrp);
+
     }
 }
