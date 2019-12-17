@@ -273,13 +273,10 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
     RsGroupMetaData chatGrpMeta =it->second;
     RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
 
-    std::cerr <<"Group CircleType:"<<chatGrpMeta.mCircleType<<std::endl;
-
     switch(chatGrpMeta.mCircleType){
     case GXS_CIRCLE_TYPE_PUBLIC:
     {
         //get all online friends and send this message to them.
-        std::cerr <<"Public CircleType:"<<chatGrpMeta.mCircleType<<std::endl;
 
         std::list<RsPeerId> ids;
         rsPeers->getOnlineList(ids);
