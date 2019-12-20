@@ -1418,7 +1418,7 @@ void ChatWidget::sendChat()
                 post.mMeta.mAuthorId = gxsIdList.front() ;
             }
             //unseenp2p - add more timestamp
-            post.mMeta.mPublishTs = QDateTime::currentDateTime().toTime_t();
+            post.mMeta.mPublishTs = QDateTime::currentSecsSinceEpoch();
 
             post.mMsg = textToSignal;
 

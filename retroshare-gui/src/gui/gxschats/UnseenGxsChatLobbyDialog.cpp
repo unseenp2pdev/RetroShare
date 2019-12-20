@@ -1202,13 +1202,19 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
 
 
         //unseenp2p - try to add msg into chat content
-        QDateTime sendTime = QDateTime::currentDateTime();
+        QDateTime sendTime = QDateTime::fromSecsSinceEpoch(posts[i].mMeta.mPublishTs);
         QDateTime recvTime =QDateTime::currentDateTime();
         RsGxsId gxs_id = posts[i].mMeta.mAuthorId;
         QString mmsg = QString::fromUtf8(posts[i].mMsg.c_str());
         bool incomming = !rsIdentity->isOwnId(gxs_id);
+        RsIdentityDetails details;
+        QString nickname = "someone";
+        if (rsIdentity->getIdDetails(gxs_id, details))
+        {
+            nickname = QString::fromStdString(details.mNickname);
+        }
 
-        ui.chatWidget->addChatMsg(incomming, "someone: ", gxs_id, sendTime, recvTime, mmsg, ChatWidget::MSGTYPE_NORMAL);
+        ui.chatWidget->addChatMsg(incomming, nickname, gxs_id, sendTime, recvTime, mmsg, ChatWidget::MSGTYPE_NORMAL);
     }
 
 #ifdef DEBUG_CHAT
