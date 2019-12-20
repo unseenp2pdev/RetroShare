@@ -33,7 +33,7 @@
 #include "util/TokenQueue.h"
 #include "GxsIdTreeWidgetItem.h"
 #include "GxsGroupDialog.h"
-#include "../gui/gxschats/UnseenGxsSmartlistmodel.h"
+#include "gui/gxschats/UnseenGxsSmartlistmodel.h"
 
 
 
@@ -162,6 +162,7 @@ private slots:
 	void removeCurrentSearch();
 
     void smartListSelectionChanged(const QItemSelection  &selected, const QItemSelection  &deselected);
+    void updateRecentTime(const gxsChatId&, std::string, long long, std::string, bool);
 private:
 	virtual QString text(TextType type) = 0;
 	virtual QString icon(IconType type) = 0;

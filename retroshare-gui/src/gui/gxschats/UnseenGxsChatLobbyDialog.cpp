@@ -55,6 +55,12 @@
 #include <time.h>
 #include <unistd.h>
 
+//for gxs chat
+#include <algorithm>
+#include "gui/gxs/RsGxsUpdateBroadcastBase.h"
+#include "gui/common/UIStateHelper.h"
+#include "gui/gxschats/CreateGxsChatMsg.h"
+
 #define COLUMN_NAME      0
 #define COLUMN_ACTIVITY  1
 #define COLUMN_ID        2
@@ -64,14 +70,22 @@
 #define ROLE_SORT            Qt::UserRole + 1
 #define ROLE_ID             Qt::UserRole + 2
 
+#define DEBUG_CHAT 1
+
 const static uint32_t timeToInactivity = 60 * 10;   // in seconds
 
 /** Default constructor */
-UnseenGxsChatLobbyDialog::UnseenGxsChatLobbyDialog(const RsGxsGroupId& id, QWidget *parent, Qt::WindowFlags flags)
+UnseenGxsChatLobbyDialog::UnseenGxsChatLobbyDialog( const RsGxsGroupId& id, QWidget *parent, Qt::WindowFlags flags)
         : ChatDialog(parent, flags), mGXSGroupId(id),
           bullet_red_128(":/app/images/statusicons/dnd.png"), bullet_grey_128(":/app/images/statusicons/bad.png"),
           bullet_green_128(":/app/images/statusicons/online.png"), bullet_yellow_128(":/app/images/statusicons/away.png"), bullet_unknown_128(":/app/images/statusicons/ask.png")
 {
+
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// //Keep for UnseenGxsChatLobbyDialog
+    //////////////////////////////////////////////////////////////////////////////
+
     /* Invoke Qt Designer generated QObject setup routine */
     ui.setupUi(this);
 
@@ -196,6 +210,45 @@ UnseenGxsChatLobbyDialog::UnseenGxsChatLobbyDialog(const RsGxsGroupId& id, QWidg
     connect(unsubscribeButton, SIGNAL(clicked()), this , SLOT(leaveLobby()));
 
     getChatWidget()->addTitleBarWidget(unsubscribeButton) ;
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// //END of Keep for UnseenGxsChatLobbyDialog
+    //////////////////////////////////////////////////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// //4 classes constructors that this class uses
+    //////////////////////////////////////////////////////////////////////////////
+    //GxsUpdateBroadcastWidget constructor
+    mBase = new RsGxsUpdateBroadcastBase(rsGxsChats, this);
+    connect(mBase, SIGNAL(fillDisplay(bool)), this, SLOT(fillDisplay(bool)));
+    mInterfaceHelper = rsGxsChats;
+
+    //GxsMessageFramePostsWidget constructor
+    mSubscribeFlags = 0;
+    mFillThread = NULL;
+    mTokenTypeGroupData = nextTokenType();
+    mTokenTypeAllPosts = nextTokenType();
+    mTokenTypePosts = nextTokenType();
+
+    //GxsMessageFrameWidget constructor
+    mNextTokenType = 0;
+    mTokenQueue = new TokenQueue(rsGxsChats->getTokenService(), this);
+    //mStateHelper = new UIStateHelper(this);
+
+    /* Set read status */
+    mTokenTypeAcknowledgeReadStatus = nextTokenType();
+    mAcknowledgeReadStatusToken = 0;
+
+
+    //GxsChatPostsWidget constructor
+    setGroupId(id);
+
+    /* Add dummy entry to store waiting status */
+    //mStateHelper->addWidget(mTokenTypeAcknowledgeReadStatus, NULL, 0);
+
+    /// End for 4 classes constructors
+
 }
 
 void UnseenGxsChatLobbyDialog::leaveLobby()
@@ -963,4 +1016,1009 @@ void UnseenGxsChatLobbyDialog::filterIds()
     QString text = ui.filterLineEdit->text();
 
     ui.participantsList->filterItems(filterColumn, text);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/// ALL FROM RsGxsUpdateBroadcastWidget                                                       ////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+void UnseenGxsChatLobbyDialog::fillComplete()
+{
+    mBase->fillComplete();
+}
+
+void UnseenGxsChatLobbyDialog::setUpdateWhenInvisible(bool update)
+{
+    mBase->setUpdateWhenInvisible(update);
+}
+
+const std::set<RsGxsGroupId> &UnseenGxsChatLobbyDialog::getGrpIds()
+{
+    return mBase->getGrpIds();
+}
+
+const std::set<TurtleRequestId>& UnseenGxsChatLobbyDialog::getSearchResults()
+{
+    return mBase->getSearchResults();
+}
+const std::set<RsGxsGroupId> &UnseenGxsChatLobbyDialog::getGrpIdsMeta()
+{
+    return mBase->getGrpIdsMeta();
+}
+
+void UnseenGxsChatLobbyDialog::getAllGrpIds(std::set<RsGxsGroupId> &grpIds)
+{
+    mBase->getAllGrpIds(grpIds);
+}
+
+const std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &UnseenGxsChatLobbyDialog::getMsgIds()
+{
+    return mBase->getMsgIds();
+}
+
+const std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &UnseenGxsChatLobbyDialog::getMsgIdsMeta()
+{
+    return mBase->getMsgIdsMeta();
+}
+
+void UnseenGxsChatLobbyDialog::getAllMsgIds(std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &msgIds)
+{
+    mBase->getAllMsgIds(msgIds);
+}
+
+void UnseenGxsChatLobbyDialog::fillDisplay(bool complete)
+{
+    updateDisplay(complete);
+    update(); // Qt flush
+}
+
+void UnseenGxsChatLobbyDialog::showEvent(QShowEvent *event)
+{
+    mBase->showEvent(event);
+    QWidget::showEvent(event);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///     ALL  from GxsMessageFrameWidget
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+const RsGxsGroupId &UnseenGxsChatLobbyDialog::groupId()
+{
+    return mGroupId;
+}
+
+bool UnseenGxsChatLobbyDialog::isLoading()
+{
+    return false;
+}
+
+bool UnseenGxsChatLobbyDialog::isWaiting()
+{
+//    if (mStateHelper->isLoading(mTokenTypeAcknowledgeReadStatus)) {
+//        return true;
+//    }
+
+    return false;
+}
+
+void UnseenGxsChatLobbyDialog::setGroupId(const RsGxsGroupId &groupId)
+{
+    if (mGroupId == groupId  && !groupId.isNull())
+        return;
+
+    if(!groupId.isNull())
+    {
+        mAcknowledgeReadStatusToken = 0;
+//        if (mStateHelper->isLoading(mTokenTypeAcknowledgeReadStatus)) {
+//            mStateHelper->setLoading(mTokenTypeAcknowledgeReadStatus, false);
+
+//            emit waitingChanged(this);
+//        }
+
+        mGroupId = groupId;
+        groupIdChanged();
+    }
+    else
+    {
+        mGroupId.clear();
+        //blank();	// clear the displayed data, because no group is selected.
+    }
+}
+
+void UnseenGxsChatLobbyDialog::setAllMessagesRead(bool read)
+{
+    uint32_t token = 0;
+    setAllMessagesReadDo(read, token);
+
+    if (token) {
+        /* Wait for acknowlegde of the token */
+        mAcknowledgeReadStatusToken = token;
+        mTokenQueue->queueRequest(mAcknowledgeReadStatusToken, 0, 0, mTokenTypeAcknowledgeReadStatus);
+        //mStateHelper->setLoading(mTokenTypeAcknowledgeReadStatus, true);
+
+        emit waitingChanged(this);
+    }
+}
+
+void UnseenGxsChatLobbyDialog::GxsMessageFrameWidgetloadRequest(const TokenQueue *queue, const TokenRequest &req)
+{
+    if (queue == mTokenQueue)
+    {
+        if (req.mUserType == mTokenTypeAcknowledgeReadStatus) {
+            if (mAcknowledgeReadStatusToken == req.mToken) {
+                /* Set read status is finished */
+                //mStateHelper->setLoading(mTokenTypeAcknowledgeReadStatus, false);
+
+                emit waitingChanged(this);
+            }
+            return;
+        }
+    }
+
+    std::cerr << "UnseenGxsChatLobbyDialog::GxsMessageFrameWidgetloadRequestloadRequest() ERROR: INVALID TYPE";
+    std::cerr << std::endl;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///     ALL  from GxsUpdateBroadcastWidget
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+//COPY from GxsUpdateBroadcastWidget
+void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, GxsMessageFramePostThread2 *thread, bool related)
+{
+    if (related && thread) {
+        std::cerr << "GxsChatPostsWidget::insertChannelPosts fill only related posts as thread is not possible" << std::endl;
+        return;
+    }
+
+    int count = posts.size();
+    int pos = 0;
+
+    if (!thread) {
+        //TODO: GUI
+        //ui->feedWidget->setSortingEnabled(false);
+    }
+
+    // collect new versions of posts if any
+
+#ifdef DEBUG_CHAT
+    std::cerr << "Inserting chat posts" << std::endl;
+#endif
+
+    std::vector<uint32_t> new_versions ;
+    for (uint32_t i=0;i<posts.size();++i)
+    {
+        if(posts[i].mMeta.mOrigMsgId == posts[i].mMeta.mMsgId)
+            posts[i].mMeta.mOrigMsgId.clear();
+
+#ifdef DEBUG_CHAT
+        std::cerr << "  " << i << ": msg_id=" << posts[i].mMeta.mMsgId << ": orig msg id = " << posts[i].mMeta.mOrigMsgId << std::endl;
+#endif
+
+        if(!posts[i].mMeta.mOrigMsgId.isNull())
+            new_versions.push_back(i) ;
+
+
+        //unseenp2p - try to add msg into chat content
+        QDateTime sendTime = QDateTime::currentDateTime();
+        QDateTime recvTime =QDateTime::currentDateTime();
+        RsGxsId gxs_id = posts[i].mMeta.mAuthorId;
+        QString mmsg = QString::fromUtf8(posts[i].mMsg.c_str());
+        bool incomming = !rsIdentity->isOwnId(gxs_id);
+
+        ui.chatWidget->addChatMsg(incomming, "someone: ", gxs_id, sendTime, recvTime, mmsg, ChatWidget::MSGTYPE_NORMAL);
+    }
+
+#ifdef DEBUG_CHAT
+    std::cerr << "New versions: " << new_versions.size() << std::endl;
+#endif
+
+    if(!new_versions.empty())
+    {
+#ifdef DEBUG_CHAT
+        std::cerr << "  New versions present. Replacing them..." << std::endl;
+        std::cerr << "  Creating search map."  << std::endl;
+#endif
+
+        // make a quick search map
+        std::map<RsGxsMessageId,uint32_t> search_map ;
+        for (uint32_t i=0;i<posts.size();++i)
+            search_map[posts[i].mMeta.mMsgId] = i ;
+
+        for(uint32_t i=0;i<new_versions.size();++i)
+        {
+#ifdef DEBUG_CHAT
+            std::cerr << "  Taking care of new version  at index " << new_versions[i] << std::endl;
+#endif
+
+            uint32_t current_index = new_versions[i] ;
+            uint32_t source_index  = new_versions[i] ;
+#ifdef DEBUG_CHAT
+            RsGxsMessageId source_msg_id = posts[source_index].mMeta.mMsgId ;
+#endif
+
+            // What we do is everytime we find a replacement post, we climb up the replacement graph until we find the original post
+            // (or the most recent version of it). When we reach this post, we replace it with the data of the source post.
+            // In the mean time, all other posts have their MsgId cleared, so that the posts are removed from the list.
+
+            //std::vector<uint32_t> versions ;
+            std::map<RsGxsMessageId,uint32_t>::const_iterator vit ;
+
+            while(search_map.end() != (vit=search_map.find(posts[current_index].mMeta.mOrigMsgId)))
+            {
+#ifdef DEBUG_CHAT
+                std::cerr << "    post at index " << current_index << " replaces a post at position " << vit->second ;
+#endif
+
+                // Now replace the post only if the new versionis more recent. It may happen indeed that the same post has been corrected multiple
+                // times. In this case, we only need to replace the post with the newest version
+
+                //uint32_t prev_index = current_index ;
+                current_index = vit->second ;
+
+                if(posts[current_index].mMeta.mMsgId.isNull())	// This handles the branching situation where this post has been already erased. No need to go down further.
+                {
+#ifdef DEBUG_CHAT
+                    std::cerr << "  already erased. Stopping." << std::endl;
+#endif
+                    break ;
+                }
+
+                if(posts[current_index].mMeta.mPublishTs < posts[source_index].mMeta.mPublishTs)
+                {
+#ifdef DEBUG_CHAT
+                    std::cerr << " and is more recent => following" << std::endl;
+#endif
+                    for(std::set<RsGxsMessageId>::const_iterator itt(posts[current_index].mOlderVersions.begin());itt!=posts[current_index].mOlderVersions.end();++itt)
+                        posts[source_index].mOlderVersions.insert(*itt);
+
+                    posts[source_index].mOlderVersions.insert(posts[current_index].mMeta.mMsgId);
+                    posts[current_index].mMeta.mMsgId.clear();	    // clear the msg Id so the post will be ignored
+                }
+#ifdef DEBUG_CHAT
+                else
+                    std::cerr << " but is older -> Stopping" << std::endl;
+#endif
+            }
+        }
+    }
+
+#ifdef DEBUG_CHAT
+    std::cerr << "Now adding posts..." << std::endl;
+#endif
+
+    for (std::vector<RsGxsChatMsg>::const_reverse_iterator it = posts.rbegin(); it != posts.rend(); ++it)
+    {
+#ifdef DEBUG_CHAT
+        std::cerr << "  adding post: " << (*it).mMeta.mMsgId ;
+#endif
+
+        if(!(*it).mMeta.mMsgId.isNull())
+        {
+#ifdef DEBUG_CHAT
+            std::cerr << " added" << std::endl;
+#endif
+
+            if (thread && thread->stopped())
+                break;
+
+            if (thread)
+                thread->emitAddPost(qVariantFromValue(*it), related, ++pos, count);
+            else
+                createPostItem(*it, related);
+        }
+#ifdef DEBUG_CHAT
+        else
+            std::cerr << " skipped" << std::endl;
+#endif
+    }
+
+    if (!thread) {
+        //TODO: GUI
+        //ui->feedWidget->setSortingEnabled(true);
+    }
+}
+
+void UnseenGxsChatLobbyDialog::insertAllPosts(const uint32_t &token, GxsMessageFramePostThread2 *thread)
+{
+    std::vector<RsGxsChatMsg> posts;
+    rsGxsChats->getPostData(token, posts);
+
+    insertChannelPosts(posts, thread, false);
+}
+
+
+void UnseenGxsChatLobbyDialog::updateDisplay(bool complete)
+{
+    if (complete) {
+        /* Fill complete */
+        requestGroupData();
+        requestAllPosts();
+        return;
+    }
+
+    if (groupId().isNull()) {
+        return;
+    }
+
+    bool updateGroup = false;
+    const std::set<RsGxsGroupId> &grpIdsMeta = getGrpIdsMeta();
+
+    if(grpIdsMeta.find(groupId())!=grpIdsMeta.end())
+        updateGroup = true;
+
+    const std::set<RsGxsGroupId> &grpIds = getGrpIds();
+    if (!groupId().isNull() && grpIds.find(groupId())!=grpIds.end())
+    {
+        updateGroup = true;
+        /* Do we need to fill all posts? */
+        requestAllPosts();
+    } else {
+        std::map<RsGxsGroupId, std::set<RsGxsMessageId> > msgs;
+        getAllMsgIds(msgs);
+        if (!msgs.empty()) {
+            auto mit = msgs.find(groupId());
+            if (mit != msgs.end()) {
+                requestPosts(mit->second);
+            }
+        }
+    }
+
+    if (updateGroup) {
+        requestGroupData();
+    }
+}
+
+
+
+//COPY/MOVE from GxsMessageFramePostWidget (or GxsChannelPostsWidget that inherit from this class (GxsMessageFramePostWidget))
+/**************************************************************/
+/** Request / Response of Data ********************************/
+/**************************************************************/
+
+bool UnseenGxsChatLobbyDialog::navigate(const RsGxsMessageId &msgId)
+{
+    if (msgId.isNull()) {
+        return false;
+    }
+
+//    if (mStateHelper->isLoading(mTokenTypeAllPosts) || mStateHelper->isLoading(mTokenTypePosts)) {
+//        mNavigatePendingMsgId = msgId;
+
+//        /* No information if group is available */
+//        return true;
+//    }
+
+    return navigatePostItem(msgId);
+}
+
+void UnseenGxsChatLobbyDialog::requestGroupData()
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::requestGroupData()";
+    std::cerr << std::endl;
+#endif
+
+    mSubscribeFlags = 0;
+
+    mTokenQueue->cancelActiveRequestTokens(mTokenTypeGroupData);
+
+    if (groupId().isNull()) {
+//        mStateHelper->setActive(mTokenTypeGroupData, false);
+//        mStateHelper->setLoading(mTokenTypeGroupData, false);
+//        mStateHelper->clear(mTokenTypeGroupData);
+
+        mGroupName.clear();
+
+        groupNameChanged(mGroupName);
+
+        emit groupChanged(this);
+
+        return;
+    }
+
+    //mStateHelper->setLoading(mTokenTypeGroupData, true);
+
+    emit groupChanged(this);
+
+    std::list<RsGxsGroupId> groupIds;
+    groupIds.push_back(groupId());
+
+    RsTokReqOptions opts;
+    opts.mReqType = GXS_REQUEST_TYPE_GROUP_DATA;
+
+    uint32_t token;
+    mTokenQueue->requestGroupInfo(token, RS_TOKREQ_ANSTYPE_DATA, opts, groupIds, mTokenTypeGroupData);
+}
+
+void UnseenGxsChatLobbyDialog::loadGroupData(const uint32_t &token)
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::loadGroupData()";
+    std::cerr << std::endl;
+#endif
+
+    RsGroupMetaData metaData;
+    bool ok = insertGroupData(token, metaData);
+
+    //mStateHelper->setLoading(mTokenTypeGroupData, false);
+
+    if (ok) {
+        mSubscribeFlags = metaData.mSubscribeFlags;
+
+        mGroupName = QString::fromUtf8(metaData.mGroupName.c_str());
+        groupNameChanged(mGroupName);
+    } else {
+        std::cerr << "GxsMessageFramePostWidget::loadGroupData() ERROR Not just one Group";
+        std::cerr << std::endl;
+
+        //mStateHelper->clear(mTokenTypeGroupData);
+
+        mGroupName.clear();
+        groupNameChanged(mGroupName);
+    }
+
+    //mStateHelper->setActive(mTokenTypeGroupData, ok);
+    emit groupChanged(this);
+}
+
+void UnseenGxsChatLobbyDialog::requestAllPosts()
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::requestAllPosts()";
+    std::cerr << std::endl;
+#endif
+
+    mNavigatePendingMsgId.clear();
+
+    /* Request all posts */
+
+    mTokenQueue->cancelActiveRequestTokens(mTokenTypeAllPosts);
+
+    if (mFillThread) {
+        /* Stop current fill thread */
+        GxsMessageFramePostThread2 *thread = mFillThread;
+        mFillThread = NULL;
+        thread->stop(false);
+
+        //mStateHelper->setLoading(mTokenTypeAllPosts, false);
+    }
+
+    //clearPosts();
+
+    if (groupId().isNull()) {
+//        mStateHelper->setActive(mTokenTypeAllPosts, false);
+//        mStateHelper->setLoading(mTokenTypeAllPosts, false);
+//        mStateHelper->clear(mTokenTypeAllPosts);
+
+        emit groupChanged(this);
+        return;
+    }
+
+    //mStateHelper->setLoading(mTokenTypeAllPosts, true);
+    emit groupChanged(this);
+
+    std::list<RsGxsGroupId> groupIds;
+    groupIds.push_back(groupId());
+
+    RsTokReqOptions opts;
+    opts.mReqType = GXS_REQUEST_TYPE_MSG_DATA;
+
+    uint32_t token;
+    mTokenQueue->requestMsgInfo(token, RS_TOKREQ_ANSTYPE_DATA, opts, groupIds, mTokenTypeAllPosts);
+}
+
+void UnseenGxsChatLobbyDialog::loadAllPosts(const uint32_t &token)
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::loadAllPosts()";
+    std::cerr << std::endl;
+#endif
+
+    //mStateHelper->setActive(mTokenTypeAllPosts, true);
+
+    if (useThread()) {
+        /* Create fill thread */
+        mFillThread = new GxsMessageFramePostThread2(token, this);
+
+        // connect thread
+        connect(mFillThread, SIGNAL(finished()), this, SLOT(fillThreadFinished()), Qt::BlockingQueuedConnection);
+        connect(mFillThread, SIGNAL(addPost(QVariant,bool,int,int)), this, SLOT(fillThreadAddPost(QVariant,bool,int,int)), Qt::BlockingQueuedConnection);
+
+#ifdef ENABLE_DEBUG
+        std::cerr << "GxsMessageFramePostWidget::loadAllPosts() Start fill thread" << std::endl;
+#endif
+
+        /* Start thread */
+        mFillThread->start();
+    } else {
+        insertAllPosts(token, NULL);
+
+        //mStateHelper->setLoading(mTokenTypeAllPosts, false);
+
+        if (!mNavigatePendingMsgId.isNull()) {
+            navigate(mNavigatePendingMsgId);
+
+            mNavigatePendingMsgId.clear();
+        }
+    }
+
+    emit groupChanged(this);
+}
+
+void UnseenGxsChatLobbyDialog::requestPosts(const std::set<RsGxsMessageId> &msgIds)
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::requestPosts()";
+    std::cerr << std::endl;
+#endif
+
+    mNavigatePendingMsgId.clear();
+
+    mTokenQueue->cancelActiveRequestTokens(mTokenTypePosts);
+
+    if (groupId().isNull()) {
+//        mStateHelper->setActive(mTokenTypePosts, false);
+//        mStateHelper->setLoading(mTokenTypePosts, false);
+//        mStateHelper->clear(mTokenTypePosts);
+        emit groupChanged(this);
+        return;
+    }
+
+    if (msgIds.empty()) {
+        return;
+    }
+
+   // mStateHelper->setLoading(mTokenTypePosts, true);
+    emit groupChanged(this);
+
+    RsTokReqOptions opts;
+    opts.mReqType = GXS_REQUEST_TYPE_MSG_DATA;
+
+    uint32_t token;
+    GxsMsgReq requestMsgIds;
+    requestMsgIds[groupId()] = msgIds;
+    mTokenQueue->requestMsgInfo(token, RS_TOKREQ_ANSTYPE_DATA, opts, requestMsgIds, mTokenTypePosts);
+}
+
+void UnseenGxsChatLobbyDialog::loadPosts(const uint32_t &token)
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::loadPosts()";
+    std::cerr << std::endl;
+#endif
+
+   // mStateHelper->setActive(mTokenTypePosts, true);
+
+    insertPosts(token);
+
+    //mStateHelper->setLoading(mTokenTypePosts, false);
+    emit groupChanged(this);
+
+    if (!mNavigatePendingMsgId.isNull()) {
+        navigate(mNavigatePendingMsgId);
+
+        mNavigatePendingMsgId.clear();
+    }
+}
+
+void UnseenGxsChatLobbyDialog::loadRequest(const TokenQueue *queue, const TokenRequest &req)
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::loadRequest() UserType: " << req.mUserType;
+    std::cerr << std::endl;
+#endif
+
+    if (queue == mTokenQueue)
+    {
+        if (req.mUserType == mTokenTypeGroupData) {
+            loadGroupData(req.mToken);
+            return;
+        }
+
+        if (req.mUserType == mTokenTypeAllPosts) {
+            loadAllPosts(req.mToken);
+            return;
+        }
+
+        if (req.mUserType == mTokenTypePosts) {
+            loadPosts(req.mToken);
+            return;
+        }
+    }
+    GxsMessageFrameWidgetloadRequest(queue, req);
+}
+
+void UnseenGxsChatLobbyDialog::groupIdChanged()
+{
+    mGroupName = groupId().isNull () ? "" : tr("Loading");
+    groupNameChanged(mGroupName);
+
+    emit groupChanged(this);
+
+    fillComplete();
+}
+
+
+void UnseenGxsChatLobbyDialog::groupNameChanged(const QString &name)
+{
+    std::cerr << "groupNameChanged to " << name.toStdString() << std::endl;
+//    if (groupId().isNull()) {
+//        ui->nameLabel->setText(tr("No Channel Selected"));
+//        ui->logoLabel->setPixmap(QPixmap(":/images/channels.png"));
+//    } else {
+//        ui->nameLabel->setText(name);
+//    }
+}
+
+bool UnseenGxsChatLobbyDialog::navigatePostItem(const RsGxsMessageId &msgId)
+{
+    return true;
+//    FeedItem *feedItem = ui->feedWidget->findGxsFeedItem(groupId(), msgId);
+//    if (!feedItem) {
+//        return false;
+//    }
+
+    //return ui->feedWidget->scrollTo(feedItem, true);
+}
+
+void UnseenGxsChatLobbyDialog::fillThreadAddPost(const QVariant &post, bool related, int current, int count)
+{
+    if (sender() == mFillThread) {
+        fillThreadCreatePost(post, related, current, count);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///     ALL  from highest GxsChatPostsWidget
+/////////////////////////////////////////////////////////////////////////////////////////////
+//copy from highest: GxsChatPostsWidget
+
+void UnseenGxsChatLobbyDialog::insertPosts(const uint32_t &token)
+{
+    std::vector<RsGxsChatMsg> posts;
+    rsGxsChats->getPostData(token, posts);
+
+    insertChannelPosts(posts, NULL, true);
+}
+
+void UnseenGxsChatLobbyDialog::setViewMode(int viewMode)
+{
+    return;
+}
+void UnseenGxsChatLobbyDialog::createPostItem(const RsGxsChatMsg& post, bool related)
+{
+    GxsChatPostItem *item = NULL;
+    return;
+
+}
+void UnseenGxsChatLobbyDialog::filterChanged(int filter)
+{
+   return;
+}
+
+void UnseenGxsChatLobbyDialog::subscribeGroup(bool subscribe)
+{
+    if (groupId().isNull()) {
+        return;
+    }
+
+    uint32_t token;
+    rsGxsChats->subscribeToGroup(token, groupId(), subscribe);
+//	mChannelQueue->queueRequest(token, 0, RS_TOKREQ_ANSTYPE_ACK, TOKEN_TYPE_SUBSCRIBE_CHANGE);
+}
+
+bool UnseenGxsChatLobbyDialog::insertGroupData(const uint32_t &token, RsGroupMetaData &metaData)
+{
+    std::vector<RsGxsChatGroup> groups;
+    rsGxsChats->getGroupData(token, groups);
+
+    if(groups.size() == 1)
+    {
+        insertChannelDetails(groups[0]);
+        metaData = groups[0].mMeta;
+        return true;
+    }
+    else
+    {
+        RsGxsChatGroup distant_group;
+        if(rsGxsChats->retrieveDistantGroup(groupId(),distant_group))
+        {
+            insertChannelDetails(distant_group);
+            metaData = distant_group.mMeta;
+            return true ;
+        }
+    }
+
+    return false;
+}
+
+void UnseenGxsChatLobbyDialog::insertChannelDetails(const RsGxsChatGroup &group)
+{
+    /* IMAGE */
+    QPixmap chanImage;
+    if (group.mImage.mData != NULL) {
+        chanImage.loadFromData(group.mImage.mData, group.mImage.mSize, "PNG");
+    } else {
+//        chanImage = QPixmap(CHAN_DEFAULT_IMAGE);
+    }
+//    ui->logoLabel->setPixmap(chanImage);
+
+//    ui->subscribersLabel->setText(QString::number(group.mMeta.mPop)) ;
+
+//    if (group.mMeta.mSubscribeFlags & GXS_SERV::GROUP_SUBSCRIBE_PUBLISH)
+//    {
+//        mStateHelper->setWidgetEnabled(ui->postButton, true);
+//    }
+//    else
+//    {
+//        mStateHelper->setWidgetEnabled(ui->postButton, false);
+//    }
+
+//    ui->subscribeToolButton->setSubscribed(IS_GROUP_SUBSCRIBED(group.mMeta.mSubscribeFlags));
+
+    bool autoDownload ;
+            rsGxsChats->getChannelAutoDownload(group.mMeta.mGroupId,autoDownload);
+
+    setAutoDownload(true);
+
+//    if (IS_GROUP_SUBSCRIBED(group.mMeta.mSubscribeFlags)) {
+//        ui->feedToolButton->setEnabled(true);
+
+//        ui->fileToolButton->setEnabled(true);
+//        ui->infoWidget->hide();
+//        setViewMode(viewMode());
+
+//        ui->infoPosts->clear();
+//        ui->infoDescription->clear();
+//    } else {
+//        ui->infoPosts->setText(QString::number(group.mMeta.mVisibleMsgCount));
+//        if(group.mMeta.mLastPost==0)
+//            ui->infoLastPost->setText(tr("Never"));
+//        else
+//            ui->infoLastPost->setText(DateTime::formatLongDateTime(group.mMeta.mLastPost));
+//        ui->infoDescription->setText(QString::fromUtf8(group.mDescription.c_str()));
+
+//            ui->infoAdministrator->setId(group.mMeta.mAuthorId) ;
+
+//            QString distrib_string ( "[unknown]" );
+
+//            switch(group.mMeta.mCircleType)
+//        {
+//        case GXS_CIRCLE_TYPE_PUBLIC: distrib_string = tr("Public") ;
+//            break ;
+//        case GXS_CIRCLE_TYPE_EXTERNAL:
+//        {
+//            RsGxsCircleDetails det ;
+
+//            // !! What we need here is some sort of CircleLabel, which loads the circle and updates the label when done.
+
+//            if(rsGxsCircles->getCircleDetails(group.mMeta.mCircleId,det))
+//                distrib_string = tr("Restricted to members of circle \"")+QString::fromUtf8(det.mCircleName.c_str()) +"\"";
+//            else
+//                distrib_string = tr("Restricted to members of circle ")+QString::fromStdString(group.mMeta.mCircleId.toStdString()) ;
+//        }
+//            break ;
+//        case GXS_CIRCLE_TYPE_YOUR_EYES_ONLY: distrib_string = tr("Your eyes only");
+//            break ;
+//        case GXS_CIRCLE_TYPE_LOCAL: distrib_string = tr("You and your friend nodes");
+//            break ;
+//        default:
+//            std::cerr << "(EE) badly initialised group distribution ID = " << group.mMeta.mCircleType << std::endl;
+//        }
+
+//        ui->infoDistribution->setText(distrib_string);
+
+//        ui->infoWidget->show();
+//        ui->feedWidget->hide();
+//        ui->fileWidget->hide();
+
+//        ui->feedToolButton->setEnabled(false);
+//        ui->fileToolButton->setEnabled(false);
+//    }
+}
+
+void UnseenGxsChatLobbyDialog::settingsChanged()
+{
+    mUseThread = Settings->getChatsLoadThread();
+
+    //mStateHelper->setWidgetVisible(ui->progressBar, mUseThread);
+}
+
+void UnseenGxsChatLobbyDialog::fillThreadCreatePost(const QVariant &post, bool related, int current, int count)
+{
+    /* show fill progress */
+    if (count) {
+        //ui->progressBar->setValue(current * ui->progressBar->maximum() / count);
+    }
+
+    if (!post.canConvert<RsGxsChatMsg>()) {
+        return;
+    }
+
+    createPostItem(post.value<RsGxsChatMsg>(), related);
+}
+void UnseenGxsChatLobbyDialog::fillThreadFinished()
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::fillThreadFinished()" << std::endl;
+#endif
+
+    /* Thread has finished */
+    GxsMessageFramePostThread2 *thread = dynamic_cast<GxsMessageFramePostThread2*>(sender());
+    if (thread) {
+        if (thread == mFillThread) {
+            /* Current thread has finished */
+            mFillThread = NULL;
+
+            //mStateHelper->setLoading(mTokenTypeAllPosts, false);
+            emit groupChanged(this);
+
+            if (!mNavigatePendingMsgId.isNull()) {
+                navigate(mNavigatePendingMsgId);
+
+                mNavigatePendingMsgId.clear();
+            }
+        }
+
+#ifdef ENABLE_DEBUG
+        if (thread->stopped()) {
+            // thread was stopped
+            std::cerr << "GxsMessageFramePostWidget::fillThreadFinished() Thread was stopped" << std::endl;
+        }
+#endif
+
+#ifdef ENABLE_DEBUG
+        std::cerr << "GxsMessageFramePostWidget::fillThreadFinished() Delete thread" << std::endl;
+#endif
+
+        thread->deleteLater();
+        thread = NULL;
+    }
+
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostWidget::fillThreadFinished done()" << std::endl;
+#endif
+}
+
+void UnseenGxsChatLobbyDialog::toggleAutoDownload()
+{
+    RsGxsGroupId grpId = groupId();
+    if (grpId.isNull()) {
+        return;
+    }
+
+    bool autoDownload ;
+        if(!rsGxsChats->getChannelAutoDownload(grpId,autoDownload) || !rsGxsChats->setChannelAutoDownload(grpId, !autoDownload))
+    {
+        std::cerr << "GxsChatDialog::toggleAutoDownload() Auto Download failed to set";
+        std::cerr << std::endl;
+    }
+}
+
+class GxsChatPostsReadData
+{
+public:
+    GxsChatPostsReadData(bool read)
+    {
+        mRead = read;
+        mLastToken = 0;
+    }
+
+public:
+    bool mRead;
+    uint32_t mLastToken;
+};
+
+//static void setAllMessagesReadCallback(FeedItem *feedItem, void *data)
+//{
+//    GxsChatPostItem *chatPostItem = dynamic_cast<GxsChatPostItem*>(feedItem);
+//    if (!chatPostItem) {
+//        return;
+//    }
+
+//    GxsChatPostsReadData *readData = (GxsChatPostsReadData*) data;
+//    bool is_not_new = !chatPostItem->isUnread() ;
+
+//    if(is_not_new == readData->mRead)
+//        return ;
+
+//    RsGxsGrpMsgIdPair msgPair = std::make_pair(chatPostItem->groupId(), chatPostItem->messageId());
+//    rsGxsChats->setMessageReadStatus(readData->mLastToken, msgPair, readData->mRead);
+//}
+
+void UnseenGxsChatLobbyDialog::setAllMessagesReadDo(bool read, uint32_t &token)
+{
+    if (groupId().isNull() || !IS_GROUP_SUBSCRIBED(subscribeFlags())) {
+        return;
+    }
+
+    GxsChatPostsReadData data(read);
+    //ui->feedWidget->withAll(setAllMessagesReadCallback, &data);
+
+    token = data.mLastToken;
+
+    //continue from the GxsMessageFrameWidget::setAllMessagesReadDo
+    if (token) {
+        /* Wait for acknowlegde of the token */
+        mAcknowledgeReadStatusToken = token;
+        mTokenQueue->queueRequest(mAcknowledgeReadStatusToken, 0, 0, mTokenTypeAcknowledgeReadStatus);
+        //mStateHelper->setLoading(mTokenTypeAcknowledgeReadStatus, true);
+
+        emit waitingChanged(this);
+    }
+}
+
+void UnseenGxsChatLobbyDialog::createMsg()
+{
+    if (groupId().isNull()) {
+        return;
+    }
+
+    if (!IS_GROUP_SUBSCRIBED(subscribeFlags())) {
+        return;
+    }
+
+    CreateGxsChatMsg *msgDialog = new CreateGxsChatMsg(groupId());
+    msgDialog->show();
+
+    /* window will destroy itself! */
+}
+void UnseenGxsChatLobbyDialog::setAutoDownload(bool autoDl)
+{
+//    mAutoDownloadAction->setChecked(autoDl);
+//    mAutoDownloadAction->setText(autoDl ? tr("Disable Auto-Download") : tr("Enable Auto-Download"));
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///     ALL  from  GxsMessageFramePostThread
+/////////////////////////////////////////////////////////////////////////////////////////////
+//copy from GxsMessageFramePostThread
+GxsMessageFramePostThread2::GxsMessageFramePostThread2(uint32_t token, UnseenGxsChatLobbyDialog *parent)
+    : QThread(parent), mToken(token), mParent(parent)
+{
+    mStopped = false;
+}
+
+GxsMessageFramePostThread2::~GxsMessageFramePostThread2()
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostThread::~GxsMessageFramePostThread" << std::endl;
+#endif
+}
+
+void GxsMessageFramePostThread2::stop(bool waitForStop)
+{
+    if (waitForStop) {
+        disconnect();
+    }
+
+    mStopped = true;
+    QApplication::processEvents();
+
+    if (waitForStop) {
+        wait();
+    }
+}
+
+void GxsMessageFramePostThread2::run()
+{
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostThread2::run()" << std::endl;
+#endif
+
+    mParent->insertAllPosts(mToken, this);
+
+#ifdef ENABLE_DEBUG
+    std::cerr << "GxsMessageFramePostThread2::run() stopped: " << (stopped() ? "yes" : "no") << std::endl;
+#endif
+}
+
+void GxsMessageFramePostThread2::emitAddPost(const QVariant &post, bool related, int current, int count)
+{
+    emit addPost(post, related, current, count);
 }

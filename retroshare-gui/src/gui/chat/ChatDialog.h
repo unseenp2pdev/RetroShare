@@ -25,9 +25,11 @@
 
 #include <QWidget>
 #include <retroshare/rsmsgs.h>
+#include "retroshare/rsgxschats.h"
 
 Q_DECLARE_METATYPE(RsGxsId)
 Q_DECLARE_METATYPE(QList<RsGxsId>)
+
 
 class ChatWidget;
 class RSStyle;

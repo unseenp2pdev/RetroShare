@@ -34,6 +34,9 @@
 #include "util/rsdir.h"
 
 #include <retroshare/rsfiles.h>
+//unseenp2p - add for get the own gxsId
+#include <retroshare/rsidentity.h>
+#include <QDateTime>
 
 #include <iostream>
 
@@ -687,6 +690,17 @@ void CreateGxsChatMsg::sendMessage(const std::string &subject, const std::string
 
         post.mMeta.mOrigMsgId = mOrigPostId;
         post.mMeta.mMsgName = subject;
+
+        //unseenp2p - add author gxsid
+        std::list<RsGxsId> gxsIdList;
+        rsIdentity->getOwnIds(gxsIdList);
+        if(!gxsIdList.empty())
+        {
+            post.mMeta.mAuthorId = gxsIdList.front() ;
+        }
+        //unseenp2p - add more timestamp
+        post.mMeta.mPublishTs = QDateTime::currentDateTime().toTime_t();
+
         post.mMsg = msg;
         post.mFiles = files;
 

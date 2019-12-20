@@ -343,7 +343,7 @@ private:
 		TYPE_PRIVATE,            // private chat with directly connected friend, peer_id is valid
 		TYPE_PRIVATE_DISTANT,    // private chat with distant peer, gxs_id is valid
 		TYPE_LOBBY,              // chat lobby id, lobby_id is valid
-		TYPE_BROADCAST           // message to/from all connected peers
+        TYPE_BROADCAST           // message to/from all connected peers
 	};
 
     Type type;
@@ -371,19 +371,26 @@ public:
 
     std::string toStdString() const;
 
-    RsGxsGroupId    toGxsChatId()  const;
+    RsGxsGroupId    toGxsGroupId()  const;
     bool operator<(const gxsChatId& other) const;
     bool isSameEndpoint(const gxsChatId& other) const;
 
     bool operator==(const gxsChatId& other) const { return isSameEndpoint(other) ; }
 private:
+    enum Type : uint8_t
+    {	TYPE_NOT_SET,
+        TYPE_GXSONE2ONE,
+        TYPE_GXSGROUPCHAT,
+        TYPE_GXSCHANNEL
+    };
 
+    Type type;
     RsGxsGroupId  groupId;
-
     // RsSerializable interface
 public:
     void serial_process(RsGenericSerializer::SerializeJob j, RsGenericSerializer::SerializeContext &ctx) {
         RS_SERIAL_PROCESS(groupId);
+        RS_SERIAL_PROCESS(type);
     }
 };
 

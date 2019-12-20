@@ -467,7 +467,7 @@ void ChatWidget::init(const gxsChatId &chat_id, const QString &title)
     uint32_t hist_chat_type = RS_HISTORY_TYPE_GXSGROUPCHAT; // a value larger than the biggest RS_HISTORY_TYPE_* value
     int messageCount=0;
 
-    if (chatType() == GXSGROUPCHAT)
+    if (chatType() == CHATTYPE_GXSGROUPCHAT)
     {
         messageCount=100;   //just for testing gxs groupchat
     }
@@ -535,7 +535,11 @@ ChatWidget::ChatType ChatWidget::chatType()
     if(chatId.isLobbyId())
         return CHATTYPE_LOBBY;
 
-    if (chatId.isNotSet()) return GXSGROUPCHAT;
+    if (chatId.isNotSet())
+    {
+        //if (mGxsChatId.toStdString()) ()
+        return CHATTYPE_GXSGROUPCHAT;
+    }
 
     return CHATTYPE_UNKNOWN;
 }
@@ -1344,6 +1348,14 @@ void ChatWidget::updateLenOfChatTextEdit()
 	ui->chatTextEdit->setToolTip(text);
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// //Unseenp2p - need to separate some types of chat:
+///  1. normal (one2one ssl + groupchat) chat
+///  2. gxs chat (use gxs post) for both one2one and gxs groupchat + channel
+////////////////////////////////////////////////////////////////////////////////
+
 void ChatWidget::sendChat()
 {
 	if (!ui->sendButton->isEnabled()){
@@ -1378,9 +1390,43 @@ void ChatWidget::sendChat()
 	std::cout << "ChatWidget:sendChat " << std::endl;
 #endif
     //TODO: use gxsChatId to send msg?
-    rsMsgs->sendChat(chatId, msg);
-
     std::string textToSignal = chatWidget->toPlainText().toStdString();
+
+    if (this->chatType() != CHATTYPE_GXSGROUPCHAT)
+    {
+        rsMsgs->sendChat(chatId, msg);
+    }
+    else if (this->chatType() == CHATTYPE_GXSGROUPCHAT)
+    {
+        uint32_t token;
+        RsGxsChatMsg post;
+        if (rsGxsChats)
+        {
+            post.mMeta.mGroupId = getGxsChatId().toGxsGroupId();
+            post.mMeta.mParentId.clear() ;
+            post.mMeta.mThreadId.clear() ;
+            post.mMeta.mMsgId.clear() ;
+
+            //post.mMeta.mOrigMsgId = mOrigPostId;
+            post.mMeta.mMsgName = "";
+
+            //unseenp2p - add author gxsid
+            std::list<RsGxsId> gxsIdList;
+            rsIdentity->getOwnIds(gxsIdList);
+            if(!gxsIdList.empty())
+            {
+                post.mMeta.mAuthorId = gxsIdList.front() ;
+            }
+            //unseenp2p - add more timestamp
+            post.mMeta.mPublishTs = QDateTime::currentDateTime().toTime_t();
+
+            post.mMsg = textToSignal;
+
+            rsGxsChats->createPost(token, post);
+        }
+    }
+
+
 	chatWidget->clear();
 	// workaround for Qt bug - http://bugreports.qt.nokia.com/browse/QTBUG-2533
 	// QTextEdit::clear() does not reset the CharFormat if document contains hyperlinks that have been accessed.
@@ -1392,14 +1438,22 @@ void ChatWidget::sendChat()
         //unsigned int current_time = QDateTime::currentDateTime().toTime_t();
         long long current_time = QDateTime::currentSecsSinceEpoch();
         std::string nickInGroupChat = "You";
-        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);
+        emit NotifyQt::getInstance()->alreadySendChat(this->getChatId(), nickInGroupChat, current_time, textToSignal, true);        
+    }
+    // this for gxs chat recent time, sort the gxschat conversation list
+    else if (this->chatType() == CHATTYPE_GXSGROUPCHAT)
+    {
+        long long current_time = QDateTime::currentSecsSinceEpoch();
+        std::string nickInGroupChat = "You";
+        emit NotifyQt::getInstance()->alreadySendChat(this->getGxsChatId(), nickInGroupChat, current_time, textToSignal, true);
+    }
 
-        //we can check the scroll position here, if it now at the end, so update it to the end
-        QScrollBar *scrollbar = ui->textBrowser->verticalScrollBar();
-        bool is_scrollbar_at_end = scrollbar->value() == scrollbar->maximum();
-        if (!is_scrollbar_at_end ) {
-            scrollbar->setValue(scrollbar->maximum());
-        }
+    // This is common, for all cases of chat,
+    //we can check the scroll position here, if it is not at the end, so update it to the end
+    QScrollBar *scrollbar = ui->textBrowser->verticalScrollBar();
+    bool is_scrollbar_at_end = scrollbar->value() == scrollbar->maximum();
+    if (!is_scrollbar_at_end ) {
+        scrollbar->setValue(scrollbar->maximum());
     }
 }
 

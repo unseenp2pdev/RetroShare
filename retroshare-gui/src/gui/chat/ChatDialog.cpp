@@ -182,8 +182,8 @@ ChatDialog* ChatDialog::getExistingChat(gxsChatId id)
 
         if (chatflags & RS_CHAT_OPEN) {
 
-                UnseenGxsChatLobbyDialog* cld = new UnseenGxsChatLobbyDialog(id.toGxsChatId());
-                cld->init(gxsChatId(), "");
+                UnseenGxsChatLobbyDialog* cld = new UnseenGxsChatLobbyDialog(id.toGxsGroupId());
+                cld->init(id, "");
                 cd = cld;
             }
     }  else if(cd)

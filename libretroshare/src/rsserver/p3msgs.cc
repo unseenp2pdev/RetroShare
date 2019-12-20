@@ -244,7 +244,7 @@ RsPeerId    ChatId::toPeerId()  const
     }
 }
 
-DistantChatPeerId     ChatId::toDistantChatId()   const
+DistantChatPeerId ChatId::toDistantChatId()   const
 {
     if(type == TYPE_PRIVATE_DISTANT)
         return distant_chat_id;
@@ -275,7 +275,7 @@ gxsChatId::gxsChatId(RsGxsGroupId groupid)
     groupId = groupid;
 }
 
-RsGxsGroupId gxsChatId::toGxsChatId() const
+RsGxsGroupId gxsChatId::toGxsGroupId() const
 {
     return groupId;
 }

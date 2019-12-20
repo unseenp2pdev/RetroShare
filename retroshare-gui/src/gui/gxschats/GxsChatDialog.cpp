@@ -35,6 +35,8 @@
 #include "gui/notifyqt.h"
 #include "gui/common/GroupTreeWidget.h"
 
+//#include "gui/gxschats/UnseenGxsChatLobbyDialog.h"
+
 class GxsChatGroupInfoData : public RsUserdata
 {
 public:
@@ -165,6 +167,7 @@ GxsMessageFrameWidget *GxsChatDialog::createMessageFrameWidget(const RsGxsGroupI
 {
     //rsGxsChats->setSyncPeriod(groupId,300.0);   //reset sync message in 5min for this group
     return new GxsChatPostsWidget(groupId);
+    //return new UnseenGxsChatLobbyDialog(groupId);
 }
 
 void GxsChatDialog::setDefaultDirectory()

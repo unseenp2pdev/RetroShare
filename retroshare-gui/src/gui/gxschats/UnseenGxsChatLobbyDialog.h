@@ -27,10 +27,19 @@
 #include "gui/common/RSTreeWidgetItem.h"
 #include "gui/chat/ChatDialog.h"
 
+#include <retroshare/rsgxsifacetypes.h>
+#include "util/TokenQueue.h"
+
+#include "gui/gxs/GxsMessageFramePostWidget.h"
+#include "gui/feeds/FeedHolder.h"
+#include "retroshare/rsgxschats.h"
+
+class GxsMessageFramePostThread2;
+class UIStateHelper;
+
 Q_DECLARE_METATYPE(gxsChatId)
-//Q_DECLARE_METATYPE(RsGxsId)
-//Q_DECLARE_METATYPE(QList<RsGxsId>)
-//Q_DECLARE_METATYPE(QList<RsGxsId>)
+Q_DECLARE_METATYPE(RsGxsChatMsg)
+
 
 class GxsIdChooser ;
 class QToolButton;
@@ -38,11 +47,19 @@ class QWidgetAction;
 class ChatId;
 class gxsChatId;
 
-class UnseenGxsChatLobbyDialog: public ChatDialog
+//for gxs things
+class GxsChatPostItem;
+class RsGxsIfaceHelper;
+class RsGxsUpdateBroadcastBase;
+typedef uint32_t TurtleRequestId;
+
+//customize this class so it can inherit from the TokenResponse
+class UnseenGxsChatLobbyDialog: public ChatDialog, public TokenResponse
 {
 	Q_OBJECT 
 
 	friend class ChatDialog;
+    friend class GxsMessageFramePostThread2;
 
 public:
     void displayLobbyEvent(int event_type, const RsGxsId &gxs_id, const QString& str);
@@ -152,6 +169,216 @@ private:
 
     //unseenp2p - add for gxs groupchat
     RsGxsGroupId  mGXSGroupId;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ///             THESE ARE FOR 4 CLASS THAT THIS CLASS NEED TO DO                ////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ///     ALL  from RsGxsUpdateBroadcastWidget
+    /////////////////////////////////////////////////////////////////////////////////////////////
+//copy from RsGxsUpdateBroadcastWidget - to get all the RsGxsGroupId, RsGxsMessageId, loadRequest
+public:
+    void fillComplete();
+    void setUpdateWhenInvisible(bool update);
+    const std::set<RsGxsGroupId> &getGrpIds();
+    const std::set<RsGxsGroupId> &getGrpIdsMeta();
+    void getAllGrpIds(std::set<RsGxsGroupId> &grpIds);
+    const std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &getMsgIds();
+    const std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &getMsgIdsMeta();
+    void getAllMsgIds(std::map<RsGxsGroupId, std::set<RsGxsMessageId> > &msgIds);
+    const std::set<TurtleRequestId>& getSearchResults() ;
+
+    RsGxsIfaceHelper *interfaceHelper() { return mInterfaceHelper; }
+
+protected:
+    virtual void showEvent(QShowEvent *event);
+    // This is overloaded in subclasses. -> now it will in one class only
+    virtual void updateDisplay(bool complete);
+
+private slots:
+    void fillDisplay(bool complete);
+
+private:
+    RsGxsUpdateBroadcastBase *mBase;
+    RsGxsIfaceHelper *mInterfaceHelper;
+//END of copy from RsGxsUpdateBroadcastWidget
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ///     ALL  from GxsMessageFrameWidget
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+public:
+
+    const RsGxsGroupId &groupId();
+    void setGroupId(const RsGxsGroupId &groupId);
+    void setAllMessagesRead(bool read);
+    void groupIdChanged();
+    bool isLoading();
+    bool isWaiting();
+
+    /* GXS functions */
+    uint32_t nextTokenType() { return ++mNextTokenType; }
+    void GxsMessageFrameWidgetloadRequest(const TokenQueue *queue, const TokenRequest &req);
+
+signals:
+    void groupChanged(QWidget *widget);
+    void waitingChanged(QWidget *widget);
+    void loadComment(const RsGxsGroupId &groupId, const QVector<RsGxsMessageId>& msg_versions,const RsGxsMessageId &msgId, const QString &title);
+
+protected:
+    void setAllMessagesReadDo(bool read, uint32_t &token);
+protected:
+    TokenQueue *mTokenQueue;
+    UIStateHelper *mStateHelper;
+
+    /* Set read status */
+    uint32_t mTokenTypeAcknowledgeReadStatus;
+    uint32_t mAcknowledgeReadStatusToken;
+
+private:
+    RsGxsGroupId mGroupId; /* current group */
+    uint32_t mNextTokenType;
+//END of copy from GxsMessageFrameWidget
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ///     ALL  from GxsMessageFramePostWidget
+    /////////////////////////////////////////////////////////////////////////////////////////////
+//copy from GxsMessageFramePostWidget
+public:
+
+
+    /* GxsMessageFrameWidget */
+    //need to remove because of the same
+    /* GxsMessageFrameWidget */
+
+    QString groupName(bool withUnreadCount);
+    bool navigate(const RsGxsMessageId& msgId);
+
+    /* GXS functions */
+    void loadRequest(const TokenQueue *queue, const TokenRequest &req);
+
+    int subscribeFlags() { return mSubscribeFlags; }
+
+protected:
+    /* RsGxsUpdateBroadcastWidget */
+    //virtual void updateDisplay(bool complete);
+
+     void groupNameChanged(const QString &/*name*/);
+
+
+     void clearPosts();
+     bool navigatePostItem(const RsGxsMessageId& msgId);
+
+    /* Thread functions */
+     bool useThread() { return false; }
+     void fillThreadCreatePost(const QVariant &/*post*/, bool /*related*/, int /*current*/, int /*count*/);
+
+    /* GXS functions */
+    void requestGroupData();
+    void loadGroupData(const uint32_t &token);
+    bool insertGroupData(const uint32_t &token, RsGroupMetaData &metaData);
+
+    void requestAllPosts();
+    void loadAllPosts(const uint32_t &token);
+    void insertAllPosts(const uint32_t &token, GxsMessageFramePostThread2 *thread);
+
+    void requestPosts(const std::set<RsGxsMessageId> &msgIds);
+    void loadPosts(const uint32_t &token);
+    void insertPosts(const uint32_t &token);
+
+private slots:
+    void fillThreadFinished();
+    void fillThreadAddPost(const QVariant &post, bool related, int current, int count);
+protected:
+    uint32_t mTokenTypeGroupData;
+    uint32_t mTokenTypeAllPosts;
+    uint32_t mTokenTypePosts;
+    RsGxsMessageId mNavigatePendingMsgId;
+
+private:
+    QString mGroupName;
+    int mSubscribeFlags;
+    GxsMessageFramePostThread2 *mFillThread;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ///     ALL  from GxsChatPostsWidget - highest class
+    /////////////////////////////////////////////////////////////////////////////////////////////
+//copy from GxsChatPostsWidget - highest class
+public:
+
+    /* GxsMessageFrameWidget */
+   // virtual QIcon groupIcon();
+
+    /* FeedHolder */
+    QScrollArea *getScrollArea();
+    void deleteFeedItem(QWidget *item, uint32_t type);
+    void openChat(const RsPeerId& peerId);
+    void openComments(uint32_t type, const RsGxsGroupId &groupId, const QVector<RsGxsMessageId> &msg_versions, const RsGxsMessageId &msgId, const QString &title);
+
+
+private slots:
+    void createMsg();
+    void toggleAutoDownload();
+    void subscribeGroup(bool subscribe);
+    void filterChanged(int filter);
+    void setViewMode(int viewMode);
+    void settingsChanged();
+
+private:
+
+
+    void setAutoDownload(bool autoDl);
+
+    int viewMode();
+
+    void insertChannelDetails(const RsGxsChatGroup &group);
+    void insertChannelPosts(std::vector<RsGxsChatMsg> &posts, GxsMessageFramePostThread2 *thread, bool related);
+
+    void createPostItem(const RsGxsChatMsg &post, bool related);
+
+private:
+    QAction *mAutoDownloadAction;
+
+    bool mUseThread;
+
+//END of copy from GxsChatPostsWidget
+
+//RS GXS workflow
+
+// GxsChannelPostsWidget -> GxsMessageFramePostWidget -> GxsMessageFrameWidget -> RsGxsUpdateBroadcastWidget (->QWidget) + TokenResponse
+//                                     |
+//                          GxsMessageFramePostThread
+
+//Because UnseenGxsChatLobbyDialog get all these 4 classes, so it will take all variables and functions from these 4 classes
+
+// GxsGroupFrameDialog -> RsGxsUpdateBroadcastPage (-> MainPage) + TokenResponse
+
+
+};
+
+class GxsMessageFramePostThread2 : public QThread
+{
+    Q_OBJECT
+
+public:
+    GxsMessageFramePostThread2(uint32_t token, UnseenGxsChatLobbyDialog  *parent);
+    ~GxsMessageFramePostThread2();
+
+    void run();
+    void stop(bool waitForStop);
+    bool stopped() { return mStopped; }
+
+    void emitAddPost(const QVariant &post, bool related, int current, int count);
+
+signals:
+    void addPost(const QVariant &post, bool related, int current, int count);
+
+private:
+    uint32_t mToken;
+    UnseenGxsChatLobbyDialog *mParent;
+    volatile bool mStopped;
 };
 
 #endif

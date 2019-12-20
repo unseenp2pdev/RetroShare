@@ -90,6 +90,7 @@ UnseenGxsGroupFrameDialog::UnseenGxsGroupFrameDialog(RsGxsIfaceHelper *ifaceImpl
 	mOtherGroups = NULL;
 	mMessageWidget = NULL;
 
+    QObject::connect( NotifyQt::getInstance(), SIGNAL(alreadySendChat(const gxsChatId&, std::string, long long, std::string, bool)), this, SLOT(updateRecentTime(const ChatId&, std::string, long long, std::string, bool)));
 
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged()));
     connect(ui->filterLineEdit, SIGNAL(filterChanged(int)), this, SLOT(filterChanged()));
@@ -1438,7 +1439,7 @@ void UnseenGxsGroupFrameDialog::showGxsGroupChatMVC(gxsChatId chatId)
 {
 
     //ChatLobbyId lobbyId = QString::fromStdString(chatIdStr).toULongLong();
-    RsGxsGroupId groupId = chatId.toGxsChatId();
+    RsGxsGroupId groupId = chatId.toGxsGroupId();
     if(_unseenGxsGroup_infos.find(groupId) == _unseenGxsGroup_infos.end())
     {
         ChatDialog::chatFriend(chatId,true) ;
@@ -1451,5 +1452,77 @@ void UnseenGxsGroupFrameDialog::showGxsGroupChatMVC(gxsChatId chatId)
         cld->updateParticipantsList();
     }
 
+
+}
+
+//update recent time for every chat item and sort by recent time
+void UnseenGxsGroupFrameDialog::updateRecentTime(const gxsChatId & chatId, std::string nickInGroupChat, long long current_time, std::string textmsg, bool isSend)
+{
+
+        //TODO: update the gxs conversation list
+
+        //Need to update the Conversation list in rsMsg, then update the GUI of chat item list
+//       std::string chatIdStr;
+//       if (chatId.isLobbyId())          //for groupchat
+//       {
+//           chatIdStr = std::to_string(chatId.toLobbyId());
+//       }
+//       else if (chatId.isPeerId())      //for one2one chat
+//       {
+//           chatIdStr = chatId.toPeerId().toStdString();
+//       }
+
+//       //update both new last msg and last msg datetime to the conversation list
+//       rsMsgs->updateRecentTimeOfItemInConversationList(chatIdStr, nickInGroupChat, current_time, textmsg, !isSend);
+
+//       //Need to get the selected item with saving uId before sorting and updating the layout
+//       //so that we use uId to re-select the item with saved uId
+//        // Even when user in search mode, we still can get the right selectedUId
+//       QModelIndexList list = ui->lobbyTreeWidget->selectionModel()->selectedIndexes();
+//       std::string selectedUId;
+//       foreach (QModelIndex index, list)
+//       {
+//           if (index.row()!=-1)
+//           {
+//               selectedUId = rsMsgs->getSeletedUIdBeforeSorting(index.row());
+//               break;
+//           }
+//       }
+
+//        if (!isSend)
+//        {
+//            //receive new msg, need to update unread msg to model data, increase 1
+//            rsMsgs->updateUnreadNumberOfItemInConversationList(chatIdStr, 1, false);
+//            //check if this is a current chat window, so update new msg as read
+//            if (chatIdStr == selectedUId)
+//            {
+//                rsHistory->updateMessageAsRead(chatId);
+//            }
+//        }
+//        else
+//        {
+//            //check if this is the filtered search mode, just return to normal mode
+//            if (rsMsgs->getConversationListMode() == CONVERSATION_MODE_WITH_SEARCH_FILTER)
+//            {
+//                if (!ui->filterLineEdit->text().isEmpty())
+//                {
+//                    ui->filterLineEdit->setText("");
+//                }
+//            }
+//        }
+
+//        rsMsgs->sortConversationItemListByRecentTime();
+//        emit ui->lobbyTreeWidget->model()->layoutChanged();
+
+//        // For both case of sending or receiving, just clear the selection and re-select chat item
+//        ui->lobbyTreeWidget->selectionModel()->clearSelection();
+
+//        //re-select the chat item again, the old selected one was saved to selectedIndex
+//        // at first find the index of the uId, then re-select
+
+//        int seletedrow = rsMsgs->getIndexFromUId(selectedUId);
+//        QModelIndex idx = ui->lobbyTreeWidget->model()->index(seletedrow, 0);
+//        ui->lobbyTreeWidget->selectionModel()->select(idx, QItemSelectionModel::Select);
+//        emit ui->lobbyTreeWidget->model()->layoutChanged();
 
 }

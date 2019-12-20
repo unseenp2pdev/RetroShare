@@ -122,7 +122,7 @@ GxsChatPostsWidget::GxsChatPostsWidget(const RsGxsGroupId &channelId, QWidget *p
     ui->subscribeToolButton->addSubscribedAction(mAutoDownloadAction);
 
     /* Initialize GUI */
-    setAutoDownload(false);
+    setAutoDownload(true);
     settingsChanged();
     setGroupId(channelId);
 }
@@ -257,7 +257,8 @@ void GxsChatPostsWidget::insertChannelDetails(const RsGxsChatGroup &group)
 
     bool autoDownload ;
             rsGxsChats->getChannelAutoDownload(group.mMeta.mGroupId,autoDownload);
-    setAutoDownload(autoDownload);
+
+    setAutoDownload(true);
 
     if (IS_GROUP_SUBSCRIBED(group.mMeta.mSubscribeFlags)) {
         ui->feedToolButton->setEnabled(true);

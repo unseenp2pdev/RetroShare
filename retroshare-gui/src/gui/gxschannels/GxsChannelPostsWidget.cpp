@@ -120,8 +120,8 @@ GxsChannelPostsWidget::GxsChannelPostsWidget(const RsGxsGroupId &channelId, QWid
 
 	ui->subscribeToolButton->addSubscribedAction(mAutoDownloadAction);
 
-	/* Initialize GUI */
-	setAutoDownload(false);
+    /* Initialize GUI */ //unseenp2p - try to change here for hard code setAutoDownload(true)
+    setAutoDownload(true);
 	settingsChanged();
 	setGroupId(channelId);
 }
@@ -256,7 +256,8 @@ void GxsChannelPostsWidget::insertChannelDetails(const RsGxsChannelGroup &group)
 
     bool autoDownload ;
             rsGxsChannels->getChannelAutoDownload(group.mMeta.mGroupId,autoDownload);
-	setAutoDownload(autoDownload);
+    //set hard code here
+    setAutoDownload(true);
 
 	if (IS_GROUP_SUBSCRIBED(group.mMeta.mSubscribeFlags)) {
 		ui->feedToolButton->setEnabled(true);
