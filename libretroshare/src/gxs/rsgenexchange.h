@@ -123,6 +123,8 @@ public:
 
     void setNetworkExchangeService(RsNetworkExchangeService *ns) ;
 
+    RsNetworkExchangeService * getNetworkExchangeService();
+
     /** S: Observer implementation **/
 
     /*!
@@ -595,6 +597,10 @@ protected:
      * @return SERVICE_CREATE_SUCCESS, SERVICE_CREATE_FAIL, SERVICE_FAIL_TRY_LATER
      */
     virtual ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+
+    virtual ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp); //group with complete keypairs
+
+    virtual ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
 public:
 

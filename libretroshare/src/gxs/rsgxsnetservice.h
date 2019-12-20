@@ -160,6 +160,8 @@ public:
      */
     virtual int requestMsg(const RsGxsGrpMsgIdPair& /* msgId */){ return 0;}
 
+    virtual void handleRecvChatMessage(RsNxsMsg* msg);
+    virtual void handleRecvChatGroup(RsNxsGrp * grp);
     /*!
      * Request for this group is sent through to peers on your network
      * and how many hops from them you've indicated
@@ -444,6 +446,10 @@ private:
     static RsGxsGroupId hashGrpId(const RsGxsGroupId& gid,const RsPeerId& pid) ;
     
 	RsGxsGrpConfig& locked_getGrpConfig(const RsGxsGroupId& grp_id);
+
+    virtual void PublishChat(RsNxsMsg* msg, std::list<RsPeerId> &ids);
+    virtual void PublishChatGroup(RsNxsGrp *grp, std::list<RsPeerId> &ids);
+
 private:
 
     typedef std::vector<RsNxsGrp*> GrpFragments;

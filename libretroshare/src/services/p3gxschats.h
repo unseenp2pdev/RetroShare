@@ -11,7 +11,7 @@
 #include <string>
 
 //chatservice
-#include "chat/p3gxschatservice.h"
+#include "chat/p3chatservice.h"
 #include "rsitems/rsmsgitems.h"
 #include "pqi/pqiservicemonitor.h"
 #include "chat/distantchat.h"
@@ -37,18 +37,24 @@ class SSGxsChatGroup
     std::string mDownloadDirectory;
 };
 
-class p3GxsChats: public RsGenExchange, public RsGxsChats,
-    public GxsTokenQueue, public p3GxsChatService, virtual public p3Config,
+class p3GxsChats: public RsGenExchange,  public RsGxsChats,
+    public GxsTokenQueue, virtual public p3Config, public RsNxsChatObserver,
     public RsTickEvent	/* only needed for testing - remove after */
 {
 public:
     p3GxsChats( RsGeneralDataService* gds, RsNetworkExchangeService* nes,
-                   RsGixs* gixs, p3ServiceControl *sc, p3IdService *pids,
-                p3LinkMgr *lm, p3HistoryMgr *historyMgr,
-                p3GxsTrans& gxsTransService );
+                   RsGixs* gixs);
     virtual RsServiceInfo getServiceInfo();
 
     virtual void service_tick();
+
+    virtual void setp3ChatService(p3ChatService *chatsrv)
+    {
+        if(mChatSrv != NULL)
+            std::cerr << "(EE) Cannot override existing p3chatservice. Make sure it has been deleted otherwise." << std::endl;
+        else
+            mChatSrv = chatsrv;
+    }
 
 protected:
 
@@ -71,8 +77,20 @@ protected:
     virtual bool getChannelDownloadDirectory(const RsGxsGroupId &groupId, std::string& directory);
 
 
+    //p3chatservice callback to process gxs messages/groups
+
+    virtual void receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages);
+    virtual void receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups);
+    virtual void notifyReceiveChatInvite(const RsGxsGroupId &grpId) {}
+    virtual void notifyReceiveChatPublishKey(const RsGxsGroupId &grpId) {}
+    virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) {}
+
 
 virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+
+virtual RsGenExchange::ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp);
+
+virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);
 
@@ -248,6 +266,12 @@ bool generateGroup(uint32_t &token, std::string groupName);
 
     /// Cleanup mSearchCallbacksMap
     void cleanTimedOutSearches();
+    p3ChatService *mChatSrv;
+    RsSerialType *mSerialiser;
+    RsMutex mChatMtx;
+
+
+
 };
 
 #endif // P3GXSCHATS_H

@@ -229,6 +229,7 @@ RetroCursor* RetroDb::sqlQuery(const std::string& tableName, const std::list<std
     else
         sqlQuery += ";";
 
+
 #ifdef RETRODB_DEBUG
     std::cerr << "RetroDb::sqlQuery(): " << sqlQuery << std::endl;
 #endif

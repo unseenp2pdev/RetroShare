@@ -40,8 +40,11 @@
 #include "util/rsrandom.h"
 #include "util/rsstring.h"
 
+#include "chat/rschatitems.h"
+#include "retroshare/rspeers.h"
+#include "rsitems/rsnxsitems.h"
 
-#define GXSCHATS_DEBUG 1
+//#define GXSCHATS_DEBUG 1
 
 
 
@@ -65,12 +68,13 @@ RsGxsChats *rsGxsChats = NULL;
 /******************* Startup / Tick    ******************************************/
 /********************************************************************************/
 
-p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs,
-        p3ServiceControl *sc, p3IdService *pids, p3LinkMgr *lm, p3HistoryMgr *historyMgr, p3GxsTrans& gxsTransService) :
-        RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
-        RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
-        p3GxsChatService(sc, pids,lm,historyMgr),
-    mSearchCallbacksMapMutex("GXS chats search")
+p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes, RsGixs* gixs):
+    RsGenExchange( gds, nes, new RsGxsChatSerialiser(), RS_SERVICE_GXS_TYPE_CHATS, gixs, chatsAuthenPolicy() ),
+    RsGxsChats(static_cast<RsGxsIface&>(*this)), GxsTokenQueue(this),
+    mSearchCallbacksMapMutex("GXS chats search"),
+    mChatSrv(NULL),
+    mSerialiser(new RsGxsChatSerialiser()),
+    mChatMtx("GxsChat Mutex")
 {
     // For Dummy Msgs.
     mGenActive = false;
@@ -110,6 +114,7 @@ uint32_t p3GxsChats::chatsAuthenPolicy()
     RsGenExchange::setAuthenPolicyFlag(flag, policy, RsGenExchange::PUBLIC_GRP_BITS);
 
     flag |= GXS_SERV::MSG_AUTHEN_CHILD_PUBLISH_SIGN;
+    //flag |= GXS_SERV::MSG_AUTHEN_ROOT_PUBLISH_SIGN | GXS_SERV::MSG_AUTHEN_CHILD_PUBLISH_SIGN;
     RsGenExchange::setAuthenPolicyFlag(flag, policy, RsGenExchange::RESTRICTED_GRP_BITS);
     RsGenExchange::setAuthenPolicyFlag(flag, policy, RsGenExchange::PRIVATE_GRP_BITS);
 
@@ -207,12 +212,104 @@ RsSerialiser* p3GxsChats::setupSerialiser()
 }
 
 /** Overloaded to cache new groups **/
-RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& /* keySet */)
+RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet)
 {
     updateSubscribedGroup(grpItem->meta);
+
+    bool serialOk = false;
+    RsNxsGrp* grp = new RsNxsGrp(RS_PKT_SUBTYPE_NXS_CHAT_GRP_ITEM);
+
+    uint32_t size = mSerialiser->size(grpItem);
+    char *gData = new char[size];
+    serialOk = mSerialiser->serialise(grpItem, gData, &size);
+    if (serialOk){  //push group to your peers before GxsSync Start!
+        grp->grp.setBinData(gData, size);
+
+        grp->metaData = new RsGxsGrpMetaData();
+        *(grp->metaData) = grpItem->meta;
+
+        // TODO: change when publish key optimisation added (public groups don't have publish key
+        grp->metaData->mSubscribeFlags = GXS_SERV::GROUP_SUBSCRIBE_ADMIN | GXS_SERV::GROUP_SUBSCRIBE_SUBSCRIBED
+                        | GXS_SERV::GROUP_SUBSCRIBE_PUBLISH;
+
+        //send Group to the network
+
+        //mChatSrv->sendGxsItem(grp);  //need to include a list of members or getting circle or private node members.
+        delete grp;
+        delete[] gData;
+
+    } //end pushing group to all add members.
     return SERVICE_CREATE_SUCCESS;
 }
 
+RsGenExchange::ServiceCreate_Return p3GxsChats::service_PublishGroup(RsNxsGrp *grp){
+
+    std::list<RsPeerId> ids;
+    RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+
+    rsPeers->getOnlineList(ids);
+    netService->PublishChatGroup(grp,ids);
+
+    //sharing publish key to all invite members.
+    std::set<RsPeerId> peers;
+    for (auto it=ids.begin(); it !=ids.end(); it++)
+            peers.insert(*it);
+
+    groupShareKeys(grp->grpId,peers);
+
+}
+
+RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* msg){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::service_CreateMessage()  MsgId: " << msg->msgId << " and GroupId: " << msg->grpId<< std::endl;
+#endif
+
+    std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
+    it = mSubscribedGroups.find(msg->grpId);
+
+    if (it == mSubscribedGroups.end() )
+        return SERVICE_CREATE_FAIL;  //message doesn't belong to any group.
+
+    RsGroupMetaData chatGrpMeta =it->second;
+    RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+
+    switch(chatGrpMeta.mCircleType){
+    case GXS_CIRCLE_TYPE_PUBLIC:
+    {
+        //get all online friends and send this message to them.
+
+        std::list<RsPeerId> ids;
+        rsPeers->getOnlineList(ids);
+        netService->PublishChat(msg,ids);
+        break;
+    }
+    case GXS_CIRCLE_TYPE_EXTERNAL:// restricted to an external circle, made of RsGxsId
+    {
+        std::cerr << "CircleType: GXS_CIRCLE_TYPE_EXTERNAL"<<std::endl;
+        break;
+    }
+    case GXS_CIRCLE_TYPE_YOUR_FRIENDS_ONLY:	// restricted to a subset of friend nodes of a given RS node given by a RsPgpId list
+    {
+        if(!chatGrpMeta.mInternalCircle.isNull())
+        {
+            RsGroupInfo ginfo ;
+            RsNodeGroupId  groupId = RsNodeGroupId(chatGrpMeta.mInternalCircle);
+
+            if(rsPeers->getGroupInfo(groupId,ginfo))
+            {
+                for (auto it = ginfo.peerIds.begin(); it != ginfo.peerIds.end(); it++ ){
+                    std::list<RsPeerId> ids;
+                    if (rsPeers->getAssociatedSSLIds(*it,ids))
+                        netService->PublishChat(msg,ids);
+                }//end for loop
+            }
+        }
+        break;
+    }
+
+    }//end switch
+    return SERVICE_CREATE_SUCCESS;
+}
 
 void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
 {
@@ -293,6 +390,10 @@ void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
                                 {
                                     notify->AddFeedItem(RS_FEED_ITEM_CHATS_NEW, git->toStdString());
                                     mKnownChats.insert(std::make_pair(*git,time(NULL))) ;
+                                    //auto subscribe chat conversation when it's first received.
+                                    uint32_t token;
+                                    bool subscribe=true;
+                                    subscribeToGroup(token, *git, subscribe);
                                 }
                                 else
                                     std::cerr << "(II) Not notifying already known chat " << *git << std::endl;
@@ -333,21 +434,16 @@ static  rstime_t last_dummy_tick = 0;
     {
         dummy_tick();
         last_dummy_tick = time(NULL);
+
     }
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
-    //p3GxsChatService::tick();
-
 
 }
 
 bool p3GxsChats::getGroupData(const uint32_t &token, std::vector<RsGxsChatGroup> &groups)
 {
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::getGroupData()";
-    std::cerr << std::endl;
-#endif
 
     std::vector<RsGxsGrpItem*> grpData;
     bool ok = RsGenExchange::getGroupData(token, grpData);
@@ -392,10 +488,6 @@ bool p3GxsChats::groupShareKeys(
 
 bool p3GxsChats::getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &msgs, std::vector<RsGxsComment> &cmts)
 {
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::getPostData()";
-    std::cerr << std::endl;
-#endif
 
     GxsMsgDataMap msgData;
     bool ok = RsGenExchange::getMsgData(token, msgData);
@@ -924,7 +1016,48 @@ bool p3GxsChats::updateGroup(uint32_t &token, RsGxsChatGroup &group)
     return true;
 }
 
+void p3GxsChats::receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::receiveNewChatMesesage() testing Only!" << std::endl;
+#endif
 
+    std::vector<RsNxsMsg *> nxtMsg;
+    uint32_t size =0;
+    RsServiceInfo  gxsChatInfo = this->getServiceInfo();
+
+    std::vector<GxsNxsChatMsgItem*>::iterator it;
+  {
+    RS_STACK_MUTEX(mChatMtx);
+    for (it=messages.begin(); it != messages.end(); it++){
+        GxsNxsChatMsgItem *msg = *it;
+
+        size = mSerialiser->size(msg);
+        char* mData = new char[size];
+        bool serialOk = mSerialiser->serialise(msg, mData, &size);
+
+        if (serialOk){ //converting RsChatItem to GxsMessage
+            RsNxsMsg *newMsg = new RsNxsMsg(RS_PKT_SUBTYPE_GXSCHAT_MSG);
+            newMsg->PeerId(msg->PeerId());
+
+            newMsg->grpId = msg->grpId;
+            newMsg->msgId = msg->msgId;
+            newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
+            newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
+            nxtMsg.push_back(newMsg);
+            //testing publish the new message anyway.
+        }
+        //delete mData;
+    }
+  }//end mutex
+  RsGenExchange::receiveNewMessages(nxtMsg);  //send new message to validate
+
+
+}
+void p3GxsChats::receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::receiveNewChatGroup()" << std::endl;
+#endif
+}
 
 bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
 {

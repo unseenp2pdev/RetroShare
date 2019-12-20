@@ -70,11 +70,17 @@ RsServiceInfo p3GxsChatService::getServiceInfo()
 
 int	p3GxsChatService::tick()
 {
+
     if(receivedItems()) receiveChatQueue();
 
     DistributedChatService::flush();
 
+#ifdef GXSGXSCHAT_DEBUG
+    std::cerr << "p3GxsChatService::tick()";
+    std::cerr << std::endl;
+#endif
     return 0;
+
 }
 
 /***************** Chat Stuff **********************/

@@ -26,6 +26,9 @@
  * #define RS_DATA_SERVICE_DEBUG_CACHE 1
  ****/
 
+//#define RS_DATA_SERVICE_DEBUG  1
+//#define RS_DATA_SERVICE_DEBUG_CACHE 1
+
 #include <fstream>
 #include <util/rsdir.h>
 #include <algorithm>
@@ -744,8 +747,9 @@ RsNxsMsg* RsDataService::locked_getMessage(RetroCursor &c)
             ok &= msg->msg.GetTlv(data, data_len, &offset);
     }
 
-    if(ok)
+    if(ok){
         return msg;
+    }
     else
         delete msg;
 
@@ -830,8 +834,8 @@ int RsDataService::storeMessage(const std::list<RsNxsMsg*>& msg)
             std::cerr << std::endl;
             std::cerr << "\t & MessageId: " << msgMetaPtr->mMsgId.toStdString();
             std::cerr << std::endl;
-        }
 
+        }
         // This is needed so that mLastPost is correctly updated in the group meta when it is re-loaded.
 
         locked_clearGrpMetaCache(msgMetaPtr->mGroupId);
@@ -870,14 +874,14 @@ int RsDataService::storeGroup(const std::list<RsNxsGrp*>& grp)
 		if(!validSize(grpPtr)) continue;
 
 #ifdef RS_DATA_SERVICE_DEBUG
-		std::cerr << "RsDataService::storeGroup() GrpId: " << grpPtr->grpId.toStdString();
+        std::cerr << "RsDataService::storeGroup() GrpId: " << grpPtr->grpId.toStdString();
 		std::cerr << " CircleType: " << (uint32_t) grpMetaPtr->mCircleType;
 		std::cerr << " CircleId: " << grpMetaPtr->mCircleId.toStdString();
 		std::cerr << std::endl;
 #endif
 
 		/*!
-		 * STORE data, data len,
+         * STORE data, data len,
 		 * grpId, flags, publish time stamp, identity,
 		 * id signature, admin signatue, key set, last posting ts
 		 * and meta data
@@ -930,7 +934,7 @@ int RsDataService::storeGroup(const std::list<RsNxsGrp*>& grp)
 
 		if (!mDb->sqlInsert(GRP_TABLE_NAME, "", cv))
 		{
-			std::cerr << "RsDataService::storeGroup() sqlInsert Failed";
+            std::cerr << "RsDataService::storeGroup() sqlInsert Failed";
 			std::cerr << std::endl;
 			std::cerr << "\t For GroupId: " << grpMetaPtr->mGroupId.toStdString();
 			std::cerr << std::endl;
@@ -1226,7 +1230,6 @@ int RsDataService::retrieveNxsMsgs(const GxsMsgReq &reqIds, GxsMsgResult &msg, b
             {
                 locked_retrieveMessages(c, msgSet, withMeta ? mColMsg_WithMetaOffset : 0);
             }
-
             delete c;
         }else{
 

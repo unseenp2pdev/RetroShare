@@ -54,9 +54,10 @@ RsItem *RsChatSerialiser::create_item(uint16_t service_id,uint8_t item_sub_id) c
 	case RS_PKT_SUBTYPE_CHAT_LOBBY_CONFIG: return new RsChatLobbyConfigItem();
     case RS_PKT_SUBTYPE_CHAT_LOBBY_INFO: return new RsChatLobbyInfoItem();
 	case RS_PKT_SUBTYPE_OUTGOING_MAP: return new PrivateOugoingMapItem();
-    case RS_PKT_SUBTYPE_GXSCHAT_GROUP_MSG: return new GxsNxsChatGroupItem();  //adding direct chat gxs group message
+    case RS_PKT_SUBTYPE_GXSCHAT_GROUP: return new GxsNxsChatGroupItem();  //adding direct chat gxs group message
     case RS_PKT_SUBTYPE_GXSCHAT_MSG: return new GxsNxsChatMsgItem();          //adding direct chat gxs message
-	default:
+    case RS_PKT_SUBTYPE_GXSCHAT_PUBLISH_KEY: return new GxsNxsGroupPublishKeyItem();  //adding direct share publish key gxs group
+    default:
 		std::cerr << "Unknown packet type in chat!" << std::endl;
 		return NULL;
 	}
@@ -91,6 +92,16 @@ void GxsNxsChatGroupItem::serial_process(RsGenericSerializer::SerializeJob j,RsG
     RsTypeSerializer::serial_process<RsTlvItem>(j,ctx,meta             ,"meta") ;
 }
 
+void GxsNxsGroupPublishKeyItem::serial_process(RsGenericSerializer::SerializeJob j,RsGenericSerializer::SerializeContext& ctx)
+{
+    RsTypeSerializer::serial_process           (j,ctx,grpId            ,"grpId") ;
+    RsTypeSerializer::serial_process<RsTlvItem>(j,ctx,private_key      ,"private_key") ;
+}
+
+void GxsNxsGroupPublishKeyItem::clear()
+{
+    private_key.TlvClear();
+}
 
 RsChatAvatarItem::~RsChatAvatarItem()
 {
@@ -240,12 +251,14 @@ void PrivateOugoingMapItem::serial_process(
 int GxsNxsChatGroupItem::refcount = 0;
 /** print and clear functions **/
 int GxsNxsChatMsgItem::refcount = 0;
+
 void GxsNxsChatMsgItem::clear()
 {
 
     msg.TlvClear();
     meta.TlvClear();
 }
+
 
 std::ostream&GxsNxsChatMsgItem::print(std::ostream& out, uint16_t /*indent*/)
 { return out; }

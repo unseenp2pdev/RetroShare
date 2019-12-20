@@ -103,6 +103,10 @@ void RsGenExchange::setNetworkExchangeService(RsNetworkExchangeService *ns)
 	}
 }
 
+RsNetworkExchangeService * RsGenExchange::getNetworkExchangeService(){
+        return mNetService;
+}
+
 RsGenExchange::~RsGenExchange()
 {
     // need to destruct in a certain order (bad thing, TODO: put down instance ownership rules!)
@@ -755,7 +759,7 @@ int RsGenExchange::createMessage(RsNxsMsg* msg)
 		msg->msgId = hashId;
 
 		// assign msg id to msg meta
-		msg->metaData->mMsgId = msg->msgId;
+        msg->metaData->mMsgId = msg->msgId;
 
 		delete[] metaData;
 		delete[] allMsgData;
@@ -1357,10 +1361,6 @@ bool RsGenExchange::getGroupData(const uint32_t &token, std::vector<RsGxsGrpItem
 	bool ok = mDataAccess->getGroupData(token, nxsGrps);
 
 	std::list<RsNxsGrp*>::iterator lit = nxsGrps.begin();
-#ifdef GEN_EXCH_DEBUG
-	std::cerr << "RsGenExchange::getGroupData() RsNxsGrp::len: " << nxsGrps.size();
-    std::cerr << std::endl;
-#endif
 
 	if(ok)
 	{
@@ -1435,7 +1435,6 @@ bool RsGenExchange::getMsgData(uint32_t token, GxsMsgDataMap &msgItems)
 	RS_STACK_MUTEX(mGenMtx) ;
 	NxsMsgDataResult msgResult;
 	bool ok = mDataAccess->getMsgData(token, msgResult);
-
 	if(ok)
 	{
 		NxsMsgDataResult::iterator mit = msgResult.begin();
@@ -1447,7 +1446,7 @@ bool RsGenExchange::getMsgData(uint32_t token, GxsMsgDataMap &msgItems)
 			std::vector<RsNxsMsg*>::iterator vit = nxsMsgsV.begin();
 			for(; vit != nxsMsgsV.end(); ++vit)
 			{
-				RsNxsMsg*& msg = *vit;
+                RsNxsMsg*& msg = *vit;
 				RsItem* item = NULL;
 
 				if(msg->msg.bin_len != 0)
@@ -1616,10 +1615,10 @@ void RsGenExchange::receiveNewMessages(std::vector<RsNxsMsg *>& messages)
 		if(it == mMsgPendingValidate.end())
 		{
 #ifdef GEN_EXCH_DEBUG
-			std::cerr << "RsGenExchange::notifyNewMessages() Received Msg: ";
-			std::cerr << " GrpId: " << msg->grpId;
-			std::cerr << " MsgId: " << msg->msgId;
-			std::cerr << std::endl;
+            std::cerr << "RsGenExchange::receiveNewMessages: ";
+            std::cerr << " GrpId: " << msg->grpId;
+            std::cerr << " MsgId: " << msg->msgId;
+            std::cerr << std::endl;
 #endif
 			RsGxsGrpMsgIdPair id;
 			id.first = msg->grpId;
@@ -2279,7 +2278,9 @@ void RsGenExchange::publishMsgs()
                 
 				computeHash(msg->msg, msg->metaData->mHash);
 				mDataAccess->addMsgData(msg);
-				delete msg ;
+
+                ServiceCreate_Return ret = service_CreateMessage(msg); //callback to drived class for push messages.
+                //delete msg ;
 
 				msgChangeMap[grpId].insert(msgId);
 
@@ -2291,6 +2292,8 @@ void RsGenExchange::publishMsgs()
 				// add to published to allow acknowledgement
 				mMsgNotify.insert(std::make_pair(mit->first, std::make_pair(grpId, msgId)));
 				mDataAccess->updatePublicRequestStatus(mit->first, RsTokenService::COMPLETE);
+
+
 
 			}
 			else
@@ -2329,6 +2332,14 @@ void RsGenExchange::publishMsgs()
 
 }
 
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateMessage(RsNxsMsg *msg){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_CreateMessage(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
+}
+
 RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateGroup(RsGxsGrpItem* /* grpItem */,
 		RsTlvSecurityKeySet& /* keySet */)
 {
@@ -2339,6 +2350,13 @@ RsGenExchange::ServiceCreate_Return RsGenExchange::service_CreateGroup(RsGxsGrpI
 	return SERVICE_CREATE_SUCCESS;
 }
 
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_PublishGroup(RsNxsGrp *grp){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_PublishGroup(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
+}
 
 #define PENDING_SIGN_TIMEOUT 10 //  5 seconds
 
@@ -2684,7 +2702,15 @@ void RsGenExchange::publishGrps()
 						    else
 							    mDataAccess->addGroupData(grp);
 
-							delete grp ;
+                            grp->metaData->keys.private_keys.clear() ;
+                            std::cerr << "******publishGrps****************"<<std::endl;
+                            std::cerr <<"Sendin Group to peers"<<grp->grpId <<std::endl;
+                            std::cerr <<"groupSize():" << grp->grp.TlvSize() <<std::endl;
+                            std::cerr << "GroupMeta Size(): "<< grp->meta.TlvSize() <<std::endl;
+                            ServiceCreate_Return grpRet = service_PublishGroup(grp);
+                            if (grpRet)
+                                delete grp ;
+
 							groups_to_subscribe.push_back(grpId) ;
 					    }
 					    else
@@ -2901,6 +2927,7 @@ void RsGenExchange::processRecvdMessages()
 			if(!accept_new_msg)
 				messages_to_reject.push_back(msg->metaData->mMsgId); // This prevents reloading the message again at next sync.
 
+
 		    if(!accept_new_msg || gpsi.mFirstTryTS + VALIDATE_MAX_WAITING_TIME < now)
 		    {
 #ifdef GEN_EXCH_DEBUG
@@ -2926,10 +2953,6 @@ void RsGenExchange::processRecvdMessages()
 	    GxsMsgReq msgIds;
 	    RsNxsMsgDataTemporaryList msgs_to_store;
 
-#ifdef GEN_EXCH_DEBUG
-	    std::cerr << "  updating received messages:" << std::endl;
-#endif
-
 		// 3 - Validate each message
 
 	    for(NxsMsgPendingVect::iterator pend_it = mMsgPendingValidate.begin();pend_it != mMsgPendingValidate.end();)
@@ -2953,9 +2976,33 @@ void RsGenExchange::processRecvdMessages()
 #endif
 			std::map<RsGxsGroupId, RsGxsGrpMetaData*>::iterator mit = grpMetas.find(msg->grpId);
 
-#ifdef GEN_EXCH_DEBUG
-			    std::cerr << "    msg info         : grp id=" << msg->grpId << ", msg id=" << msg->msgId << std::endl;
-#endif
+//#ifdef GEN_EXCH_DEBUG
+//			    std::cerr << "    msg info         : grp id=" << msg->grpId << ", msg id=" << msg->msgId << std::endl;
+//                std::cerr << "***********RsGenExchange::processRecvdMessages(): Info*************************"<<std::endl;
+//                std::cerr << "MessageId:"<<msg->msgId << " and groupId: "<<msg->grpId << " and Message Size: "<<msg->msg.TlvSize()<<std::endl;
+//                std::cerr << "Mesage= "; msg->msg.print(std::cerr, 15); std::cerr<<std::endl;
+//                std::cerr <<"   Meta Size:"<<msg->meta.TlvSize()<<std::endl;
+//                std::cerr <<"   mAuthorId:" <<msg->metaData->mAuthorId << std::endl;
+//                std::cerr <<"   mChildTs:"  <<msg->metaData->mChildTs << std::endl;
+//                std::cerr <<"   mGroupId:" <<msg->metaData->mGroupId << std::endl;
+//                std::cerr <<"   mHash:" <<msg->metaData->mHash << std::endl;
+//                std::cerr <<"   mMsgFlags:" <<msg->metaData->mMsgFlags << std::endl;
+//                std::cerr <<"   mMsgId:" <<msg->metaData->mMsgId << std::endl;
+//                std::cerr <<"   mMsgName:" <<msg->metaData->mMsgName << std::endl;
+//                std::cerr <<"   mMsgSize:" <<msg->metaData->mMsgSize << std::endl;
+//                std::cerr <<"   mMsgStatus:" <<msg->metaData->mMsgStatus << std::endl;
+//                std::cerr <<"   mOrigMsgId:" <<msg->metaData->mOrigMsgId << std::endl;
+//                std::cerr <<"   mParentId:" <<msg->metaData->mParentId << std::endl;
+//                std::cerr <<"   mPublishTs:" <<msg->metaData->mPublishTs << std::endl;
+//                std::cerr <<"   mServiceString:" <<msg->metaData->mServiceString << std::endl;
+//                std::cerr <<"   mThreadId:" <<msg->metaData->mThreadId << std::endl;
+//                std::cerr <<"   recvTS:" <<msg->metaData->recvTS << std::endl;
+//                std::cerr <<"   refcount:" <<msg->metaData->refcount << std::endl;
+//                std::cerr <<"   validated:" <<msg->metaData->validated << std::endl;
+//                std::cerr <<"   signSet Size:" <<msg->metaData->signSet.TlvSize() << std::endl;
+//                msg->metaData->signSet.print(std::cerr, 15); std::cerr<<std::endl;
+//                std::cerr <<"Message Meta:"; msg->meta.print(std::cerr, 20); std::cerr<<std::endl;
+//#endif
 			// validate msg
 
 			if(mit == grpMetas.end())
@@ -2995,6 +3042,7 @@ void RsGenExchange::processRecvdMessages()
 				std::cerr << "    new status flags: " << msg->metaData->mMsgStatus << std::endl;
 				std::cerr << "    computed hash: " << msg->metaData->mHash << std::endl;
 				std::cerr << "Message received. Identity=" << msg->metaData->mAuthorId << ", from peer " << msg->PeerId() << std::endl;
+
 #endif
 
 				if(!msg->metaData->mAuthorId.isNull())
@@ -3035,11 +3083,14 @@ void RsGenExchange::processRecvdMessages()
 #ifdef GEN_EXCH_DEBUG
 		    std::cerr << "  storing remaining messages" << std::endl;
 #endif
-		    mDataStore->storeMessage(msgs_to_store);
+            if(! mDataStore->storeMessage(msgs_to_store)){
+                std::cerr <<"Failed to store the message" <<std::endl;
+            };
 
-		    RsGxsMsgChange* c = new RsGxsMsgChange(RsGxsNotify::TYPE_RECEIVED_NEW, false);
+            RsGxsMsgChange* c = new RsGxsMsgChange(RsGxsNotify::TYPE_RECEIVED_NEW, false);  //set meta change = reload all
 		    c->msgChangeMap = msgIds;
 		    mNotifications.push_back(c);
+
 	    }
     }
 
