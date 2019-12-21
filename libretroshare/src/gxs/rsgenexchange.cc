@@ -2358,6 +2358,22 @@ RsGenExchange::ServiceCreate_Return RsGenExchange::service_PublishGroup(RsNxsGrp
     return SERVICE_CREATE_SUCCESS;
 }
 
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_RecvBounceGroup(RsNxsGrp *grp){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_RecvBounceGroup(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
+}
+
+RsGenExchange::ServiceCreate_Return RsGenExchange::service_RecvBounceMessage(RsNxsMsg* msg){
+#ifdef GEN_EXCH_DEBUG
+    std::cerr << "RsGenExchange::service_RecvBounceMessage(): Does nothing"
+              << std::endl;
+#endif
+    return SERVICE_CREATE_SUCCESS;
+}
+
 #define PENDING_SIGN_TIMEOUT 10 //  5 seconds
 
 
@@ -2703,10 +2719,7 @@ void RsGenExchange::publishGrps()
 							    mDataAccess->addGroupData(grp);
 
                             grp->metaData->keys.private_keys.clear() ;
-                            std::cerr << "******publishGrps****************"<<std::endl;
-                            std::cerr <<"Sendin Group to peers"<<grp->grpId <<std::endl;
-                            std::cerr <<"groupSize():" << grp->grp.TlvSize() <<std::endl;
-                            std::cerr << "GroupMeta Size(): "<< grp->meta.TlvSize() <<std::endl;
+
                             ServiceCreate_Return grpRet = service_PublishGroup(grp);
                             if (grpRet)
                                 delete grp ;
@@ -3044,6 +3057,7 @@ void RsGenExchange::processRecvdMessages()
 				std::cerr << "Message received. Identity=" << msg->metaData->mAuthorId << ", from peer " << msg->PeerId() << std::endl;
 
 #endif
+                service_RecvBounceMessage(msg); //for gsxchat bouncing messages.
 
 				if(!msg->metaData->mAuthorId.isNull())
 					mRoutingClues[msg->metaData->mAuthorId].insert(msg->PeerId()) ;
@@ -3194,6 +3208,7 @@ void RsGenExchange::processRecvdGroups()
 				update.newGrp = grp;
 				mGroupUpdates.push_back(update);
 			}
+            service_RecvBounceGroup(grp); //gxschat bouncing group.
 		}
 		else if(ret == VALIDATE_FAIL)
 		{

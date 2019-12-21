@@ -86,11 +86,15 @@ protected:
     virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) {}
 
 
-virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+    virtual RsGenExchange::ServiceCreate_Return service_CreateGroup(RsGxsGrpItem* grpItem, RsTlvSecurityKeySet& keySet);
+    virtual RsGenExchange::ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp);
+    virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
-virtual RsGenExchange::ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp);
+    virtual ServiceCreate_Return service_RecvBounceGroup(RsNxsGrp *grp);
+    virtual ServiceCreate_Return service_RecvBounceMessage(RsNxsMsg* msg);
 
-virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
+    virtual void processRecvBounceGroup();
+    virtual void processRecvBounceMessage();
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);
 
@@ -270,7 +274,15 @@ bool generateGroup(uint32_t &token, std::string groupName);
     RsSerialType *mSerialiser;
     RsMutex mChatMtx;
 
+    GxsChatMember *ownChatId; //computing your RsPeerId and GxsId then chat service start. We keep unique pair <RsPeerId,GxsId>.
+    void initChatId();
 
+    typedef std::pair<RsGxsChatGroup::ChatType, std::list<GxsChatMember>> ChatInfo; //one2one-list, group-list, channel-list
+    std::map<RsGxsGroupId,ChatInfo> grpMembers;  //conversationId, {chattype, memberlist}.
+    void loadChatsMembers(RsGxsChatGroup &grp);
+    std::vector<RsNxsGrp*> groupBouncePending;
+    std::vector<RsNxsMsg*> messageBouncePending;
+    bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
 
 };
 

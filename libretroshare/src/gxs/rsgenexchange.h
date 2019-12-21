@@ -602,6 +602,10 @@ protected:
 
     virtual ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
+    virtual ServiceCreate_Return service_RecvBounceGroup(RsNxsGrp *grp);
+
+    virtual ServiceCreate_Return service_RecvBounceMessage(RsNxsMsg* msg);
+
 public:
 
     /*!
