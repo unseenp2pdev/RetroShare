@@ -378,7 +378,7 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceMessage(RsNxsM
     return SERVICE_CREATE_SUCCESS;
 }
 void p3GxsChats::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid){
-    RS_STACK_MUTEX(mChatMtx) ;
+    //RS_STACK_MUTEX(mChatMtx) ;
     RsGenExchange::notifyReceivePublishKey(grpId,peerid);
 
     auto mit = grpMembers.find(grpId);
@@ -729,6 +729,9 @@ static  rstime_t last_dummy_tick = 0;
         last_dummy_tick = time(NULL);
 
     }
+
+    processRecvBounceGroup();
+    processRecvBounceMessage();
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
