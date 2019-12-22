@@ -377,6 +377,68 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceMessage(RsNxsM
     messageBouncePending.push_back(newMsg);
     return SERVICE_CREATE_SUCCESS;
 }
+void p3GxsChats::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid){
+    RS_STACK_MUTEX(mChatMtx) ;
+    RsGenExchange::notifyReceivePublishKey(grpId,peerid);
+
+    auto mit = grpMembers.find(grpId);
+    if (mit == grpMembers.end()) //does nothing if group is not there to share publish permission.
+        return;
+
+    std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
+    it = mSubscribedGroups.find(grpId);
+
+    if(it == mSubscribedGroups.end())
+        return;
+
+    RsGroupMetaData grpMeta = it->second;
+
+    ChatInfo cinfo = mit->second;
+    std::list<GxsChatMember> friendList = cinfo.second;
+    RsPeerId sender = peerid;
+    std::list<GxsChatMember> sendList;
+    std::set<RsPeerId> tempSendList;
+
+
+    switch(cinfo.first){
+    case RsGxsChatGroup::ONE2ONE:   break;  //drop, no bouncing off
+    case RsGxsChatGroup::GROUPCHAT:
+    case RsGxsChatGroup::CHANNEL:
+        if (grpMeta.mCircleType ==GXS_CIRCLE_TYPE_PUBLIC){
+            std::list<RsPeerId> ids;
+            rsPeers->getOnlineList(ids);
+            for(auto id=ids.begin(); id !=ids.end(); id++){
+                if(*id != sender || *id != ownChatId->chatPeerId){
+                    tempSendList.insert(*id);
+                }
+            }
+        }
+        else {
+            for (auto sit=friendList.begin(); sit !=friendList.end(); sit++){
+                if(sit->chatPeerId == sender || sit->chatPeerId ==  ownChatId->chatPeerId){
+                    //Don't send to itself and sender peer.
+                    continue;
+                }
+                else{
+                    sendList.push_back(*sit);
+                    //need to check if the member is owner friend and online
+                    //if member is not yet a friend, need to establish gxs tunnel if possible.
+                    //if not yet member and able to establish gxs tunnel, auto add friend (non-trust mode)
+                    //trust node = physical connection, non-trust node = gxs tunnel friend (People)
+                    tempSendList.insert(sit->chatPeerId); //temp without gxs tunneling.
+                }
+            }
+        }
+
+   }//end of switch statement
+
+
+   if(!tempSendList.empty())
+       groupShareKeys(grpId,tempSendList);
+
+
+
+}
 bool p3GxsChats::toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grp ){
     //new group just received. We have to deserialized to find out what type of conversation (ONE2ONE, GROUP, or CHANNEL)
     RsTlvBinaryData& data = grp->grp;

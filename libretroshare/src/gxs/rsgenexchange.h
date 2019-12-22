@@ -140,7 +140,7 @@ public:
     /*!
      * @param grpId group id
      */
-    virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId);
+    virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId,  const RsPeerId &peerId);
 
     /*!
      * \brief notifyReceiveDistantSearchResults

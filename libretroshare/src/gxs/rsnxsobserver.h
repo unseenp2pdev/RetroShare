@@ -60,7 +60,7 @@ public:
     /*!
      * @param grpId group id
      */
-    virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId) = 0;
+    virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerId) = 0;
 
     /*!
      * @param grpId group id

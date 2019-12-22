@@ -93,6 +93,7 @@ protected:
     virtual ServiceCreate_Return service_RecvBounceGroup(RsNxsGrp *grp);
     virtual ServiceCreate_Return service_RecvBounceMessage(RsNxsMsg* msg);
 
+    virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid);
     virtual void processRecvBounceGroup();
     virtual void processRecvBounceMessage();
 

@@ -1646,7 +1646,7 @@ void RsGenExchange::receiveDistantSearchResults(TurtleRequestId id,const RsGxsGr
     std::cerr << "RsGenExchange::receiveDistantSearchResults(): received result for request " << std::hex << id << std::dec << std::endl;
 }
 
-void RsGenExchange::notifyReceivePublishKey(const RsGxsGroupId &grpId)
+void RsGenExchange::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid)
 {
 	RS_STACK_MUTEX(mGenMtx);
 

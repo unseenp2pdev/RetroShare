@@ -495,7 +495,7 @@ void RsGxsNetService::processObserverNotifications()
     std::vector<RsNxsGrp*> grps_copy ;
     std::vector<RsNxsMsg*> msgs_copy ;
     std::set<RsGxsGroupId> stat_copy ;
-    std::set<RsGxsGroupId> keys_copy ;
+    std::map<RsGxsGroupId, RsPeerId> keys_copy ;
 
     {
 	    RS_STACK_MUTEX(mNxsMutex) ;
@@ -514,8 +514,8 @@ void RsGxsNetService::processObserverNotifications()
     if(!grps_copy.empty()) mObserver->receiveNewGroups  (grps_copy);
     if(!msgs_copy.empty()) mObserver->receiveNewMessages(msgs_copy);
 
-    for(std::set<RsGxsGroupId>::const_iterator it(keys_copy.begin());it!=keys_copy.end();++it)
-		mObserver->notifyReceivePublishKey(*it);
+    for(auto it(keys_copy.begin());it!=keys_copy.end();++it)
+        mObserver->notifyReceivePublishKey(it->first, it->second);
 
     for(std::set<RsGxsGroupId>::const_iterator it(stat_copy.begin());it!=stat_copy.end();++it)
 		mObserver->notifyChangedGroupStats(*it);
@@ -5119,7 +5119,7 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 #ifdef NXS_NET_DEBUG_3
 		GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "   (EE) Publish key already present in database. Discarding message." << std::endl;
 #endif
-        mNewPublishKeysToNotify.insert(item->grpId) ;
+        mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
 		return ;
 	}
 
@@ -5135,7 +5135,7 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 #ifdef NXS_NET_DEBUG_3
 		GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "  updated database with new publish keys." << std::endl;
 #endif
-        mNewPublishKeysToNotify.insert(item->grpId) ;
+        mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
 	}
 	else
 	{
