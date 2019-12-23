@@ -44,7 +44,7 @@
 #include "retroshare/rspeers.h"
 #include "rsitems/rsnxsitems.h"
 
-//#define GXSCHATS_DEBUG 1
+#define GXSCHATS_DEBUG 1
 
 
 
@@ -349,7 +349,9 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateMessage(RsNxsMsg* 
 
 
 RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceGroup(RsNxsGrp *grp){
-
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::service_RecvBounceGroup()  GroupId: " << grp->grpId << " and FromPeerId: " << grp->PeerId()<< std::endl;
+#endif
     RS_STACK_MUTEX(mChatMtx) ;
 
     RsNxsGrp *newGrp = new RsNxsGrp(grp->PacketService());  //preventing delete of the pointer from GenExchange Service.
@@ -358,13 +360,16 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceGroup(RsNxsGrp
     newGrp->grpId = grp->grpId;
     newGrp->meta.setBinData(grp->meta.bin_data, grp->meta.bin_len);
     newGrp->grp.setBinData(grp->grp.bin_data, grp->grp.bin_len);
+    newGrp->metaData = grp->metaData;
 
     groupBouncePending.push_back(newGrp);
     return SERVICE_CREATE_SUCCESS;
 }
 
 RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceMessage(RsNxsMsg* msg){
-
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::service_RecvBounceMessage()  MsgId: " << msg->msgId << " and GroupId: " << msg->grpId<< "FromPeerId: " <<msg->PeerId()<< std::endl;
+#endif
     RS_STACK_MUTEX(mChatMtx) ;
 
     RsNxsMsg *newMsg = new RsNxsMsg(msg->PacketService());
@@ -373,10 +378,19 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_RecvBounceMessage(RsNxsM
     newMsg->meta.setBinData(msg->meta.bin_data, msg->meta.bin_len);
     newMsg->msg.setBinData(msg->msg.bin_data, msg->msg.bin_len);
     newMsg->PeerId(msg->PeerId());
+    newMsg->metaData = msg->metaData;
 
     messageBouncePending.push_back(newMsg);
     return SERVICE_CREATE_SUCCESS;
 }
+
+bool p3GxsChats::getOwnMember(GxsChatMember &member){
+    if (ownChatId==NULL)
+        initChatId();
+    member = *ownChatId;
+    return true;
+}
+
 void p3GxsChats::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid){
     //RS_STACK_MUTEX(mChatMtx) ;
     RsGenExchange::notifyReceivePublishKey(grpId,peerid);
@@ -440,6 +454,9 @@ void p3GxsChats::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeer
 
 }
 bool p3GxsChats::toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grp ){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::toChatGroup()  : " << std::endl;
+#endif
     //new group just received. We have to deserialized to find out what type of conversation (ONE2ONE, GROUP, or CHANNEL)
     RsTlvBinaryData& data = grp->grp;
     RsItem* item = NULL;
@@ -461,12 +478,15 @@ bool p3GxsChats::toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grp ){
     return false;
 }
 void p3GxsChats::processRecvBounceGroup(){
+
     RS_STACK_MUTEX(mChatMtx) ;
 
     if(groupBouncePending.empty())
             return;
     //if Group is ONE2ONE, Drop the bouncing message.
-
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceGroup()  : " << std::endl;
+#endif
     RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
 
     std::vector<RsNxsGrp*>::iterator it;
@@ -474,11 +494,32 @@ void p3GxsChats::processRecvBounceGroup(){
         RsNxsGrp *bounceGrp = *it;
         RsGxsGroupId grpId = bounceGrp->grpId;
         //check to see if the group is already exist on the conversationlist.
-        RsGxsChatGroup grp;
-        if(! toChatGroup(grp, bounceGrp)){
-            std::cerr <<"Unable to deserialized Bounce GroupId:"<< bounceGrp->grpId << std::endl;
-            groupBouncePending.erase(it); //pop the already process bounce message.
-            continue;
+        RsGxsChatGroup group;
+//        if(! toChatGroup(grp, bounceGrp)){
+//            std::cerr <<"Unable to deserialized Bounce GroupId:"<< bounceGrp->grpId << std::endl;
+//            groupBouncePending.erase(it); //pop the already process bounce message.
+//            continue;
+//        }
+
+        RsTlvBinaryData& data = bounceGrp->grp;
+        RsItem* item = NULL;
+        if(data.bin_len != 0)
+            item = mSerialiser->deserialise(data.bin_data, &data.bin_len);
+
+        if(item){
+            RsGxsGrpItem* gItem = dynamic_cast<RsGxsGrpItem*>(item);
+            if (gItem && bounceGrp->metaData !=NULL){
+                gItem->meta = *(bounceGrp->metaData);
+            }
+
+            RsGxsChatGroupItem* grpItem = dynamic_cast<RsGxsChatGroupItem*>(gItem);
+            if(grpItem) {
+                grpItem->toChatGroup(group, true);
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceGroup(): grpItem->toChatGroup(group, true); " << std::endl;
+#endif
+            }
         }
 
         auto mit = grpMembers.find(grpId);
@@ -489,12 +530,12 @@ void p3GxsChats::processRecvBounceGroup(){
             RsPeerId sender = bounceGrp->PeerId();
             ids.remove(sender);
 
-            switch(grp.type){
+            switch(group.type){
             case RsGxsChatGroup::ONE2ONE:   break;  //drop, no bouncing off
             case RsGxsChatGroup::GROUPCHAT:
             case RsGxsChatGroup::CHANNEL:
             {
-                if(grp.mMeta.mCircleType==GXS_CIRCLE_TYPE_PUBLIC)
+                if(group.mMeta.mCircleType==GXS_CIRCLE_TYPE_PUBLIC)
                     netService->PublishChatGroup(bounceGrp, ids);
 
                 //private group or channel will not bouncing to other friends.
@@ -553,6 +594,10 @@ void p3GxsChats::processRecvBounceMessage(){
 
     if(messageBouncePending.empty())
         return;
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceGroup()  : " << std::endl;
+#endif
 
     RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
     std::vector<RsNxsMsg*>::iterator it;
