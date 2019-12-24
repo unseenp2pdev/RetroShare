@@ -112,6 +112,8 @@ public:
 	QString getTitle() { return title; }
 	int getPeerStatus() { return peerStatus; }
 	void setName(const QString &name);
+    void setTitle(const QString &title);
+
 
 	bool setStyle();
 	const RSStyle *getStyle() { return &style; }

@@ -41,7 +41,7 @@
 #include "gui/gxschats/UnseenGxsSmartlistview.h"
 #include "gui/UnseenGxsConversationitemdelegate.h"
 
-//#define DEBUG_GROUPFRAMEDIALOG
+#define DEBUG_GROUPFRAMEDIALOG 1
 
 /* Images for TreeWidget */
 #define IMAGE_SUBSCRIBE      ":/images/edit_add24.png"
@@ -1078,6 +1078,15 @@ void UnseenGxsGroupFrameDialog::insertGroupsData(const std::map<RsGxsGroupId,RsG
     // Here only take the first 2 list: admin list + subscribed list only, because the popular list is still not subscribe anyway
     smartListModel_->setGxsGroupList(allGxsGroupList);
     emit ui->unseenGroupTreeWidget->model()->layoutChanged();
+
+#ifdef DEBUG_GROUPFRAMEDIALOG
+    std::cerr << " Show all Gxs Group Chat : " << std::endl;
+    for (std::vector<UnseenGroupItemInfo>::iterator it2 = allGxsGroupList.begin(); it2!= allGxsGroupList.end(); ++it2)
+    {
+        std::cerr << " GxsChat Id: " << (*it2).id.toStdString() << (*it2).name.toStdString() << std::endl;
+    }
+#endif
+
 
 
 //	/* Re-fill group */

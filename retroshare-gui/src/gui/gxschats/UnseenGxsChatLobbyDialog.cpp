@@ -71,6 +71,7 @@
 #define ROLE_ID             Qt::UserRole + 2
 
 #define DEBUG_CHAT 1
+#define ENABLE_DEBUG 1
 
 const static uint32_t timeToInactivity = 60 * 10;   // in seconds
 
@@ -240,7 +241,7 @@ UnseenGxsChatLobbyDialog::UnseenGxsChatLobbyDialog( const RsGxsGroupId& id, QWid
     mTokenTypeAcknowledgeReadStatus = nextTokenType();
     mAcknowledgeReadStatusToken = 0;
 
-
+    showAllPostOnlyOnce = false;
     //GxsChatPostsWidget constructor
     setGroupId(id);
 
@@ -1166,10 +1167,17 @@ void UnseenGxsChatLobbyDialog::GxsMessageFrameWidgetloadRequest(const TokenQueue
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 //COPY from GxsUpdateBroadcastWidget
+void sortGxsMsgChat(std::vector<RsGxsChatMsg> &list)
+{
+    std::sort(list.begin(), list.end(),
+              [] (RsGxsChatMsg const& a, RsGxsChatMsg const& b)
+    { return a.mMeta.mPublishTs < b.mMeta.mPublishTs; });
+}
+
 void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &posts, GxsMessageFramePostThread2 *thread, bool related)
 {
     if (related && thread) {
-        std::cerr << "GxsChatPostsWidget::insertChannelPosts fill only related posts as thread is not possible" << std::endl;
+        std::cerr << "v::insertChannelPosts fill only related posts as thread is not possible" << std::endl;
         return;
     }
 
@@ -1185,8 +1193,10 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
 
 #ifdef DEBUG_CHAT
     std::cerr << "Inserting chat posts" << std::endl;
+    std::cerr << "After sorting..." << std::endl;
 #endif
 
+    sortGxsMsgChat(posts);
     std::vector<uint32_t> new_versions ;
     for (uint32_t i=0;i<posts.size();++i)
     {
@@ -1194,12 +1204,11 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
             posts[i].mMeta.mOrigMsgId.clear();
 
 #ifdef DEBUG_CHAT
-        std::cerr << "  " << i << ": msg_id=" << posts[i].mMeta.mMsgId << ": orig msg id = " << posts[i].mMeta.mOrigMsgId << std::endl;
+        std::cerr << "  " << i << ": msg_id=" << posts[i].mMeta.mMsgId <<" : msg timestamp= " << posts[i].mMeta.mPublishTs << " : msg = " << posts[i].mMsg << std::endl;
 #endif
 
         if(!posts[i].mMeta.mOrigMsgId.isNull())
             new_versions.push_back(i) ;
-
 
         //unseenp2p - try to add msg into chat content
         QDateTime sendTime = QDateTime::fromSecsSinceEpoch(posts[i].mMeta.mPublishTs);
@@ -1208,7 +1217,7 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
         QString mmsg = QString::fromUtf8(posts[i].mMsg.c_str());
         bool incomming = !rsIdentity->isOwnId(gxs_id);
         RsIdentityDetails details;
-        QString nickname = "someone";
+        QString nickname = "Unknown";
         if (rsIdentity->getIdDetails(gxs_id, details))
         {
             nickname = QString::fromStdString(details.mNickname);
@@ -1340,8 +1349,14 @@ void UnseenGxsChatLobbyDialog::updateDisplay(bool complete)
 {
     if (complete) {
         /* Fill complete */
-        requestGroupData();
-        requestAllPosts();
+        //fix the duplication of show all messages
+        if (!showAllPostOnlyOnce)   //we get all msg only once, the next time will not show all again!
+        {
+            requestGroupData();
+            requestAllPosts();
+            showAllPostOnlyOnce = true;
+        }
+
         return;
     }
 
@@ -1360,7 +1375,11 @@ void UnseenGxsChatLobbyDialog::updateDisplay(bool complete)
     {
         updateGroup = true;
         /* Do we need to fill all posts? */
-        requestAllPosts();
+        if (!showAllPostOnlyOnce)   //we get all msg only once, the next time will not show all again!
+        {
+            requestAllPosts();
+            showAllPostOnlyOnce = true;
+        }
     } else {
         std::map<RsGxsGroupId, std::set<RsGxsMessageId> > msgs;
         getAllMsgIds(msgs);
@@ -1403,7 +1422,7 @@ bool UnseenGxsChatLobbyDialog::navigate(const RsGxsMessageId &msgId)
 void UnseenGxsChatLobbyDialog::requestGroupData()
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::requestGroupData()";
+    std::cerr << "UnseenGxsChatLobbyDialog::requestGroupData()";
     std::cerr << std::endl;
 #endif
 
@@ -1442,7 +1461,7 @@ void UnseenGxsChatLobbyDialog::requestGroupData()
 void UnseenGxsChatLobbyDialog::loadGroupData(const uint32_t &token)
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::loadGroupData()";
+    std::cerr << "UnseenGxsChatLobbyDialog::loadGroupData()";
     std::cerr << std::endl;
 #endif
 
@@ -1456,8 +1475,10 @@ void UnseenGxsChatLobbyDialog::loadGroupData(const uint32_t &token)
 
         mGroupName = QString::fromUtf8(metaData.mGroupName.c_str());
         groupNameChanged(mGroupName);
+        //need to update groupname here:
+        getChatWidget()->setTitle(mGroupName);
     } else {
-        std::cerr << "GxsMessageFramePostWidget::loadGroupData() ERROR Not just one Group";
+        std::cerr << "UnseenGxsChatLobbyDialog::loadGroupData() ERROR Not just one Group";
         std::cerr << std::endl;
 
         //mStateHelper->clear(mTokenTypeGroupData);
@@ -1473,7 +1494,7 @@ void UnseenGxsChatLobbyDialog::loadGroupData(const uint32_t &token)
 void UnseenGxsChatLobbyDialog::requestAllPosts()
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::requestAllPosts()";
+    std::cerr << "UnseenGxsChatLobbyDialog::requestAllPosts()";
     std::cerr << std::endl;
 #endif
 
@@ -1519,7 +1540,7 @@ void UnseenGxsChatLobbyDialog::requestAllPosts()
 void UnseenGxsChatLobbyDialog::loadAllPosts(const uint32_t &token)
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::loadAllPosts()";
+    std::cerr << "UnseenGxsChatLobbyDialog::loadAllPosts()";
     std::cerr << std::endl;
 #endif
 
@@ -1534,7 +1555,7 @@ void UnseenGxsChatLobbyDialog::loadAllPosts(const uint32_t &token)
         connect(mFillThread, SIGNAL(addPost(QVariant,bool,int,int)), this, SLOT(fillThreadAddPost(QVariant,bool,int,int)), Qt::BlockingQueuedConnection);
 
 #ifdef ENABLE_DEBUG
-        std::cerr << "GxsMessageFramePostWidget::loadAllPosts() Start fill thread" << std::endl;
+        std::cerr << "UnseenGxsChatLobbyDialog::loadAllPosts() Start fill thread" << std::endl;
 #endif
 
         /* Start thread */
@@ -1557,7 +1578,7 @@ void UnseenGxsChatLobbyDialog::loadAllPosts(const uint32_t &token)
 void UnseenGxsChatLobbyDialog::requestPosts(const std::set<RsGxsMessageId> &msgIds)
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::requestPosts()";
+    std::cerr << "UnseenGxsChatLobbyDialog::requestPosts()";
     std::cerr << std::endl;
 #endif
 
@@ -1592,7 +1613,7 @@ void UnseenGxsChatLobbyDialog::requestPosts(const std::set<RsGxsMessageId> &msgI
 void UnseenGxsChatLobbyDialog::loadPosts(const uint32_t &token)
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::loadPosts()";
+    std::cerr << "UnseenGxsChatLobbyDialog::loadPosts()";
     std::cerr << std::endl;
 #endif
 
@@ -1613,7 +1634,7 @@ void UnseenGxsChatLobbyDialog::loadPosts(const uint32_t &token)
 void UnseenGxsChatLobbyDialog::loadRequest(const TokenQueue *queue, const TokenRequest &req)
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::loadRequest() UserType: " << req.mUserType;
+    std::cerr << "UnseenGxsChatLobbyDialog::loadRequest() UserType: " << req.mUserType;
     std::cerr << std::endl;
 #endif
 
@@ -1850,7 +1871,7 @@ void UnseenGxsChatLobbyDialog::fillThreadCreatePost(const QVariant &post, bool r
 void UnseenGxsChatLobbyDialog::fillThreadFinished()
 {
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::fillThreadFinished()" << std::endl;
+    std::cerr << "UnseenGxsChatLobbyDialog::fillThreadFinished()" << std::endl;
 #endif
 
     /* Thread has finished */
@@ -1873,12 +1894,12 @@ void UnseenGxsChatLobbyDialog::fillThreadFinished()
 #ifdef ENABLE_DEBUG
         if (thread->stopped()) {
             // thread was stopped
-            std::cerr << "GxsMessageFramePostWidget::fillThreadFinished() Thread was stopped" << std::endl;
+            std::cerr << "UnseenGxsChatLobbyDialog::fillThreadFinished() Thread was stopped" << std::endl;
         }
 #endif
 
 #ifdef ENABLE_DEBUG
-        std::cerr << "GxsMessageFramePostWidget::fillThreadFinished() Delete thread" << std::endl;
+        std::cerr << "UnseenGxsChatLobbyDialog::fillThreadFinished() Delete thread" << std::endl;
 #endif
 
         thread->deleteLater();
@@ -1886,7 +1907,7 @@ void UnseenGxsChatLobbyDialog::fillThreadFinished()
     }
 
 #ifdef ENABLE_DEBUG
-    std::cerr << "GxsMessageFramePostWidget::fillThreadFinished done()" << std::endl;
+    std::cerr << "UnseenGxsChatLobbyDialog::fillThreadFinished done()" << std::endl;
 #endif
 }
 

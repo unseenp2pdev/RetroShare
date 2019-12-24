@@ -1877,6 +1877,8 @@ void ChatWidget::setCurrentFileName(const QString &fileName)
 
 void ChatWidget::updateStatus(const QString &peer_id, int status)
 {
+    if ((chatType() == CHATTYPE_GXSGROUPCHAT || chatType() == CHATTYPE_LOBBY)) return;
+
     if (! (chatType() == CHATTYPE_PRIVATE || chatType() == CHATTYPE_DISTANT))
     {
 		// updateTitle is used
@@ -1970,12 +1972,15 @@ void ChatWidget::updateStatus(const QString &peer_id, int status)
 
 void ChatWidget::updateTitle()
 {
-	if (chatType() != CHATTYPE_LOBBY) {
-		// updateStatus is used
-		return;
-	}
+//	if (chatType() != CHATTYPE_LOBBY) {
+//		// updateStatus is used
+//		return;
+//	}
 
-	ui->titleLabel->setText(RsHtml::plainText(name) + "@" + RsHtml::plainText(title));
+    //ui->titleLabel->setText(RsHtml::plainText(name) + "@" + RsHtml::plainText(title));
+    if (chatType() == CHATTYPE_GXSGROUPCHAT || chatType() == CHATTYPE_LOBBY)
+        ui->titleLabel->setText(RsHtml::plainText(title));
+
 }
 
 void ChatWidget::updatePeersCustomStateString(const QString& /*peer_id*/, const QString& /*status_string*/)
@@ -2021,6 +2026,12 @@ void ChatWidget::setName(const QString &name)
 {
 	this->name = name;
 	updateTitle();
+}
+
+void ChatWidget::setTitle(const QString &title)
+{
+    this->title = title;
+    updateTitle();
 }
 
 bool ChatWidget::setStyle()

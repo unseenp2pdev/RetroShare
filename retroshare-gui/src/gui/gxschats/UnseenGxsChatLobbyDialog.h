@@ -23,6 +23,7 @@
 #ifndef _UNSEENGXSCHATLOBBYDIALOG_H
 #define _UNSEENGXSCHATLOBBYDIALOG_H
 
+#include "ui_UnseenGxsChatLobbyDialog.h"
 #include "ui_ChatLobbyDialog.h"
 #include "gui/common/RSTreeWidgetItem.h"
 #include "gui/chat/ChatDialog.h"
@@ -202,6 +203,7 @@ private slots:
 private:
     RsGxsUpdateBroadcastBase *mBase;
     RsGxsIfaceHelper *mInterfaceHelper;
+    bool showAllPostOnlyOnce;
 //END of copy from RsGxsUpdateBroadcastWidget
 
 
@@ -257,7 +259,7 @@ public:
     bool navigate(const RsGxsMessageId& msgId);
 
     /* GXS functions */
-    void loadRequest(const TokenQueue *queue, const TokenRequest &req);
+    virtual void loadRequest(const TokenQueue *queue, const TokenRequest &req);
 
     int subscribeFlags() { return mSubscribeFlags; }
 
