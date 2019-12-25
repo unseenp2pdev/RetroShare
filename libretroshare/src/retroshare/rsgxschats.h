@@ -199,6 +199,7 @@ public:
     virtual bool getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &posts, std::vector<RsGxsComment> &cmts) = 0;
     virtual bool getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &posts) = 0;
 
+    virtual bool getOwnMember(GxsChatMember &ownId)=0;
 
     /**
      * @brief toggle message read status

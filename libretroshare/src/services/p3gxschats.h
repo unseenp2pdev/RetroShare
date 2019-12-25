@@ -90,10 +90,9 @@ protected:
     virtual RsGenExchange::ServiceCreate_Return service_PublishGroup(RsNxsGrp *grp);
     virtual RsGenExchange::ServiceCreate_Return service_CreateMessage(RsNxsMsg* msg);
 
-    virtual ServiceCreate_Return service_RecvBounceGroup(RsNxsGrp *grp);
-    virtual ServiceCreate_Return service_RecvBounceMessage(RsNxsMsg* msg);
+    virtual ServiceCreate_Return service_RecvBounceGroup(RsNxsGrp *grp, bool isNew);
+    virtual ServiceCreate_Return service_RecvBounceMessage(RsNxsMsg* msg, bool isNew);
 
-    bool getOwnMember(GxsChatMember &member);
 
     virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid);
     virtual void processRecvBounceGroup();
@@ -125,6 +124,8 @@ virtual bool createGroup(uint32_t &token, RsGxsChatGroup &group);
 virtual bool createPost(uint32_t &token, RsGxsChatMsg &post);
 
 virtual bool updateGroup(uint32_t &token, RsGxsChatGroup &group);
+
+virtual bool getOwnMember(GxsChatMember &member);
 
 
 
@@ -283,8 +284,8 @@ bool generateGroup(uint32_t &token, std::string groupName);
     typedef std::pair<RsGxsChatGroup::ChatType, std::list<GxsChatMember>> ChatInfo; //one2one-list, group-list, channel-list
     std::map<RsGxsGroupId,ChatInfo> grpMembers;  //conversationId, {chattype, memberlist}.
     void loadChatsMembers(RsGxsChatGroup &grp);
-    std::vector<RsNxsGrp*> groupBouncePending;
-    std::vector<RsNxsMsg*> messageBouncePending;
+    std::vector<std::pair<RsNxsGrp*,bool>> groupBouncePending;
+    std::vector<std::pair<RsNxsMsg*, bool>> messageBouncePending;
     bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
 
 };
