@@ -67,7 +67,13 @@ GxsChatGroupDialog::GxsChatGroupDialog(TokenQueue *tokenQueue, QWidget *parent)
 GxsChatGroupDialog::GxsChatGroupDialog(TokenQueue *tokenExternalQueue, RsTokenService *tokenService, Mode mode, RsGxsGroupId groupId, QWidget *parent)
     : GxsGroupDialog(tokenExternalQueue, tokenService, mode, groupId, ChannelEditEnabledFlags, ChannelEditDefaultsFlags, parent)
 {
-    rsGxsChats->getOwnMember(ownChatId);
+    GxsChatMember chatId;
+    rsGxsChats->getOwnMember(chatId);
+    ownChatId=chatId;
+    members.push_back(chatId);
+    chattype=RsGxsChatGroup::GROUPCHAT;  //set default for now...
+
+
 }
 
 void GxsChatGroupDialog::initUi()

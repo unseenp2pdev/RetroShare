@@ -263,6 +263,23 @@ RsGenExchange::ServiceCreate_Return p3GxsChats::service_CreateGroup(RsGxsGrpItem
                         | GXS_SERV::GROUP_SUBSCRIBE_PUBLISH;
 
         //send Group to the network
+         RsGxsChatGroupItem *item = dynamic_cast<RsGxsChatGroupItem*>(grpItem);
+         if (item){
+             //groupId should exist by now.
+             grpMembers[item->meta.mGroupId]= make_pair(item->type,item->members);
+
+#ifdef GXSCHATS_DEBUG
+            std::cerr <<"*****************p3GxsChats::service_CreateGroup(**********"<<std::endl;
+            std::cerr <<"GroupId:"<<item->meta.mGroupId<< "group.type:"<<item->type<<std::endl;
+            std::cerr <<"GroupMembers:";
+            for(auto it=item->members.begin(); it !=item->members.end(); it++){
+                std::cerr << "chatPeerId:"<< it->chatPeerId<< "Username: "<<it->nickname<< std::endl;
+            }
+#endif
+         }
+         else {
+             std::cerr <<"Failed to cast object: dynamic_cast<RsGxsChatGroupItem*>(grpItem); "<<std::endl;
+         }
 
         //mChatSrv->sendGxsItem(grp);  //need to include a list of members or getting circle or private node members.
         delete grp;
@@ -487,7 +504,10 @@ void p3GxsChats::processRecvBounceGroup(){
     RS_STACK_MUTEX(mChatMtx) ;
 
     if(groupBouncePending.empty())
-            return;
+        return;
+
+    if(ownChatId==NULL)
+        initChatId();
     //if Group is ONE2ONE, Drop the bouncing message.
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::processRecvBounceGroup()  : " << std::endl;
@@ -508,7 +528,7 @@ void p3GxsChats::processRecvBounceGroup(){
             item = mSerialiser->deserialise(data.bin_data, &data.bin_len);
 
         if(!item){
-            groupBouncePending.erase(it); //pop the already process bounce message.
+            //groupBouncePending.erase(it); //pop the already process bounce message.
             continue;
         }
         RsGxsGrpItem* gItem = dynamic_cast<RsGxsGrpItem*>(item);
@@ -526,22 +546,17 @@ void p3GxsChats::processRecvBounceGroup(){
             ids.remove(sender);
 
             switch(grpItem->type){
-            case RsGxsChatGroup::ONE2ONE:   break;  //drop, no bouncing off
-            case RsGxsChatGroup::GROUPCHAT:
-            case RsGxsChatGroup::CHANNEL:
-            {
+                case RsGxsChatGroup::ONE2ONE:   break;  //drop, no bouncing off
+                case RsGxsChatGroup::GROUPCHAT:
+                case RsGxsChatGroup::CHANNEL:
+                {
                 if(grpItem->meta.mCircleType==GXS_CIRCLE_TYPE_PUBLIC )
                     netService->PublishChatGroup(bounceGrp, ids);
-                else{
-                //private group or channel will not bouncing to other friends.
-                    groupBouncePending.erase(it); //pop it
-                    continue;
+                //private group or channel will not bounce if it is received new group invitation.
                 }
-            }
-
-          }//end switch
+            }//end switch
         }
-        else{
+        else if(!isNew){
             //exist on the list. Look up the conversation type. probably an Group Update. Send only to memberlist.
             ChatInfo cinfo = mit->second;
             RsGxsGroupId grpId = bounceGrp->grpId;
@@ -554,7 +569,7 @@ void p3GxsChats::processRecvBounceGroup(){
                    if(!isNew){
                         std::list<GxsChatMember> friendList = cinfo.second;
                         RsPeerId sender = bounceGrp->PeerId();
-                        std::list<GxsChatMember> sendList;
+                        //std::list<GxsChatMember> sendList;
                         std::list<RsPeerId> tempSendList;
 
                         for (auto sit=friendList.begin(); sit !=friendList.end(); sit++){
@@ -563,7 +578,7 @@ void p3GxsChats::processRecvBounceGroup(){
                                 continue;
                             }
                             else{
-                                sendList.push_back(*sit);
+                                //sendList.push_back(*sit);
                                 //need to check if the member is owner friend and online
                                 //if member is not yet a friend, need to establish gxs tunnel if possible.
                                 //if not yet member and able to establish gxs tunnel, auto add friend (non-trust mode)
@@ -581,9 +596,10 @@ void p3GxsChats::processRecvBounceGroup(){
 
         }
 
-        groupBouncePending.erase(it); //pop the already process bounce message.
+        //groupBouncePending.erase(it); //pop the already process bounce message.
 
     }//end for loop
+    groupBouncePending.clear();
 
 }
 void p3GxsChats::processRecvBounceMessage(){
@@ -595,6 +611,8 @@ void p3GxsChats::processRecvBounceMessage(){
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::processRecvBounceGroup()  : " << std::endl;
 #endif
+    if(ownChatId==NULL)
+        initChatId();
 
     RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
     std::vector<std::pair<RsNxsMsg*,bool>>::iterator it;
@@ -602,13 +620,20 @@ void p3GxsChats::processRecvBounceMessage(){
         RsNxsMsg *msg = it->first;
         bool isNew = it->second;
         RsGxsGroupId grpId = msg->grpId;
+
         auto mit = grpMembers.find(grpId);
          if (mit == grpMembers.end()){
              //message doesn't belong to anygroup... Drop it!
-             messageBouncePending.erase(it);
              continue;
          }
          ChatInfo cinfo = mit->second;
+         if(msg){
+             std::cerr <<"MesageId: "<< msg->msgId << "GroupId: "<<msg->grpId << "*****"<<std::endl;
+             std::cerr <<"Message Size(): "<<msg->msg.TlvSize()<<std::endl;
+             std::cerr <<"Meta Size() : "<<msg->meta.TlvSize()<<std::endl;
+             std::cerr <<"isNew: "<<isNew <<std::endl;
+             std::cerr <<"chatType: "<< cinfo.first <<std::endl;
+         }
          switch(cinfo.first){
             case RsGxsChatGroup::ONE2ONE: {
                 //one2one message, drop off, final destination!
@@ -619,17 +644,19 @@ void p3GxsChats::processRecvBounceMessage(){
             {
                 //bouncing all the message on the group, execept the sender of this message.
                 std::list<GxsChatMember> friendList = cinfo.second;
+                if(friendList.empty())
+                    continue;
+
                 RsPeerId sender = msg->PeerId();
-                std::list<GxsChatMember> sendList;
+                //std::list<GxsChatMember> sendList;
                 std::list<RsPeerId> tempSendList;
 
                 for (auto sit=friendList.begin(); sit !=friendList.end(); sit++){
                     if(sit->chatPeerId == sender || sit->chatPeerId ==  ownChatId->chatPeerId){
                         //Don't send to itself and sender peer.
-                        continue;
                     }
                     else{
-                        sendList.push_back(*sit);
+                        //sendList.push_back(*sit);
                         //need to check if the member is owner friend and online
                         //if member is not yet a friend, need to establish gxs tunnel if possible.
                         //if not yet member and able to establish gxs tunnel, auto add friend (non-trust mode)
@@ -642,9 +669,11 @@ void p3GxsChats::processRecvBounceMessage(){
                     netService->PublishChat(msg, tempSendList);
                 }
             }
+
+
          }//end switch
-         messageBouncePending.erase(it);  //remove the message of the pending.
     }//end for loop
+    messageBouncePending.clear();
 }
 
 void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
@@ -774,7 +803,7 @@ static  rstime_t last_dummy_tick = 0;
     }
 
     processRecvBounceGroup();
-    //processRecvBounceMessage();
+    processRecvBounceMessage();
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
@@ -1354,41 +1383,14 @@ bool p3GxsChats::createGroup(uint32_t &token, RsGxsChatGroup &group)
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::createGroup()" << std::endl;
 #endif
-
-    if (ownChatId==NULL){
-        //initalized chatInfo
-        initChatId();
-    }
+    if(ownChatId==NULL);
+        this->initChatId();
 
     if(group.members.empty()){
-        //adding your own id as memberlist, because this might be a public groupchat..u don't need add members.
+        group.type = RsGxsChatGroup::GROUPCHAT;
         group.members.push_back(*ownChatId);
     }
-    else{
-        std::list<GxsChatMember>::iterator it;
-        bool found=false;
-        for (it=group.members.begin(); it !=group.members.begin();it++){
-                if(*ownChatId ==*it){
-                    found=true;
-                    break;
-                }
-        }
-        if(!found){
-             group.members.push_back(*ownChatId);
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "Adding its own info into Members List of groupId:"<< group.mMeta.mGroupId<< std::endl;
-#endif
-        }
 
-    }
-    grpMembers[group.mMeta.mGroupId]= make_pair(group.type,group.members);
-
-#ifdef GXSCHATS_DEBUG
-    std::cerr <<"Print all memberlist from this group:"<<std::endl;
-    for(auto it=group.members.begin(); it !=group.members.end(); it++){
-        std::cerr << "chatPeerId:"<< it->chatPeerId<< "Username: "<<it->nickname<< std::endl;
-    }
-#endif
     RsGxsChatGroupItem* grpItem = new RsGxsChatGroupItem();
     grpItem->fromChatGroup(group, true);
 

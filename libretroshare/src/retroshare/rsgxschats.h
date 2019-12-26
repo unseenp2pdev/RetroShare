@@ -99,7 +99,7 @@ class RsGxsChatGroup : RsSerializable
         std::list<GxsChatMember> members;
         /// @see RsSerializable
         bool mAutoDownload;
-        RsGxsChatGroup(): type(ONE2ONE){}
+        RsGxsChatGroup(): type(GROUPCHAT){}
         virtual void serial_process( RsGenericSerializer::SerializeJob j,
                                  RsGenericSerializer::SerializeContext& ctx )
         {
