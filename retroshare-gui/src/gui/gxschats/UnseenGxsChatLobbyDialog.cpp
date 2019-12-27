@@ -1223,6 +1223,9 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
             nickname = QString::fromStdString(details.mNickname);
         }
 
+        //try to show all files from post.files: if image, show thumbnail + link, if not, only show link
+        std::list<RsGxsFile> fileList = posts[i].mFiles;
+
         ui.chatWidget->addChatMsg(incomming, nickname, gxs_id, sendTime, recvTime, mmsg, ChatWidget::MSGTYPE_NORMAL);
     }
 

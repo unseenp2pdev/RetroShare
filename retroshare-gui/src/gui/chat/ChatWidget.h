@@ -166,6 +166,9 @@ private slots:
 	void chatCharFormatChanged();
 
 	void fileHashingFinished(QList<HashedFile> hashedFiles);
+    //unseenp2p
+    void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles );
+    //void gxsfileHashingFinished(std::list<SubFileItem *> mFiles); //unseenp2p
 
 	void smileyWidget();
 	void addSmiley();
@@ -218,6 +221,8 @@ private:
 
 	void completeNickname(bool reverse);
     QAbstractItemModel *modelFromPeers();
+
+    //void convertFromAttachmentsToGxsFiles( std::list<RsGxsFile>& files);
 
     ChatId chatId;
 
@@ -275,6 +280,10 @@ private:
 	ChatLobbyUserNotify* notify;
 
 	Ui::ChatWidget *ui;
+
+    //unseenp2p - for sending gxs files
+    std::list<SubFileItem *> mAttachments;
+
 };
 
 #endif // CHATWIDGET_H

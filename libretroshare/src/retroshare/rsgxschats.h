@@ -67,6 +67,7 @@ class RsGxsChatGroup : RsSerializable
 
 std::ostream &operator<<(std::ostream& out, const RsGxsChatGroup& group);
 
+//unseenp2p : like RsGxsChannelPost
 class RsGxsChatMsg : RsSerializable
 {
     public:

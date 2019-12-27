@@ -62,6 +62,8 @@
 #include <retroshare/rsmsgs.h>
 #include <retroshare/rsplugin.h>
 
+#include "gui/feeds/SubFileItem.h"
+
 #include <time.h>
 
 #define FMM 2.5//fontMetricsMultiplicator
@@ -183,6 +185,9 @@ ChatWidget::ChatWidget(QWidget *parent)
 	ui->actionShow_Hidden_Images->setIcon(ui->textBrowser->getBlockedImage());
 
 	connect(ui->hashBox, SIGNAL(fileHashingFinished(QList<HashedFile>)), this, SLOT(fileHashingFinished(QList<HashedFile>)));
+    //unseenp2p - add for gxsfile - in gxsChat tab
+    connect(ui->hashBox, SIGNAL(gxsfileHashingFinishedForGUI(QList<HashedFile>,std::list<SubFileItem *>)), this, SLOT(gxsfileHashingFinishedForGUI(QList<HashedFile>, std::list<SubFileItem *>)));
+    //connect(ui->hashBox, SIGNAL(gxsfileHashingFinished(std::list<SubFileItem *>)), this, SLOT(gxsfileHashingFinished(std::list<SubFileItem *>>)));
 
 	connect(NotifyQt::getInstance(), SIGNAL(peerStatusChanged(const QString&, int)), this, SLOT(updateStatus(const QString&, int)));
 	connect(NotifyQt::getInstance(), SIGNAL(peerHasNewCustomStateString(const QString&, const QString&)), this, SLOT(updatePeersCustomStateString(const QString&, const QString&)));
@@ -1350,6 +1355,42 @@ void ChatWidget::updateLenOfChatTextEdit()
 
 
 
+bool convertFromAttachmentsToGxsFiles(std::list<SubFileItem *> mAttachments, std::list<RsGxsFile>& files)
+{
+    //std::list<RsGxsFile> files;
+
+    bool mResult = false;
+    std::list<SubFileItem *>::iterator fit;
+
+    for(fit = mAttachments.begin(); fit != mAttachments.end(); ++fit)
+    {
+        //if (!(*fit)->isHidden())
+        {
+            RsGxsFile fi;
+            fi.mHash = (*fit)->FileHash();
+            fi.mName = (*fit)->FileName();
+            fi.mSize = (*fit)->FileSize();
+
+
+            files.push_back(fi);
+
+            mResult = true;
+            /* commence downloads - if we don't have the file */
+
+            if (!(*fit)->done())
+            {
+                if ((*fit)->ready())
+                {
+                    (*fit)->download();
+                }
+            // Skips unhashed files.
+            }
+        }
+    }
+    return mResult;
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// //Unseenp2p - need to separate some types of chat:
 ///  1. normal (one2one ssl + groupchat) chat
@@ -1420,7 +1461,16 @@ void ChatWidget::sendChat()
             //unseenp2p - add more timestamp
             post.mMeta.mPublishTs = QDateTime::currentSecsSinceEpoch();
 
-            post.mMsg = textToSignal;
+
+            std::list<RsGxsFile> files;
+            if (convertFromAttachmentsToGxsFiles(mAttachments, files))
+            {
+                post.mFiles = files;
+                post.mMsg = msg;
+                mAttachments.clear(); //if not clear, the next msg will still take this mAttachments to check
+            }
+            else
+                post.mMsg = textToSignal;
 
             rsGxsChats->createPost(token, post);
         }
@@ -1767,8 +1817,17 @@ void ChatWidget::messageHistory()
 void ChatWidget::addExtraFile()
 {
 	QStringList files;
-	if (misc::getOpenFileNames(this, RshareSettings::LASTDIR_EXTRAFILE, tr("Add Extra File"), "", files)) {
-		ui->hashBox->addAttachments(files,mDefaultExtraFileFlags /*, 0*/);
+    if (misc::getOpenFileNames(this, RshareSettings::LASTDIR_EXTRAFILE, tr("Add Extra File"), "", files))
+    {
+        if (chatType() == CHATTYPE_GXSGROUPCHAT)
+        {
+            ui->hashBox->addGxsFileAttachments(files,mDefaultExtraFileFlags );
+        }
+        else
+        {
+            ui->hashBox->addAttachments(files,mDefaultExtraFileFlags /*, 0*/);
+        }
+
 	}
 }
 
@@ -1821,7 +1880,7 @@ void ChatWidget::fileHashingFinished(QList<HashedFile> hashedFiles)
 			if(!preview)
 			{
 				QString image = FilesDefs::getImageFromFilename(hashedFile.filename, false);
-				if (!image.isEmpty()) {
+                if (!image.isEmpty()) {
 					message += QString("<img src=\"%1\">").arg(image);
 				}
 			}
@@ -1839,6 +1898,72 @@ void ChatWidget::fileHashingFinished(QList<HashedFile> hashedFiles)
 
     ui->chatTextEdit->insertHtml(message);
 
+}
+
+//unseenp2p - add more for gxs file
+//void ChatWidget::gxsfileHashingFinished(std::list<SubFileItem *> mFiles)
+//{
+//    std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
+//    mAttachments = mFiles;
+
+//    return;
+//}
+
+void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles )
+{
+    std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
+
+    mAttachments = mFiles;
+    QString message;
+
+    QList<HashedFile>::iterator it;
+    std::list<RsGxsFile> files;
+    for (it = hashedFiles.begin(); it != hashedFiles.end(); ++it)
+    {
+        HashedFile& hashedFile = *it;
+        QString ext = QFileInfo(hashedFile.filename).suffix().toUpper();
+
+        RetroShareLink link;
+
+        // We dont use extra links anymore, since files in the extra list can always be accessed using anonymous+encrypted FT.
+
+        link = RetroShareLink::createFile(hashedFile.filename, hashedFile.size, QString::fromStdString(hashedFile.hash.toStdString()));
+
+        if (hashedFile.flag & HashedFile::Picture) {
+            message += QString("<img src=\"file:///%1\" width=\"100\" height=\"100\">").arg(hashedFile.filepath);
+            message+="<br>";
+        } else {
+            bool preview = false;
+            if(hashedFiles.size()==1 && (ext == "JPG" || ext == "PNG" || ext == "JPEG" || ext == "GIF"))
+            {
+                QString encodedImage;
+                uint32_t maxMessageSize = this->maxMessageSize();
+                if (RsHtml::makeEmbeddedImage(hashedFile.filepath, encodedImage, 640*480, maxMessageSize - 200 - link.toHtmlSize().length()))
+                {	QTextDocumentFragment fragment = QTextDocumentFragment::fromHtml(encodedImage);
+                    ui->chatTextEdit->textCursor().insertFragment(fragment);
+                    preview=true;
+                }
+            }
+            if(!preview)
+            {
+                QString image = FilesDefs::getImageFromFilename(hashedFile.filename, false);
+                if (!image.isEmpty()) {
+                    message += QString("<img src=\"%1\">").arg(image);
+                }
+            }
+        }
+        message += link.toHtmlSize();
+
+        if (it != hashedFiles.end()) {
+            message += "<BR>";
+        }
+    }
+
+#ifdef CHAT_DEBUG
+    std::cerr << "ChatWidget::fileHashingFinished message : " << message.toStdString() << std::endl;
+#endif
+
+    ui->chatTextEdit->insertHtml(message);
 }
 
 bool ChatWidget::fileSave()
