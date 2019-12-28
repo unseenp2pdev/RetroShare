@@ -1224,7 +1224,17 @@ void UnseenGxsChatLobbyDialog::insertChannelPosts(std::vector<RsGxsChatMsg> &pos
         }
 
         //try to show all files from post.files: if image, show thumbnail + link, if not, only show link
-        std::list<RsGxsFile> fileList = posts[i].mFiles;
+
+        std::list<RsGxsFile> fileList; // = posts[i].mFiles;
+        std::list<RsGxsFile>::iterator fit;
+        for(fit = posts[i].mFiles.begin(); fit != posts[i].mFiles.end(); ++fit)
+        {
+            RsGxsFile fi;
+            fi.mName = fit->mName;
+            fi.mSize = fit->mSize;
+            fi.mHash = fit->mHash;
+            fileList.push_back(fi);
+        }
 
         ui.chatWidget->addChatMsg(incomming, nickname, gxs_id, sendTime, recvTime, mmsg, ChatWidget::MSGTYPE_NORMAL);
     }

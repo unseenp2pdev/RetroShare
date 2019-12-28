@@ -1913,7 +1913,9 @@ void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std
 {
     std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
 
-    mAttachments = mFiles;
+    mAttachments.clear();
+    mAttachments.merge(mFiles);
+
     QString message;
 
     QList<HashedFile>::iterator it;
