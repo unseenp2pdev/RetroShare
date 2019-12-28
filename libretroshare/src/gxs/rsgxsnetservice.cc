@@ -5119,7 +5119,7 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 #ifdef NXS_NET_DEBUG_3
 		GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "   (EE) Publish key already present in database. Discarding message." << std::endl;
 #endif
-        mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
+        //mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
 		return ;
 	}
 

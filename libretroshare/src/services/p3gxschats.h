@@ -287,6 +287,8 @@ bool generateGroup(uint32_t &token, std::string groupName);
     std::vector<std::pair<RsNxsGrp*,bool>> groupBouncePending;
     std::vector<std::pair<RsNxsMsg*, bool>> messageBouncePending;
     bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
+    RsGeneralDataService* mDataStore;
+
 
 };
 
