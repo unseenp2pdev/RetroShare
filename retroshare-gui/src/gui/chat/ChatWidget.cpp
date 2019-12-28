@@ -1465,7 +1465,17 @@ void ChatWidget::sendChat()
             std::list<RsGxsFile> files;
             if (convertFromAttachmentsToGxsFiles(mAttachments, files))
             {
-                post.mFiles = files;
+                //post.mFiles = files;
+                std::list<RsGxsFile>::iterator fit;
+                for(fit = files.begin(); fit != files.end(); ++fit)
+                {
+                    RsGxsFile fi;
+                    fi.mName = fit->mName;
+                    fi.mSize = fit->mSize;
+                    fi.mHash = fit->mHash;
+                    post.mFiles.push_back(fi);
+                }
+
                 post.mMsg = msg;
                 mAttachments.clear(); //if not clear, the next msg will still take this mAttachments to check
             }
