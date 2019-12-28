@@ -1914,7 +1914,14 @@ void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std
     std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
 
     mAttachments.clear();
-    mAttachments.merge(mFiles);
+
+    std::list<SubFileItem*>::iterator fit;
+    uint32_t flags =  SFI_TYPE_CHATS | SFI_STATE_EXTRA | SFI_FLAG_CREATE;
+    for(fit = mFiles.begin(); fit != mFiles.end(); ++fit)
+    {
+        SubFileItem* fi= new SubFileItem((*fit)->FileHash(), (*fit)->FileName(), (*fit)->FilePath(),(*fit)->FileSize(), flags, RsPeerId()  );
+        mAttachments.push_back(fi);
+    }
 
     QString message;
 
