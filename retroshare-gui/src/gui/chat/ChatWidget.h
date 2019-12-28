@@ -36,6 +36,7 @@
 
 #include <retroshare/rsmsgs.h>
 #include <retroshare/rsfiles.h>
+#include <retroshare/rsgxschats.h>
 
 //For PersonId anchor.
 #define PERSONID "PersonId:"
@@ -222,7 +223,7 @@ private:
 	void completeNickname(bool reverse);
     QAbstractItemModel *modelFromPeers();
 
-    //void convertFromAttachmentsToGxsFiles( std::list<RsGxsFile>& files);
+    bool convertFromAttachmentsToGxsFiles( std::list<RsGxsFile>& files);
 
     ChatId chatId;
 

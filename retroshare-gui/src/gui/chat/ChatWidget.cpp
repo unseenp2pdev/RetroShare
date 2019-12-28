@@ -1355,7 +1355,7 @@ void ChatWidget::updateLenOfChatTextEdit()
 
 
 
-bool convertFromAttachmentsToGxsFiles(std::list<SubFileItem *> mAttachments, std::list<RsGxsFile>& files)
+bool ChatWidget::convertFromAttachmentsToGxsFiles(/*std::list<SubFileItem *> mAttachments,*/ std::list<RsGxsFile>& files)
 {
     //std::list<RsGxsFile> files;
 
@@ -1370,7 +1370,6 @@ bool convertFromAttachmentsToGxsFiles(std::list<SubFileItem *> mAttachments, std
             fi.mHash = (*fit)->FileHash();
             fi.mName = (*fit)->FileName();
             fi.mSize = (*fit)->FileSize();
-
 
             files.push_back(fi);
 
@@ -1463,7 +1462,7 @@ void ChatWidget::sendChat()
 
 
             std::list<RsGxsFile> files;
-            if (convertFromAttachmentsToGxsFiles(mAttachments, files))
+            if (convertFromAttachmentsToGxsFiles(files))
             {
                 //post.mFiles = files;
                 std::list<RsGxsFile>::iterator fit;
