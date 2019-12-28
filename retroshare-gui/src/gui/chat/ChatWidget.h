@@ -168,7 +168,7 @@ private slots:
 
 	void fileHashingFinished(QList<HashedFile> hashedFiles);
     //unseenp2p
-    void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles );
+    void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles );
     //void gxsfileHashingFinished(std::list<SubFileItem *> mFiles); //unseenp2p
 
 	void smileyWidget();
@@ -223,7 +223,7 @@ private:
 	void completeNickname(bool reverse);
     QAbstractItemModel *modelFromPeers();
 
-    bool convertFromAttachmentsToGxsFiles( std::list<RsGxsFile>& files);
+   // bool convertFromAttachmentsToGxsFiles( std::list<RsGxsFile>& files);
 
     ChatId chatId;
 
@@ -283,7 +283,9 @@ private:
 	Ui::ChatWidget *ui;
 
     //unseenp2p - for sending gxs files
-    std::list<SubFileItem *> mAttachments;
+    //std::list<SubFileItem *> mAttachments;
+    QList<RsGxsFile> mAttachments;
+
 
 };
 

@@ -83,7 +83,8 @@ private slots:
 signals:
 	void fileHashingStarted();
 	void fileHashingFinished(QList<HashedFile> hashedFiles);
-    void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles);
+    //void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles);
+    void gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles);
 //    void gxsfileHashingFinished(std::list<SubFileItem *> mFiles);
 
 private:
@@ -104,7 +105,8 @@ private:
 	QList<HashingInfo> mHashingInfos;
     QList<GxsFileHashingInfo> mGxsFileHashingInfos; //unseenp2p - using for gxs file sharing in ChatWidget
 
-    std::list<SubFileItem *> mAttachments; //unseenp2p
+    //std::list<SubFileItem *> mAttachments; //unseenp2p
+    QList<SubFileItem *> mAttachments; //unseenp2p
 
 	bool mAutoHide;
 	QWidget* dropWidget;

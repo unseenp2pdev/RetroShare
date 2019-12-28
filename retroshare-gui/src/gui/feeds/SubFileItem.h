@@ -69,6 +69,7 @@ public:
 	uint64_t    FileSize() { return mFileSize; }
 	std::string FilePath() { return mPath; }
 
+    SubFileItem &operator=(const SubFileItem &a);
 	void updateItemStatic();
 
 	bool done();

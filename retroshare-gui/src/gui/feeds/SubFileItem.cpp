@@ -535,6 +535,25 @@ void SubFileItem::smaller()
 #endif
 }
 
+SubFileItem &SubFileItem::operator=(const SubFileItem &a)
+{
+    mPath = a.mPath;
+    mFileHash = a.mFileHash;
+    mFileName = a.mFileName;
+    mFileSize =    a.mFileSize;
+    mSrcId =    a.mSrcId;
+    mChannelId = a.mChannelId;
+    mChatId = a.mChatId;
+
+    mMode =    a.mMode;
+    mType =    a.mType;
+    mFlag =    a.mFlag;
+    mDivisor =    a.mDivisor;
+
+    /* for display purposes */
+    amountDone = a.amountDone;
+}
+
 void SubFileItem::toggle()
 {
 #if 0

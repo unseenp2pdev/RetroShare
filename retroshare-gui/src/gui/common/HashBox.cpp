@@ -391,6 +391,6 @@ void HashBox::checkGxsFileAttachmentReady()
     // the next line set the cache to dirty
     updateGeometry();
 
-    emit gxsfileHashingFinishedForGUI(hashedFiles, mAttachments);
+    emit gxsfileHashingFinishedForGUI(hashedFiles);
  //   emit gxsfileHashingFinished(mAttachments);
 }

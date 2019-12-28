@@ -186,7 +186,8 @@ ChatWidget::ChatWidget(QWidget *parent)
 
 	connect(ui->hashBox, SIGNAL(fileHashingFinished(QList<HashedFile>)), this, SLOT(fileHashingFinished(QList<HashedFile>)));
     //unseenp2p - add for gxsfile - in gxsChat tab
-    connect(ui->hashBox, SIGNAL(gxsfileHashingFinishedForGUI(QList<HashedFile>,std::list<SubFileItem *>)), this, SLOT(gxsfileHashingFinishedForGUI(QList<HashedFile>, std::list<SubFileItem *>)));
+    //connect(ui->hashBox, SIGNAL(gxsfileHashingFinishedForGUI(QList<HashedFile>,std::list<SubFileItem *>)), this, SLOT(gxsfileHashingFinishedForGUI(QList<HashedFile>, std::list<SubFileItem *>)));
+    connect(ui->hashBox, SIGNAL(gxsfileHashingFinishedForGUI(QList<HashedFile>)), this, SLOT(gxsfileHashingFinishedForGUI(QList<HashedFile>)));
     //connect(ui->hashBox, SIGNAL(gxsfileHashingFinished(std::list<SubFileItem *>)), this, SLOT(gxsfileHashingFinished(std::list<SubFileItem *>>)));
 
 	connect(NotifyQt::getInstance(), SIGNAL(peerStatusChanged(const QString&, int)), this, SLOT(updateStatus(const QString&, int)));
@@ -1353,43 +1354,6 @@ void ChatWidget::updateLenOfChatTextEdit()
 	ui->chatTextEdit->setToolTip(text);
 }
 
-
-
-bool ChatWidget::convertFromAttachmentsToGxsFiles(/*std::list<SubFileItem *> mAttachments,*/ std::list<RsGxsFile>& files)
-{
-    //std::list<RsGxsFile> files;
-
-    bool mResult = false;
-    std::list<SubFileItem *>::iterator fit;
-
-    for(fit = mAttachments.begin(); fit != mAttachments.end(); ++fit)
-    {
-        //if (!(*fit)->isHidden())
-        {
-            RsGxsFile fi;
-            fi.mHash = (*fit)->FileHash();
-            fi.mName = (*fit)->FileName();
-            fi.mSize = (*fit)->FileSize();
-
-            files.push_back(fi);
-
-            mResult = true;
-            /* commence downloads - if we don't have the file */
-
-            if (!(*fit)->done())
-            {
-                if ((*fit)->ready())
-                {
-                    (*fit)->download();
-                }
-            // Skips unhashed files.
-            }
-        }
-    }
-    return mResult;
-
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 /// //Unseenp2p - need to separate some types of chat:
 ///  1. normal (one2one ssl + groupchat) chat
@@ -1460,13 +1424,10 @@ void ChatWidget::sendChat()
             //unseenp2p - add more timestamp
             post.mMeta.mPublishTs = QDateTime::currentSecsSinceEpoch();
 
-
-            std::list<RsGxsFile> files;
-            if (convertFromAttachmentsToGxsFiles(files))
+            if (mAttachments.size() > 0)
             {
-                //post.mFiles = files;
-                std::list<RsGxsFile>::iterator fit;
-                for(fit = files.begin(); fit != files.end(); ++fit)
+                QList<RsGxsFile>::iterator fit;
+                for(fit = mAttachments.begin(); fit != mAttachments.end(); ++fit)
                 {
                     RsGxsFile fi;
                     fi.mName = fit->mName;
@@ -1918,24 +1879,26 @@ void ChatWidget::fileHashingFinished(QList<HashedFile> hashedFiles)
 //    return;
 //}
 
-void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles )
+//void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std::list<SubFileItem *> mFiles )
+void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles )
 {
-    std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
-
     mAttachments.clear();
 
-    std::list<SubFileItem*>::iterator fit;
-    uint32_t flags =  SFI_TYPE_CHATS | SFI_STATE_EXTRA | SFI_FLAG_CREATE;
-    for(fit = mFiles.begin(); fit != mFiles.end(); ++fit)
+    //convert from HashedFile to RsGxsFile list
+    QList<HashedFile>::iterator fit;
+    for(fit = hashedFiles.begin(); fit != hashedFiles.end(); ++fit)
     {
-        SubFileItem* fi= new SubFileItem((*fit)->FileHash(), (*fit)->FileName(), (*fit)->FilePath(),(*fit)->FileSize(), flags, RsPeerId()  );
+        RsGxsFile fi;
+        fi.mHash = (*fit).hash;
+        fi.mName = (*fit).filename.toStdString();
+        fi.mSize = (*fit).size;
         mAttachments.push_back(fi);
     }
+    std::cerr << "ChatWidget::gxsfileHashingFinished() started." << std::endl;
 
     QString message;
 
     QList<HashedFile>::iterator it;
-    std::list<RsGxsFile> files;
     for (it = hashedFiles.begin(); it != hashedFiles.end(); ++it)
     {
         HashedFile& hashedFile = *it;
@@ -1970,12 +1933,14 @@ void ChatWidget::gxsfileHashingFinishedForGUI(QList<HashedFile> hashedFiles, std
                 }
             }
         }
+        message += "<BR>";
         message += link.toHtmlSize();
 
         if (it != hashedFiles.end()) {
             message += "<BR>";
         }
     }
+
 
 #ifdef CHAT_DEBUG
     std::cerr << "ChatWidget::fileHashingFinished message : " << message.toStdString() << std::endl;
