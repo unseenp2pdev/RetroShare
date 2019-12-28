@@ -4941,7 +4941,7 @@ void RsGxsNetService::sharePublishKeysPending()
         return ;
 
 #ifdef NXS_NET_DEBUG_3
-    GXSNETDEBUG___ << "RsGxsNetService::sharePublishKeys()  " << (void*)this << std::endl;
+    GXSNETDEBUG___ << "RsGxsNetService::sharePublishKeysPending()  " << (void*)this << std::endl;
 #endif
     // get list of peers that are online
 
@@ -5001,7 +5001,7 @@ void RsGxsNetService::sharePublishKeysPending()
 
         if(grpMeta == NULL)
         {
-            std::cerr << "(EE) RsGxsNetService::sharePublishKeys() Publish keys cannot be found for group " << mit->first << std::endl;
+            std::cerr << "(EE) RsGxsNetService::sharePublishKeysPending() Publish keys cannot be found for group " << mit->first << std::endl;
             continue ;
         }
 
@@ -5019,7 +5019,7 @@ void RsGxsNetService::sharePublishKeysPending()
 
         if(!publish_key_found)
         {
-            std::cerr << "(EE) no publish key in group " << mit->first << ". Cannot share!" << std::endl;
+            std::cerr << "sharePublishKeysPending(): (EE) no publish key in group " << mit->first << ". Cannot share!" << std::endl;
             continue ;
         }
 
@@ -5084,7 +5084,7 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 
 	const RsGxsGrpMetaData *grpMeta = grpMetaMap[item->grpId] ;
 	if (!grpMeta) {
-		std::cerr << "(EE) RsGxsNetService::handleRecvPublishKeys() grpMeta not found." << std::endl;
+        std::cerr << "handleRecvPublishKeys: (EE) RsGxsNetService::handleRecvPublishKeys() grpMeta not found." << std::endl;
 		return ;
 	}
 
@@ -5103,21 +5103,21 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 
 	if(!(!admin && publi))
 	{
-		std::cerr << "  Key is not a publish private key. Discarding!" << std::endl;
+        std::cerr << "handleRecvPublishKeys:  Key is not a publish private key. Discarding!" << std::endl;
 		return ;
 	}
 	// Also check that we don't already have full keys for that group.
 
 	if(grpMeta->keys.public_keys.find(item->private_key.keyId) == grpMeta->keys.public_keys.end())
 	{
-		std::cerr << "   (EE) Key not found in known group keys. This is an inconsistency." << std::endl;
+        std::cerr << "handleRecvPublishKeys:   (EE) Key not found in known group keys. This is an inconsistency." << std::endl;
 		return ;
 	}
 
 	if(grpMeta->keys.private_keys.find(item->private_key.keyId) != grpMeta->keys.private_keys.end())
 	{
 #ifdef NXS_NET_DEBUG_3
-		GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "   (EE) Publish key already present in database. Discarding message." << std::endl;
+        GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "RsGxsNetService::handleRecvPublishKeys:   (EE) Publish key already present in database. Discarding message." << std::endl;
 #endif
         //mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
 		return ;
@@ -5133,13 +5133,14 @@ void RsGxsNetService::handleRecvPublishKeys(RsNxsGroupPublishKeyItem *item)
 	if(ret)
 	{
 #ifdef NXS_NET_DEBUG_3
-		GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "  updated database with new publish keys." << std::endl;
+        GXSNETDEBUG_PG(item->PeerId(),item->grpId)<< "handleRecvPublishKeys():  updated database with new publish keys." << std::endl;
 #endif
         mNewPublishKeysToNotify.insert(std::make_pair(item->grpId,item->PeerId())) ;
+        //clear database cache for this groupId
 	}
 	else
 	{
-		std::cerr << "(EE) could not update database. Something went wrong." << std::endl;
+        std::cerr << "RsGxsNetService::handleRecvPublishKeys: (EE) could not update database. Something went wrong." << std::endl;
 	}
 }
 

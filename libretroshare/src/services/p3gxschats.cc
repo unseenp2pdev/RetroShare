@@ -422,76 +422,78 @@ void p3GxsChats::notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeer
     std::cerr << "p3GxsChats::notifyReceivePublishKey() : groupId"<<grpId << " and PeerId: "<< peerid<< std::endl;
 #endif
 
-    // Get the meta data for this group Id
-    //
-//    RsGxsGrpMetaTemporaryMap grpMetaMap;
-//    grpMetaMap[grpId] = NULL;
-//    mDataStore->retrieveGxsGrpMetaData(grpMetaMap);
+    shareKeyBouncePending.push_back(std::make_pair(grpId,peerid));
+    //bouncing publish key..in futue, change public group policy that no need to share publish key.
 
-//    const RsGxsGrpMetaData *grpMeta = grpMetaMap[grpId] ;
-//    if (!grpMeta) {
-//        std::cerr << "(EE) p3GxsChats::notifyReceivePublishKey() grpMeta not found." << std::endl;
-//        return ;
-//    }
-
-
-    auto mit = grpMembers.find(grpId);
-    if (mit == grpMembers.end()) //does nothing if group is not there to share publish permission.
-        return;
-
-    std::map<RsGxsGroupId, RsGroupMetaData>::iterator it;
-    it = mSubscribedGroups.find(grpId);
-
-    if(it == mSubscribedGroups.end())
-        return;
-
-    RsGroupMetaData grpMeta = it->second;
-
-    ChatInfo cinfo = mit->second;
-    std::list<GxsChatMember> friendList = cinfo.second;
-    RsPeerId sender = peerid;
-    std::list<GxsChatMember> sendList;
-    std::set<RsPeerId> tempSendList;
-
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::notifyReceivePublishKey() : sender PeerId: "<<sender << " and friendList Size: "<< friendList.size()<< std::endl;
-#endif
-
-    switch(cinfo.first){
-    case RsGxsChatGroup::CHANNEL:
-    case RsGxsChatGroup::ONE2ONE:
-        std::cerr <<"ONE2ONE || CHANNEL will not reshare publish key to others"<<std::endl;
-        break;  //drop, no bouncing off
-    case RsGxsChatGroup::GROUPCHAT:
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::notifyReceivePublishKey() : GROUPCHAT  : "<< cinfo.first<< std::endl;
-#endif
-        if (grpMeta.mCircleType ==GXS_CIRCLE_TYPE_PUBLIC){
-            std::list<RsPeerId> ids;
-            //ids.remove(sender);
-            rsPeers->getOnlineList(ids);
-            for(auto id=ids.begin(); id !=ids.end(); id++){
-                if(*id == sender || *id == ownChatId->chatPeerId){
-                    //don't add to the sendlist.
-                    continue;
-                }else{
-                    std::cerr <<"Adding PeerId:"<<*(id)<<std::endl;
-                    tempSendList.insert(*id);
-                }
-            }
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::notifyReceivePublishKey() : Only Reshare the publish key with public GroupChat : "<< cinfo.first<< std::endl;
-#endif
-        }//public group.
-
-   }//end of switch statement
-
-   if(!tempSendList.empty()){
-        for(auto it=tempSendList.begin(); it !=tempSendList.end(); it++)
-            std::cerr <<"Send to PeerId:"<<*it <<std::endl;
-       groupShareKeys(grpId,tempSendList);
-    }
 }
+void p3GxsChats::handleBounceShareKey(){
+
+    RS_STACK_MUTEX(mChatMtx) ;
+
+    if (shareKeyBouncePending.empty())
+        return; //no new share key.
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::handleBounceShareKey() "<< std::endl;
+#endif
+
+    for(auto it = shareKeyBouncePending.begin(); it !=shareKeyBouncePending.end(); it++){
+        RsGxsGroupId grpId = it->first;
+        RsPeerId sender = it->second;
+
+        auto mit = grpMembers.find(grpId);
+        if (mit == grpMembers.end()) //does nothing if group is not there to share publish permission.
+            continue;
+
+        std::map<RsGxsGroupId, RsGroupMetaData>::iterator sit;
+        sit = mSubscribedGroups.find(grpId);
+
+        if(sit == mSubscribedGroups.end())
+            continue; //group is not yet subscribe...no share the key.
+
+        RsGroupMetaData grpMeta = sit->second;
+        if(grpMeta.mCircleType !=GXS_CIRCLE_TYPE_PUBLIC)
+            continue; //skip reshare if the group is private.
+
+        ChatInfo cinfo = mit->second;
+        std::list<GxsChatMember> friendList = cinfo.second;
+        std::set<RsPeerId> tempSendList;
+        std::list<RsPeerId> ids;
+        //ids.remove(sender);
+        rsPeers->getOnlineList(ids);
+        for(auto id=ids.begin(); id !=ids.end(); id++){
+            if(*id == sender || *id == ownChatId->chatPeerId){
+                //don't add to the sendlist.
+                continue;
+            }else{
+                std::cerr <<"Adding PeerId:"<<*(id)<<std::endl;
+                tempSendList.insert(*id);
+            }
+        }
+
+        switch(cinfo.first){
+            case RsGxsChatGroup::CHANNEL:
+            case RsGxsChatGroup::ONE2ONE: break;  //drop, no bouncing off
+            case RsGxsChatGroup::GROUPCHAT:
+#ifdef GXSCHATS_DEBUG
+        std::cerr << "p3GxsChats::notifyReceivePublishKey() : GROUPCHAT  : "<< cinfo.first<< std::endl;
+#endif
+        if(!tempSendList.empty()){
+#ifdef GXSCHATS_DEBUG
+             for(auto it=tempSendList.begin(); it !=tempSendList.end(); it++)
+                 std::cerr <<"Send to PeerId:"<<*it <<std::endl;
+#endif
+            groupShareKeys(grpId,tempSendList);
+         }
+
+       }//end of switch statement
+
+    }//END FOR LOOP
+
+    shareKeyBouncePending.clear();
+}
+
+
 bool p3GxsChats::toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grp ){
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::toChatGroup()  : " << std::endl;
@@ -537,7 +539,6 @@ void p3GxsChats::processRecvBounceGroup(){
         bool isNew = it->second;
         RsGxsGroupId grpId = bounceGrp->grpId;
         //check to see if the group is already exist on the conversationlist.
-        RsGxsChatGroupItem* grpItem=NULL;
 
         RsTlvBinaryData& data = bounceGrp->grp;
         RsItem* item = NULL;
@@ -548,14 +549,10 @@ void p3GxsChats::processRecvBounceGroup(){
             continue;
         }
         RsGxsGrpItem* gItem = dynamic_cast<RsGxsGrpItem*>(item);
+        RsGxsChatGroupItem* grpItem = dynamic_cast<RsGxsChatGroupItem*>(gItem);
 
-        if(!gItem)
-            continue;
-
-        if (bounceGrp->metaData !=NULL)
-            gItem->meta = *(bounceGrp->metaData);
-
-        grpItem = dynamic_cast<RsGxsChatGroupItem*>(gItem);
+        std::cerr <<"Group Circle ID:"<<grpItem->meta.mCircleId<<std::endl;
+        std::cerr <<"Group CircleType:"<<grpItem->meta.mCircleType<<std::endl;
 
         auto mit = grpMembers.find(grpId);
         if (mit == grpMembers.end() && isNew){
@@ -857,6 +854,7 @@ static  rstime_t last_dummy_tick = 0;
 
     processRecvBounceGroup();
     processRecvBounceMessage();
+    handleBounceShareKey();
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();

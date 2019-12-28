@@ -95,6 +95,7 @@ protected:
 
 
     virtual void notifyReceivePublishKey(const RsGxsGroupId &grpId, const RsPeerId &peerid);
+    virtual void handleBounceShareKey();
     virtual void processRecvBounceGroup();
     virtual void processRecvBounceMessage();
 
@@ -286,6 +287,7 @@ bool generateGroup(uint32_t &token, std::string groupName);
     void loadChatsMembers(RsGxsChatGroup &grp);
     std::vector<std::pair<RsNxsGrp*,bool>> groupBouncePending;
     std::vector<std::pair<RsNxsMsg*, bool>> messageBouncePending;
+    std::vector<std::pair<RsGxsGroupId,RsPeerId>> shareKeyBouncePending;
     bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
     RsGeneralDataService* mDataStore;
 
