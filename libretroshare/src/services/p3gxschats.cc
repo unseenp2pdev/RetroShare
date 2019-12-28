@@ -75,6 +75,7 @@ p3GxsChats::p3GxsChats(RsGeneralDataService *gds, RsNetworkExchangeService *nes,
     mChatSrv(NULL),
     mSerialiser(new RsGxsChatSerialiser()),
     mDataStore(gds),
+    ownChatId(NULL),
     mChatMtx("GxsChat Mutex")
 {
     // For Dummy Msgs.
@@ -207,6 +208,7 @@ bool p3GxsChats::loadList(std::list<RsItem *>& loadList)
     return true;
 }
 void p3GxsChats::initChatId(){
+
     if(ownChatId == NULL && rsIdentity!=NULL && rsPeers !=NULL ){
 
         ownChatId = new GxsChatMember();
@@ -232,6 +234,7 @@ void p3GxsChats::initChatId(){
         ownChatId->chatinfo["shareInviteUrl"]=shareInviteUrl;
 
     }
+
 }
 
 RsSerialiser* p3GxsChats::setupSerialiser()
@@ -1434,16 +1437,15 @@ bool p3GxsChats::createGroup(uint32_t &token, RsGxsChatGroup &group)
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::createGroup()" << std::endl;
 #endif
-    if(ownChatId==NULL);
-        this->initChatId();
-
-    if(group.members.empty()){
-        group.type = RsGxsChatGroup::GROUPCHAT;
-        group.members.push_back(*ownChatId);
-    }
 
     RsGxsChatGroupItem* grpItem = new RsGxsChatGroupItem();
     grpItem->fromChatGroup(group, true);
+
+    if(grpItem->members.empty() && ownChatId !=NULL ){
+        GxsChatMember myself =*ownChatId;
+        grpItem->type = RsGxsChatGroup::GROUPCHAT;
+        grpItem->members.push_front(myself);
+    }
 
     RsGenExchange::publishGroup(token, grpItem);
     return true;
@@ -1458,15 +1460,6 @@ bool p3GxsChats::updateGroup(uint32_t &token, RsGxsChatGroup &group)
 
     RsGxsChatGroupItem* grpItem = new RsGxsChatGroupItem();
     grpItem->fromChatGroup(group, true);
-
-    grpMembers[group.mMeta.mGroupId]= make_pair(group.type,group.members);
-
-#ifdef GXSCHATS_DEBUG
-    std::cerr <<"Print all memberlist from this update group:"<<std::endl;
-    for(auto it=group.members.begin(); it !=group.members.end(); it++){
-        std::cerr << "chatPeerId:"<< it->chatPeerId<< "Username: "<<it->nickname<< std::endl;
-    }
-#endif
 
     RsGenExchange::updateGroup(token, grpItem);
     return true;

@@ -55,7 +55,7 @@ bool RsGxsChatGroupItem::fromChatGroup(RsGxsChatGroup &group, bool moveImage)
     meta = group.mMeta;
     mDescription = group.mDescription;
     type=group.type;
-    members=group.members;
+    members = group.members;
 
     if (moveImage)
     {

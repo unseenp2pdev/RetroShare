@@ -61,12 +61,12 @@ class GxsChatMember: RsSerializable
         RS_SERIAL_PROCESS(chatGxsId);
         RsTypeSerializer::serial_process<std::string,std::string>(j,ctx,chatinfo,"chatinfo");
     }
-    GxsChatMember operator=(const GxsChatMember &member){
+
+    void operator=(const GxsChatMember &member){
         nickname    = member.nickname;
         chatPeerId  = member.chatPeerId;
         chatGxsId   = member.chatGxsId;
         chatinfo    = member.chatinfo;
-        return *this;
     }
     bool operator==(const GxsChatMember& comp ) const
     {
