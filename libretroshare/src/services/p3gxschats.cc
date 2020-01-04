@@ -582,6 +582,12 @@ void p3GxsChats::processRecvBounceGroup(){
             }//end switch
         }
         else if(!isNew){
+
+            std::map<RsGxsGroupId, RsGroupMetaData>::iterator git;
+            git = mSubscribedGroups.find(bounceGrp->grpId);
+            if(git !=mSubscribedGroups.end() ){
+                continue;
+            }
             //exist on the list. Look up the conversation type. probably an Group Update. Send only to memberlist.
             ChatInfo cinfo = mit->second;
             RsGxsGroupId grpId = bounceGrp->grpId;
