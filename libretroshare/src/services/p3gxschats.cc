@@ -928,6 +928,34 @@ void p3GxsChats::loadChatsMembers(RsGxsChatGroup &grp){
 
 
 }
+bool p3GxsChats::acceptNewMessage(const RsGxsMsgMetaData* grpMeta,uint32_t size)
+{
+
+    RsGxsGroupId grpId = grpMeta->mGroupId;
+    RsGxsMessageId msgId = grpMeta->mMsgId;
+
+    std::map<RsGxsGroupId, RsGroupMetaData>::iterator grpit;
+    grpit = mSubscribedGroups.find(grpId);
+    if(grpit == mSubscribedGroups.end() ){
+           return false; //drop this message if it's not belong to any subscribed group
+     }
+
+    //look up message with GroupId and MsgId
+    RsGxsGrpMsgIdPair grpMsgPair=std::make_pair(grpId,msgId);
+
+    auto found = messageCache.find(grpMsgPair);
+    if(found !=messageCache.end() && found->second == size){
+        //size is equal to existence message, then it's false.
+        std::cerr << "Message is already exist! msgId: "<<msgId << " and GroupId: "<<grpId<<std::endl;
+        return false;
+    }else{
+        RS_STACK_MUTEX(mChatMtx);
+        messageCache.insert(std::make_pair(grpMsgPair, size));
+    }
+    return true;
+}
+
+
 bool p3GxsChats::groupShareKeys(
         const RsGxsGroupId &groupId, const std::set<RsPeerId>& peers )
 {
@@ -959,6 +987,14 @@ bool p3GxsChats::getPostData(const uint32_t &token, std::vector<RsGxsChatMsg> &m
                     RsGxsChatMsg msg;
                     postItem->toChatPost(msg, true);
                     msgs.push_back(msg);
+                    RsGxsGrpMsgIdPair GrpMsgPair = std::make_pair(postItem->meta.mGroupId, postItem->meta.mMsgId);
+                    uint32_t size = mSerialiser->size(*vit) ;
+                    {
+                        RS_STACK_MUTEX(mChatMtx);
+                        //messageCache[pair] =msg.mSize;
+                        messageCache.insert(std::make_pair(GrpMsgPair, size));
+
+                    }
                     delete postItem;
                 }
                 else

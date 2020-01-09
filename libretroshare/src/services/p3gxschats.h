@@ -128,6 +128,16 @@ virtual bool updateGroup(uint32_t &token, RsGxsChatGroup &group);
 
 virtual bool getOwnMember(GxsChatMember &member);
 
+    /*!
+     * \brief acceptNewMessage
+     * 		Early checks if the message can be accepted. This is mainly used to check wether the group is for instance overloaded and the service wants
+     * 		to put limitations to it.
+     * 		Returns true unless derived in GXS services.
+     *
+     * \param grpMeta Group metadata to check
+     * \return
+     */
+    virtual bool acceptNewMessage(const RsGxsMsgMetaData* grpMeta, uint32_t size );
 
 
     /// @see RsGxsChannels::turtleSearchRequest
@@ -290,7 +300,7 @@ bool generateGroup(uint32_t &token, std::string groupName);
     std::vector<std::pair<RsGxsGroupId,RsPeerId>> shareKeyBouncePending;
     bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
     RsGeneralDataService* mDataStore;
-
+    std::map<RsGxsGrpMsgIdPair, user_size_t> messageCache;
 
 };
 

@@ -2935,7 +2935,7 @@ void RsGenExchange::processRecvdMessages()
 					delete meta;
 			}
 
-			bool accept_new_msg = msg->metaData != NULL && acceptNewMessage(msg->metaData,msg->msg.bin_len);
+            bool accept_new_msg = msg->metaData != NULL && acceptNewMessage(msg->metaData,msg->msg.bin_len );
 
 			if(!accept_new_msg)
 				messages_to_reject.push_back(msg->metaData->mMsgId); // This prevents reloading the message again at next sync.
@@ -3117,6 +3117,7 @@ void RsGenExchange::processRecvdMessages()
 
 bool RsGenExchange::acceptNewGroup(const RsGxsGrpMetaData* /*grpMeta*/ ) { return true; }
 bool RsGenExchange::acceptNewMessage(const RsGxsMsgMetaData* /*grpMeta*/,uint32_t /*size*/ ) { return true; }
+
 
 void RsGenExchange::processRecvdGroups()
 {
