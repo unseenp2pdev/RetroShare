@@ -300,7 +300,7 @@ bool generateGroup(uint32_t &token, std::string groupName);
     std::vector<std::pair<RsGxsGroupId,RsPeerId>> shareKeyBouncePending;
     bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
     RsGeneralDataService* mDataStore;
-    std::map<RsGxsGrpMsgIdPair, user_size_t> messageCache;
+    std::map<RsGxsGrpMsgIdPair, uint32_t> messageCache;
 
 };
 
