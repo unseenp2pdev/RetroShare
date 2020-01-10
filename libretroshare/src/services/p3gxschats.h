@@ -81,6 +81,8 @@ protected:
 
     virtual void receiveNewChatMesesage(std::vector<GxsNxsChatMsgItem*>& messages);
     virtual void receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups);
+    virtual void receiveNotifyMessages(std::vector<RsNxsNotifyChat*>& notifyMessages);
+
     virtual void notifyReceiveChatInvite(const RsGxsGroupId &grpId) {}
     virtual void notifyReceiveChatPublishKey(const RsGxsGroupId &grpId) {}
     virtual void notifyChangedChatGroupStats(const RsGxsGroupId &grpId) {}
@@ -98,6 +100,10 @@ protected:
     virtual void handleBounceShareKey();
     virtual void processRecvBounceGroup();
     virtual void processRecvBounceMessage();
+    virtual void processRecvBounceNotify();
+    virtual void processRecvBounceNotifyClear();
+    virtual void publishBounceNotifyMessage(RsNxsNotifyChat * notifyMsg);
+    virtual void publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::string,std::string> &command);
 
 virtual void notifyChanges(std::vector<RsGxsNotify*>& changes);
 
@@ -298,9 +304,10 @@ bool generateGroup(uint32_t &token, std::string groupName);
     std::vector<std::pair<RsNxsGrp*,bool>> groupBouncePending;
     std::vector<std::pair<RsNxsMsg*, bool>> messageBouncePending;
     std::vector<std::pair<RsGxsGroupId,RsPeerId>> shareKeyBouncePending;
-    bool toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grpItem );
     RsGeneralDataService* mDataStore;
     std::map<RsGxsGrpMsgIdPair, uint32_t> messageCache;
+    std::map<RsNxsNotifyChat*, rstime_t> notifyMsgCache;
+    std::map<uint32_t, rstime_t> already_notifyMsg;
 
 };
 

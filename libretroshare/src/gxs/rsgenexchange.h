@@ -273,6 +273,9 @@ public:
      */
     virtual bool acceptNewMessage(const RsGxsMsgMetaData* /*grpMeta*/,uint32_t /*size*/ );
 
+    virtual void receiveNewChatMesesages(std::vector<RsNxsMsg*>& messages) {}
+
+    virtual void receiveNotifyMessages(std::vector<RsNxsNotifyChat*>& notifyMessages){}
 
     bool subscribeToGroup(uint32_t& token, const RsGxsGroupId& grpId, bool subscribe);
 

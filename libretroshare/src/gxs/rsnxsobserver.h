@@ -68,7 +68,8 @@ public:
     virtual void notifyChangedGroupStats(const RsGxsGroupId &grpId) = 0;
 
 
-
+    virtual void receiveNewChatMesesages(std::vector<RsNxsMsg*>& messages) = 0;
+    virtual void receiveNotifyMessages(std::vector<RsNxsNotifyChat*>& notifyMessages) = 0;
 
 
 };

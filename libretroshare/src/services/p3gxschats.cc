@@ -496,31 +496,6 @@ void p3GxsChats::handleBounceShareKey(){
     shareKeyBouncePending.clear();
 }
 
-
-bool p3GxsChats::toChatGroup(RsGxsChatGroup &group, RsNxsGrp *grp ){
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::toChatGroup()  : " << std::endl;
-#endif
-    //new group just received. We have to deserialized to find out what type of conversation (ONE2ONE, GROUP, or CHANNEL)
-    RsTlvBinaryData& data = grp->grp;
-    RsItem* item = NULL;
-    if(data.bin_len != 0)
-        item = mSerialiser->deserialise(data.bin_data, &data.bin_len);
-
-    if(item){
-        RsGxsGrpItem* gItem = dynamic_cast<RsGxsGrpItem*>(item);
-        if (gItem){
-            gItem->meta = *(grp->metaData);
-        }
-
-        RsGxsChatGroupItem* grpItem = dynamic_cast<RsGxsChatGroupItem*>(gItem);
-        if(grpItem) {
-            grpItem->toChatGroup(group, true);
-            return true;
-        }
-    }
-    return false;
-}
 void p3GxsChats::processRecvBounceGroup(){
 
     RS_STACK_MUTEX(mChatMtx) ;
@@ -735,6 +710,138 @@ void p3GxsChats::processRecvBounceMessage(){
     messageBouncePending.clear();
 }
 
+void p3GxsChats::processRecvBounceNotify(){
+   if(notifyMsgCache.empty())
+        return;
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceNotify()  : " << std::endl;
+#endif
+    RS_STACK_MUTEX(mChatMtx) ;
+    p3Notify *notify = RsServer::notify();
+
+    for(auto it = notifyMsgCache.begin(); it !=notifyMsgCache.end(); ){
+        RsNxsNotifyChat *msgnotify = it->first;
+        rstime_t ts = it->second;
+        RsGxsPersonPair personIdPair = msgnotify->sendFrom.first;
+        std::string personName = msgnotify->sendFrom.second;
+        //username|RsPeerId|GxsId
+        std::string sender = personName + "|" + personIdPair.first.toStdString() + + "|" + personIdPair.second.toStdString();
+        //command type:argument, chatStatus:typing... audio_call:ICEINFO, ...
+        std::string command = msgnotify->command.first + ":" + msgnotify->command.second;
+        //send notification to application and GUI Layer.
+        notify->AddFeedItem(RS_FEED_ITEM_CHATS_NOTIFY, msgnotify->grpId.toStdString(), sender,command);
+        //bounce this message if it's groupchat public/private only.
+        //channel and one2one will not bounce notification messages.
+        publishBounceNotifyMessage(msgnotify);
+        //delete notification cache.
+        it = notifyMsgCache.erase(it);
+    }
+}
+
+void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::string,std::string> &command){
+
+    auto sit = mSubscribedGroups.find(grpId);
+    if(sit == mSubscribedGroups.end())
+        return; //group is not yet subscribe...no share the key
+
+    auto mit = grpMembers.find(grpId);
+    if (mit == grpMembers.end())
+        return;
+
+    RsNxsNotifyChat *notifyMsg = new RsNxsNotifyChat(RS_SERVICE_GXS_TYPE_CHATS);
+    RsGxsPersonPair personIdPair=std::make_pair(ownChatId->chatPeerId,ownChatId->chatGxsId);
+    notifyMsg->sendFrom=std::make_pair(personIdPair,ownChatId->nickname);
+    notifyMsg->grpId = grpId;
+    notifyMsg->msgId = RSRandom::random_u32(); //randomID
+
+    {
+        RS_STACK_MUTEX(mChatMtx) ;
+        already_notifyMsg.insert(std::make_pair(notifyMsg->msgId, time(NULL)));
+        //prevent bounce back messages.
+    }
+
+    ChatInfo cinfo = mit->second;
+     //one2one or channel notification, drop off, final destination!
+    switch(cinfo.first){
+        case RsGxsChatGroup::CHANNEL:  break;  //drop, no bouncing off
+        case RsGxsChatGroup::ONE2ONE:
+        case RsGxsChatGroup::GROUPCHAT:
+
+        RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+        RsGroupMetaData grpMeta = sit->second;
+        if(grpMeta.mCircleType ==GXS_CIRCLE_TYPE_PUBLIC){
+                //publicgroup with all user onlines. all online friends + groupMembership added & except the sender.
+                std::list<RsPeerId> ids;
+                rsPeers->getOnlineList(ids);
+                //or notifyMsg.
+                netService->PublishChatNotify(notifyMsg, ids);
+            }
+            else{
+                //privateGroup. sending to only membership, except the sender.
+            }
+     }//send switch
+
+
+}
+void p3GxsChats::publishBounceNotifyMessage(RsNxsNotifyChat * notifyMsg){
+    if(notifyMsg ==NULL)
+        return;
+
+    auto mit = grpMembers.find(notifyMsg->grpId);
+    if (mit == grpMembers.end()) return;
+
+    ChatInfo cinfo = mit->second;
+     //one2one or channel notification, drop off, final destination!
+    switch(cinfo.first){
+        case RsGxsChatGroup::ONE2ONE:  break;
+        case RsGxsChatGroup::CHANNEL:  break;  //drop, no bouncing off
+        case RsGxsChatGroup::GROUPCHAT:{
+        //std::map<RsGxsGroupId, RsGroupMetaData>::iterator sit;
+        auto sit = mSubscribedGroups.find(notifyMsg->grpId);
+        if(sit == mSubscribedGroups.end())
+            return; //group is not yet subscribe...no share the key.
+
+        RsNetworkExchangeService *netService = RsGenExchange::getNetworkExchangeService();
+        RsGroupMetaData grpMeta = sit->second;
+        if(grpMeta.mCircleType ==GXS_CIRCLE_TYPE_PUBLIC){
+                //publicgroup with all user onlines. all online friends + groupMembership added & except the sender.
+                std::list<RsPeerId> ids;
+                rsPeers->getOnlineList(ids);
+                RsPeerId sender = notifyMsg->PeerId();
+                ids.remove(sender);
+                //or notifyMsg.
+                netService->PublishChatNotify(notifyMsg, ids);
+            }
+            else{
+                //privateGroup. sending to only membership, except the sender.
+            }
+
+        }//end groupchat case
+    }//end switch
+}
+
+void p3GxsChats::processRecvBounceNotifyClear(){
+    if(already_notifyMsg.empty())
+        return;
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceNotify()  : " << std::endl;
+#endif
+    RS_STACK_MUTEX(mChatMtx) ;
+    rstime_t now = time(NULL);
+    for(auto it = already_notifyMsg.begin(); it !=already_notifyMsg.end(); ){
+        //remove all already_exist messages that is 5min old, need to expire it. Otherwise, it's growing too big!
+        if(now > it->second + 300){
+            it =already_notifyMsg.erase(it);
+        }
+        else{
+            it++;
+        }
+    }
+
+
+}
 void p3GxsChats::notifyChanges(std::vector<RsGxsNotify *> &changes)
 {
 #ifdef GXSCHATS_DEBUG
@@ -853,6 +960,7 @@ void	p3GxsChats::service_tick()
 {
 
 static  rstime_t last_dummy_tick = 0;
+static  rstime_t last_notifyClear = 0;
 
     if (time(NULL) > last_dummy_tick + 5)
     {
@@ -864,10 +972,15 @@ static  rstime_t last_dummy_tick = 0;
     processRecvBounceGroup();
     processRecvBounceMessage();
     handleBounceShareKey();
+    processRecvBounceNotify();
 
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
 
+    if( time(NULL)  > last_notifyClear + 15){
+        processRecvBounceNotifyClear(); //clear every 15 seconds.
+        last_notifyClear = time(NULL);
+    }
 }
 
 bool p3GxsChats::getGroupData(const uint32_t &token, std::vector<RsGxsChatGroup> &groups)
@@ -1548,6 +1661,22 @@ void p3GxsChats::receiveNewChatGroup(std::vector<GxsNxsChatGroupItem*>& groups){
 #ifdef GXSCHATS_DEBUG
     std::cerr << "p3GxsChats::receiveNewChatGroup()" << std::endl;
 #endif
+}
+
+void p3GxsChats::receiveNotifyMessages(std::vector<RsNxsNotifyChat*>& notifyMessages){
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::receiveNotifyMessages()" << std::endl;
+#endif
+    RS_STACK_MUTEX(mChatMtx);
+    for(auto notify:notifyMessages){
+        if( (mSubscribedGroups.find(notify->grpId) !=mSubscribedGroups.end()) &&
+                (already_notifyMsg.find(notify->msgId) == already_notifyMsg.end()) ){
+                rstime_t now = time(NULL);
+                notifyMsgCache.insert(std::make_pair(notify,now));
+                already_notifyMsg.insert(std::make_pair(notify->msgId, now ));
+        }
+        //drop the exist to prevent bouncing back messages.
+    }
 }
 
 bool p3GxsChats::createPost(uint32_t &token, RsGxsChatMsg &msg)
