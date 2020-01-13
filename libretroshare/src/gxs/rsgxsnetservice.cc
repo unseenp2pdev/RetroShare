@@ -451,6 +451,7 @@ int RsGxsNetService::tick()
 	    should_notify = should_notify || !mNewMessagesToNotify.empty() ;
 	    should_notify = should_notify || !mNewPublishKeysToNotify.empty() ;
 	    should_notify = should_notify || !mNewStatsToNotify.empty() ;
+        should_notify = should_notify || !chatMessagesToNotify.empty() ;
     }
 
     if(should_notify)
@@ -511,11 +512,14 @@ void RsGxsNetService::processObserverNotifications()
 	    mNewMessagesToNotify.clear() ;
 	    mNewStatsToNotify.clear() ;
 	    mNewPublishKeysToNotify.clear() ;
+        chatMessagesToNotify.clear();
     }
 
     if(!grps_copy.empty()) mObserver->receiveNewGroups  (grps_copy);
     if(!msgs_copy.empty()) mObserver->receiveNewMessages(msgs_copy);
-    if(!msgs_notify_copy.empty()) mObserver->receiveNotifyMessages(msgs_notify_copy);
+
+    if(!msgs_notify_copy.empty())
+        mObserver->receiveNotifyMessages(msgs_notify_copy);
 
     for(auto it(keys_copy.begin());it!=keys_copy.end();++it)
         mObserver->notifyReceivePublishKey(it->first, it->second);
@@ -4392,7 +4396,13 @@ void RsGxsNetService::handleRecvChatNotify(RsNxsNotifyChat *chatNotify){
         notifyItem->grpId=chatNotify->grpId;
         notifyItem->command = chatNotify->command;
         notifyItem->sendFrom = chatNotify->sendFrom;
+        notifyItem->msgId = chatNotify->msgId;
+
         chatMessagesToNotify.push_back(notifyItem);
+        std::cerr <<"RsGxsNetService::handleRecvChatNotify():"<<std::endl;
+        std::cerr <<"GroupId:"<<notifyItem->grpId<<" msgId:"<<notifyItem->msgId<<std::endl;
+        std::cerr <<"SendFrom: {("<<notifyItem->sendFrom.first.first.toStdString() + "," +  notifyItem->sendFrom.first.second.toStdString() + "),  " + notifyItem->sendFrom.second <<"}"<<std::endl;
+        std::cerr <<"Command: {" + notifyItem->command.first + ":" + notifyItem->command.second + "}"<<std::endl;
     }
 }
 void RsGxsNetService::handleRecvChatGroup(RsNxsGrp* grp)

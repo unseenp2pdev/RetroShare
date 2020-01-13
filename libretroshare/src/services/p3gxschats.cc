@@ -729,6 +729,10 @@ void p3GxsChats::processRecvBounceNotify(){
         std::string sender = personName + "|" + personIdPair.first.toStdString() + + "|" + personIdPair.second.toStdString();
         //command type:argument, chatStatus:typing... audio_call:ICEINFO, ...
         std::string command = msgnotify->command.first + ":" + msgnotify->command.second;
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::processRecvBounceNotify() Nofify ->Sender:"<< sender << " command:"<<command<< std::endl;
+#endif
         //send notification to application and GUI Layer.
         notify->AddFeedItem(RS_FEED_ITEM_CHATS_NOTIFY, msgnotify->grpId.toStdString(), sender,command);
         //bounce this message if it's groupchat public/private only.
@@ -740,7 +744,9 @@ void p3GxsChats::processRecvBounceNotify(){
 }
 
 void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::string,std::string> &command){
-
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishNotifyMessage()  : " << std::endl;
+#endif
     auto sit = mSubscribedGroups.find(grpId);
     if(sit == mSubscribedGroups.end())
         return; //group is not yet subscribe...no share the key
@@ -749,18 +755,32 @@ void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::s
     if (mit == grpMembers.end())
         return;
 
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishNotifyMessage()  :  found groupId: "<<grpId << std::endl;
+#endif
+
+    if(ownChatId==NULL)
+        initChatId();
+
     RsNxsNotifyChat *notifyMsg = new RsNxsNotifyChat(RS_SERVICE_GXS_TYPE_CHATS);
     RsGxsPersonPair personIdPair=std::make_pair(ownChatId->chatPeerId,ownChatId->chatGxsId);
     notifyMsg->sendFrom=std::make_pair(personIdPair,ownChatId->nickname);
     notifyMsg->grpId = grpId;
     notifyMsg->msgId = RSRandom::random_u32(); //randomID
+    notifyMsg->command = command;
+
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishNotifyMessage()  :  random msgId: "<<notifyMsg->msgId << std::endl;
+#endif
 
     {
         RS_STACK_MUTEX(mChatMtx) ;
         already_notifyMsg.insert(std::make_pair(notifyMsg->msgId, time(NULL)));
         //prevent bounce back messages.
     }
-
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishNotifyMessage()  :  add already_notifyMsg msgId: "<<notifyMsg->msgId << " time:" << time(NULL)<<std::endl;
+#endif
     ChatInfo cinfo = mit->second;
      //one2one or channel notification, drop off, final destination!
     switch(cinfo.first){
@@ -775,6 +795,11 @@ void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::s
                 std::list<RsPeerId> ids;
                 rsPeers->getOnlineList(ids);
                 //or notifyMsg.
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishNotifyMessage() sending : groupId"<<notifyMsg->grpId<<" msgId:"<< notifyMsg->msgId ;
+    std::cerr<<" sendFrom: "<<notifyMsg->sendFrom.first.first.toStdString()<< std::endl;
+    std::cerr <<"Command : {"<< notifyMsg->command.first<<", "<<notifyMsg->command.second<<"}"<< std::endl;
+#endif
                 netService->PublishChatNotify(notifyMsg, ids);
             }
             else{
@@ -788,6 +813,9 @@ void p3GxsChats::publishBounceNotifyMessage(RsNxsNotifyChat * notifyMsg){
     if(notifyMsg ==NULL)
         return;
 
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::publishBounceNotifyMessage()  : " << std::endl;
+#endif
     auto mit = grpMembers.find(notifyMsg->grpId);
     if (mit == grpMembers.end()) return;
 
@@ -812,6 +840,9 @@ void p3GxsChats::publishBounceNotifyMessage(RsNxsNotifyChat * notifyMsg){
                 ids.remove(sender);
                 //or notifyMsg.
                 netService->PublishChatNotify(notifyMsg, ids);
+#ifdef GXSCHATS_DEBUG
+    std::cerr << "p3GxsChats::PublishChatNotify: GroupId"<<notifyMsg->grpId<<" Notify's msgId:"<<notifyMsg->msgId << std::endl;
+#endif
             }
             else{
                 //privateGroup. sending to only membership, except the sender.
@@ -962,10 +993,18 @@ void	p3GxsChats::service_tick()
 static  rstime_t last_dummy_tick = 0;
 static  rstime_t last_notifyClear = 0;
 
-    if (time(NULL) > last_dummy_tick + 5)
+    if (time(NULL) > last_dummy_tick + 15)
     {
         dummy_tick();
         last_dummy_tick = time(NULL);
+
+
+//        std::pair<std::string, std::string> command;
+//        command = std::make_pair("chatstatus", "Typing");
+//        std::string hexGrpId="830e5b33f87c22088cca010e04e900f0";
+//        RsGxsGroupId grpId(hexGrpId);
+//        grpId.toStdString();
+//        publishNotifyMessage(grpId,command);
 
     }
 
