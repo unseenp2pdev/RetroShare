@@ -4399,10 +4399,13 @@ void RsGxsNetService::handleRecvChatNotify(RsNxsNotifyChat *chatNotify){
         notifyItem->msgId = chatNotify->msgId;
 
         chatMessagesToNotify.push_back(notifyItem);
+
+#ifdef NXS_NET_DEBUG_0
         std::cerr <<"RsGxsNetService::handleRecvChatNotify():"<<std::endl;
         std::cerr <<"GroupId:"<<notifyItem->grpId<<" msgId:"<<notifyItem->msgId<<std::endl;
         std::cerr <<"SendFrom: {("<<notifyItem->sendFrom.first.first.toStdString() + "," +  notifyItem->sendFrom.first.second.toStdString() + "),  " + notifyItem->sendFrom.second <<"}"<<std::endl;
         std::cerr <<"Command: {" + notifyItem->command.first + ":" + notifyItem->command.second + "}"<<std::endl;
+#endif
     }
 }
 void RsGxsNetService::handleRecvChatGroup(RsNxsGrp* grp)
