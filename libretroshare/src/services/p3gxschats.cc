@@ -985,12 +985,12 @@ static  rstime_t last_notifyClear = 0;
         last_dummy_tick = time(NULL);
 
 
-        std::pair<std::string, std::string> command;
-        command = std::make_pair("chatstatus", "Typing");
-        std::string hexGrpId="830e5b33f87c22088cca010e04e900f0";
-        RsGxsGroupId grpId(hexGrpId);
-        grpId.toStdString();
-        publishNotifyMessage(grpId,command);
+//        std::pair<std::string, std::string> command;
+//        command = std::make_pair("chatstatus", "Typing");
+//        std::string hexGrpId="830e5b33f87c22088cca010e04e900f0";
+//        RsGxsGroupId grpId(hexGrpId);
+//        grpId.toStdString();
+//        publishNotifyMessage(grpId,command);
 
     }
 
