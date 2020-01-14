@@ -714,9 +714,7 @@ void p3GxsChats::processRecvBounceNotify(){
    if(notifyMsgCache.empty())
         return;
 
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::processRecvBounceNotify()  : " << std::endl;
-#endif
+
     RS_STACK_MUTEX(mChatMtx) ;
     p3Notify *notify = RsServer::notify();
 
@@ -741,6 +739,7 @@ void p3GxsChats::processRecvBounceNotify(){
         //delete notification cache.
         it = notifyMsgCache.erase(it);
     }
+    notifyMsgCache.clear();
 }
 
 void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::string,std::string> &command){
@@ -755,10 +754,6 @@ void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::s
     if (mit == grpMembers.end())
         return;
 
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::publishNotifyMessage()  :  found groupId: "<<grpId << std::endl;
-#endif
-
     if(ownChatId==NULL)
         initChatId();
 
@@ -769,18 +764,12 @@ void p3GxsChats::publishNotifyMessage(const RsGxsGroupId &grpId,std::pair<std::s
     notifyMsg->msgId = RSRandom::random_u32(); //randomID
     notifyMsg->command = command;
 
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::publishNotifyMessage()  :  random msgId: "<<notifyMsg->msgId << std::endl;
-#endif
-
     {
         RS_STACK_MUTEX(mChatMtx) ;
         already_notifyMsg.insert(std::make_pair(notifyMsg->msgId, time(NULL)));
         //prevent bounce back messages.
     }
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::publishNotifyMessage()  :  add already_notifyMsg msgId: "<<notifyMsg->msgId << " time:" << time(NULL)<<std::endl;
-#endif
+
     ChatInfo cinfo = mit->second;
      //one2one or channel notification, drop off, final destination!
     switch(cinfo.first){
@@ -840,9 +829,6 @@ void p3GxsChats::publishBounceNotifyMessage(RsNxsNotifyChat * notifyMsg){
                 ids.remove(sender);
                 //or notifyMsg.
                 netService->PublishChatNotify(notifyMsg, ids);
-#ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::PublishChatNotify: GroupId"<<notifyMsg->grpId<<" Notify's msgId:"<<notifyMsg->msgId << std::endl;
-#endif
             }
             else{
                 //privateGroup. sending to only membership, except the sender.
@@ -857,7 +843,7 @@ void p3GxsChats::processRecvBounceNotifyClear(){
         return;
 
 #ifdef GXSCHATS_DEBUG
-    std::cerr << "p3GxsChats::processRecvBounceNotify()  : " << std::endl;
+    std::cerr << "p3GxsChats::processRecvBounceNotifyClear()  : " << std::endl;
 #endif
     RS_STACK_MUTEX(mChatMtx) ;
     rstime_t now = time(NULL);
@@ -993,7 +979,7 @@ void	p3GxsChats::service_tick()
 static  rstime_t last_dummy_tick = 0;
 static  rstime_t last_notifyClear = 0;
 
-    if (time(NULL) > last_dummy_tick + 15)
+    if (time(NULL) > last_dummy_tick + 5)
     {
         dummy_tick();
         last_dummy_tick = time(NULL);
@@ -1016,8 +1002,8 @@ static  rstime_t last_notifyClear = 0;
     RsTickEvent::tick_events();
     GxsTokenQueue::checkRequests();
 
-    if( time(NULL)  > last_notifyClear + 15){
-        processRecvBounceNotifyClear(); //clear every 15 seconds.
+    if( time(NULL)  > last_notifyClear + 60){
+        processRecvBounceNotifyClear(); //clear every 60 seconds.
         last_notifyClear = time(NULL);
     }
 }
@@ -1713,6 +1699,8 @@ void p3GxsChats::receiveNotifyMessages(std::vector<RsNxsNotifyChat*>& notifyMess
                 rstime_t now = time(NULL);
                 notifyMsgCache.insert(std::make_pair(notify,now));
                 already_notifyMsg.insert(std::make_pair(notify->msgId, now ));
+        }else{
+            std::cerr <<"Notify messageId:"<<notify->msgId <<" is already exists!"<<std::endl;
         }
         //drop the exist to prevent bouncing back messages.
     }
